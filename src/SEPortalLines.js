@@ -10,74 +10,78 @@ export class PortalLines extends React.Component {
     console.log("PortalLines constructor");
     this.RADIUS = 30;
     this.SHORT_SIDE = this.RADIUS / 2;
-    this.LONG_SIDE = SQRT_THREE * this.RADIUS /2
-        this.X_OFFSET = 0;
+    this.LONG_SIDE = SQRT_THREE * this.RADIUS /2;
+    this.X_OFFSET = 0;
     this.Y_OFFSET = 0
     this.state = {
-      sectors: props.sectors,
-      portals: props.portals,
+      galaxy: props.galaxy,
       lines: null,
       listening: false
     };
-    console.log("sectors = " + Object.keys(props.sectors));
   } 
  
   componentDidMount() {
-    var portals = this.state.portals;
-     var connections = {};
-     var lines = [];
-     var i, e;
-   for (var portal in portals) {
-     console.log("portal " + portal);
-     var p = portals[portal];
-     var sector = p.sector;
-     for (i = 0; i < p.entrances.length; i++) {
-       e = p.entrances[i];
-    console.log("entrance " + e);
-    connections[sector] = portals[e].sector;
+    var portals = this.state.galaxy.portals;
+    var sectors = this.state.galaxy.sectors;
+    var connections = {};
+    var lines = [];
+    var i, e;
+    // build map of connections among all portals
+    for (var portal in portals) {
+      console.log("portal " + portal);
+      var p = portals[portal];
+      var sector = p.sector;
+      for (i = 0; i < p.entrances.length; i++) {
+        e = p.entrances[i];
+        console.log("entrance " + e);
+        connections[sector] = portals[e].sector;
       }
-     for (i = 0; i < p.exits.length; i++) {
-       e = p.exits[i];
-         console.log("exit " + e);
+      for (i = 0; i < p.exits.length; i++) {
+        e = p.exits[i];
+        console.log("exit " + e);
         connections[portals[e].sector] = sector;
-     }
+      }
     }
+
+    // draw line for each connection
     var key = 0;
-     for (var k in connections){
-    var points = [];
-       var v = connections[k];
-         console.log("connections " + k + " -> " + v);
-      var from = this.state.sectors[k];
-      var to = this.state.sectors[v];
-         console.log("from sector = " + from);
+    for (var k in connections) {
+      var points = [];
+      var v = connections[k];
+      console.log("connections " + k + " -> " + v);
+      var from = sectors[k];
+      var to = sectors[v];
+      console.log("from sector = " + from);
       var row = from.row;
       var col = from.column;
-      
+
       var x1 = (this.getXCount(col)) * this.RADIUS + ((col % 2) * this.SHORT_SIDE) + this.X_OFFSET;
-      var y1 = ((row +1) * this.LONG_SIDE) + this.Y_OFFSET;
-       console.log("from sector x,y = " + x1 + "," + y1);
+      var y1 = ((row + 1) * this.LONG_SIDE) + this.Y_OFFSET;
+      console.log("from sector x,y = " + x1 + "," + y1);
 
       row = to.row;
       col = to.column;
       var x2 = (this.getXCount(col)) * this.RADIUS + ((col % 2) * this.SHORT_SIDE) + this.X_OFFSET;
-      var y2 = ((row +1) * this.LONG_SIDE) + this.Y_OFFSET;
+      var y2 = ((row + 1) * this.LONG_SIDE) + this.Y_OFFSET;
       points.push(x1, y1, x2, y2);
-      console.log("points = " + points);
-     var line = <Line
-       points ={ points }
-       stroke={'red'}
-         strokWdth = {2}
-       k  ey={key++}
-    />  ;
-        lines.uh(line);
-     }
-     t    s.setState({lines: lines});  
+      console.log("portal line points = " + points);
+      var line = < Line
+         points = { points }
+         stroke = { 'red' }
+         strokeWidth = { 2 }
+         key = { key++ }
+        />  ;
+      lines.push(line);
+    }
+    this.setState({
+      lines: lines
+    });
   }
  
-            tut ( column) {
-    if   (clmn < 2) {
-      re  turn column + 1;
-    }   else {
+  getXCount(column) {
+    if (column < 2) {
+      return column + 1;
+    } else {
       return this.getXCount(column - 2) + 3;
     }
   }

@@ -8,21 +8,11 @@ export class Galaxy extends React.Component {
   constructor(props) {
     super(props);
     console.log("Galaxy constructor");
-    var data = props.data;
-   var hexes = this.buildHexes(data);
+    var galaxy = props.data;
+   var hexes = this.buildHexes(galaxy);
     this.state = {
-        json:JSON.stringify(data, null, 2),
-        name:data.name,
-        adjective:data.adjective,
-        abbreviation:data.abbreviation,
-        portals:data.portals,
-        worlds:data.worlds,
-        empires:data.empire,
-        shipClasses:data.shipClasses,
-        ships:data.ships,
-        turnNumber:data.turnNumber,
-        sectors:data.sectors,
-        storms:data.storms,
+        json:JSON.stringify(galaxy, null, 2),
+        galaxy: galaxy,
         hexes:hexes,
       } 
   }
@@ -38,7 +28,7 @@ export class Galaxy extends React.Component {
     console.log("Galaxy did mount");
   }
 
-  buildHexes(data) {
+  buildHexes(galaxy) {
      var hexes = [];
     var key = 0;
     var radius = 1;
@@ -50,9 +40,9 @@ export class Galaxy extends React.Component {
     var hex;
     var hexid;  
 
-        var allSectors = data.sectors;
+    var allSectors = galaxy.sectors;
     console.log("ss = " + allSectors["0_0"].scanStatus);
-    console.log("portals = " + data.portals);
+    console.log("portals = " + galaxy.portals);
 
     for (y = radius; y >= 0; y--) {
          for (oblique = y - radius; oblique <= radius; oblique++) {
@@ -63,10 +53,10 @@ export class Galaxy extends React.Component {
               hex = <Hex 
                         key = {key++}
                         row = {row}
-                         hexid = {hexid}
+                        hexid = {hexid}
                         column = {column}
-                        sector = {allSectors[hexid]}
-                          listening = {true}
+                        galaxy = {galaxy}
+                        listening = {true}
                     />
               hexes.push(hex);    
          }
@@ -83,8 +73,8 @@ export class Galaxy extends React.Component {
                          row = {row}
                          hexid = {hexid}
                          column = {column}
-                         sector = {allSectors[hexid]}
-                          listening = {true}
+                         galaxy = {galaxy}
+                         listening = {true}
    
                     />
                hexes.push(hex);    
@@ -109,10 +99,7 @@ export class Galaxy extends React.Component {
        {this.state.hexes}
       </Layer>
       <Layer>
-        <PortalLines 
-           sectors={this.state.sectors} 
-           portals={this.state.portals}
-        /> 
+        <PortalLines galaxy={this.state.galaxy} /> 
       </Layer>
       </Stage>
     )

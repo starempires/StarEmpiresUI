@@ -17,7 +17,10 @@ export class Hex extends React.Component {
     this.SHORT_SIDE = this.RADIUS / 2;
     this.LONG_SIDE = SQRT_THREE * this.RADIUS / 2;
 
-    // console.log("Creating hex " + props.hexid);
+    var galaxy = props.galaxy;
+    var hexid = props.hexid;
+    // console.log("Creating hex " + hexid);
+    var sector = galaxy.sectors[hexid];
     //console.log("radius, short, long = " + this.RADIUS + "," + this.SHORT_SIDE + "," + this.LONG_SIDE);
     this.state = {
       row: props.row,
@@ -25,8 +28,9 @@ export class Hex extends React.Component {
       x: (this.getXCount(props.column)) * this.RADIUS + ((props.column % 2) * this.SHORT_SIDE) + this.X_OFFSET,
       y: ((props.row + 1) * this.LONG_SIDE) + this.Y_OFFSET,
 
-      sector: props.sector,
-      ships: props.ships,
+      galaxy: galaxy,
+      hexid: hexid,
+      sector: sector,
       colors: this.getColors(props),
       bgUnknownColor: props.bgUnknownColor ? props.bgUnknownColor : '#000000',
       bgStaleColor: props.bgStaleColor ? props.bgStaleColor : '#666666',
@@ -112,12 +116,9 @@ export class Hex extends React.Component {
 
   componentDidMount() {
     console.log("hex did mount");
-    // console.log("height = " + this.refs.textitem.textHeight);
-    // console.log("width = " + this.refs.textitem.textWidth);
-    // console.log("x,y = " + this.refs.textitem.x + "," + this.refs.textitem.y);
   }
 
-  sf(context) {
+  sceneFunc(context) {
 
     // var x = this.attrs.x;
     // var y = this.attrs.y;
@@ -153,12 +154,21 @@ export class Hex extends React.Component {
     var portals = sector.portals;
     if (portals) {
       console.log("hex " + sector.oblique + "," + sector.y + " portals " + Object.values(portals));
+      // if any portal collapsed, draw a smaller icon, else draw normal size
+      var angleValue = 1;
+      Object.values(portals).forEach((pname) => {
+        var portal = this.attrs.galaxy.portals[pname];
+        var collapsed = portal.collapsed;
+        if (collapsed) {
+          angleValue = 0.3;
+        }
+      });
       context.beginPath();
       context.moveTo(0, 0);
-      for (var i = 0; i < 120; i++) {
+      for (var i = 0; i < 150; i++) {
         var angle = 0.1 * i;
-        var x = 0 + (1 + 1 * angle) * Math.cos(angle);
-        var y = 0 + (1 + 1 * angle) * Math.sin(angle);
+        var x = (angleValue * angle) * Math.cos(angle);
+        var y = (angleValue * angle) * Math.sin(angle);
         context.lineTo(x, y);
       }
       context.strokeStyle = "#009900";
@@ -211,23 +221,25 @@ export class Hex extends React.Component {
     var y = this.state.y;
     var hexText = this.state.coord;
     var hexTextY = -this.RADIUS * 0.5; // this would be better based on the height of the font
-    return ( <Shape x = {x} 
-                    y = {y} 
-                    sector = {this.state.sector} 
-                    hexText = {hexText} 
-                    hexTextY = {hexTextY} 
-                    hexTextColor = { this.state.textColor }
-                    shortSide = { this.SHORT_SIDE }
-                    longSide = { this.LONG_SIDE }
-                    sides = { this.SIDES }
-                    rotation = { this.ROTATION }
-                    radius = { this.RADIUS }
-                    fill = { this.state.bgColor }
-                    sceneFunc = { this.sf }
-                    stroke = { 'black' }
-                    strokeWidth = { this.STROKE_WIDTH }
-                    onClick = { this.handleClick }
-              />
+    return ( <Shape 
+      x = { x }
+      y = { y }
+      sector = { this.state.sector }
+      galaxy = { this.state.galaxy }
+      hexText = { hexText }
+      hexTextY = { hexTextY }
+      hexTextColor = { this.state.textColor }
+      shortSide = { this.SHORT_SIDE }
+      longSide = { this.LONG_SIDE }
+      sides = { this.SIDES }
+      rotation = { this.ROTATION }
+      radius = { this.RADIUS }
+      fill = { this.state.bgColor }
+      sceneFunc = { this.sceneFunc }
+      stroke = { 'black' }
+      strokeWidth = { this.STROKE_WIDTH }
+      onClick = { this.handleClick }
+      />
     );
   }
 }
