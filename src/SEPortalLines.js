@@ -8,7 +8,7 @@ export class PortalLines extends React.Component {
    constructor(props) {
     super(props);
     console.log("PortalLines constructor");
-    this.RADIUS = 30;
+    this.RADIUS = 50;
     this.SHORT_SIDE = this.RADIUS / 2;
     this.LONG_SIDE = SQRT_THREE * this.RADIUS /2;
     this.X_OFFSET = 0;
@@ -67,7 +67,7 @@ export class PortalLines extends React.Component {
       console.log("portal line points = " + points);
       var line = < Line
          points = { points }
-         stroke = { 'red' }
+         stroke = { 'green' }
          strokeWidth = { 2 }
          key = { key++ }
         />  ;

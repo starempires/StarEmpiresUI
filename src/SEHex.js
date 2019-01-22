@@ -13,7 +13,7 @@ export class Hex extends React.Component {
     this.SIDES = 6;
     this.ROTATION = 30;
     this.STROKE_WIDTH = 1;
-    this.RADIUS = 30;
+    this.RADIUS = 50;
     this.SHORT_SIDE = this.RADIUS / 2;
     this.LONG_SIDE = SQRT_THREE * this.RADIUS / 2;
 
@@ -126,6 +126,7 @@ export class Hex extends React.Component {
     var longSide = this.attrs.longSide;
     var radius = this.attrs.radius;
     var sector = this.attrs.sector;
+    var galaxy = this.attrs.galaxy;
     // console.log("x,y= " + x + "," + y);
     // console.log("keys = " + Object.keys(this.attrs));
     // console.log("short, long = " + shortSide + "," + longSide);
@@ -140,14 +141,39 @@ export class Hex extends React.Component {
     context.rotate(0);
 
     // draw world
-    var world = sector.world;
-    if (world) {
+    var worldName = sector.world;
+    if (worldName) {
+      var size = shortSide/2;
       context.beginPath();
-      context.moveTo(0, 0)
-      context.fillStyle = '#000000';
-      context.arc(0, 0, 3, 0, 3 * Math.PI, false);
+      context.fillStyle = '#CCCCCC';
+      context.strokeStyle = '#CCCCCC';
+      context.arc(0, 0, size, 0, 2 * Math.PI, false);
       context.fill();
       context.stroke();
+      context.closePath();
+     
+      var world = galaxy.worlds[worldName];
+      // draw production
+      context.textAlign = 'center';
+      context.beginPath();
+      context.font = '14px Calibri';
+      context.strokeStyle = '#000000';
+      context.strokeText(world.production, 0, 5);
+      context.closePath();      
+
+      // draw blockade/interdiction
+      context.beginPath();
+      context.strokeStyle = '#FF0000';
+      if (world.prohibition !== undefined) {
+          context.moveTo(-shortSide, -shortSide);
+          context.lineTo(shortSide, shortSide);
+          context.stroke();
+      }
+      if (world.prohibition === 'interdicted') {
+          context.moveTo(shortSide, -shortSide);
+          context.lineTo(-shortSide, shortSide);
+          context.stroke();
+      }       
       context.closePath();
     }
 
@@ -157,7 +183,7 @@ export class Hex extends React.Component {
       // if any portal collapsed, draw a smaller icon, else draw normal size
       var angleValue = 1;
       Object.values(portals).forEach((pname) => {
-        var portal = this.attrs.galaxy.portals[pname];
+        var portal = galaxy.portals[pname];
         var collapsed = portal.collapsed;
         if (collapsed) {
           angleValue = 0.3;
