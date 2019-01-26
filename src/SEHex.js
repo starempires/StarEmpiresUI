@@ -71,8 +71,6 @@ export class Hex extends React.Component {
 
   sceneFunc(context) {
 
-    // var x = this.attrs.x;
-    // var y = this.attrs.y;
     var shortSide = this.attrs.shortSide;
     var longSide = this.attrs.longSide;
     var radius = this.attrs.radius;
@@ -133,7 +131,10 @@ export class Hex extends React.Component {
 
       var owner = world.owner;
       var worldcolor;
-      if (owner === undefined) {
+      if (scanStatus === 'stale') {
+          worldcolor = colors['staleworld'];
+      }
+      else if (owner === undefined) {
           worldcolor = colors['unowned'];
       }
       else {
@@ -177,9 +178,9 @@ export class Hex extends React.Component {
       context.moveTo(0, 0);
       for (var i = 0; i < 150; i++) {
         var angle = 0.1 * i;
-        var x = (angleValue * angle) * Math.cos(angle);
-        var y = (angleValue * angle) * Math.sin(angle);
-        context.lineTo(x, y);
+        var px = (angleValue * angle) * Math.cos(angle);
+        var py = (angleValue * angle) * Math.sin(angle);
+        context.lineTo(px, py);
       }
       context.stroke();
       context.closePath();
@@ -206,6 +207,40 @@ export class Hex extends React.Component {
     // context.strokeStyle = '#000000';
     // context.stroke();
     // context.closePath();
+
+    // draw ship dots
+    if (scanStatus === 'visible') {
+      var ships = sector.ships;
+      if (ships) {
+        var empires = Object.keys(ships).sort();
+        var num = empires.length;
+        console.log("ships %o %d", empires, num);
+        var maxdots = 6;
+        var sx = -shortSide;
+        var sy = shortSide + 2;
+        var h = 6,
+          w = 6;
+        var gap = 3;
+        for (i = 0; i < maxdots; i++) {
+          if (i === maxdots - 1 && maxdots < num) {
+            context.beginPath();
+            context.strokeStyle = colors['text'];
+            context.moveTo(sx, sy + h / 2);
+            context.lineTo(sx + w, sy + h / 2);
+            context.moveTo(sx + w / 2, sy);
+            context.lineTo(sx + w / 2, sy + h);
+            context.stroke();
+            context.closePath();
+          } else {
+            var e = empires[i];
+            context.fillStyle = colors[e]
+            context.fillRect(sx, sy, w, h);
+            sx += w + gap;
+          }
+        }
+      }
+    }
+
     context.fillStrokeShape(this);
   }
 

@@ -40,10 +40,6 @@ export class Galaxy extends React.Component {
     var hex;
     var hexid;  
 
-    var allSectors = galaxy.sectors;
-    console.log("ss = " + allSectors["0_0"].scanStatus);
-    console.log("portals = " + galaxy.portals);
-
     for (y = radius; y >= 0; y--) {
          for (oblique = y - radius; oblique <= radius; oblique++) {
               hexid = (oblique < 0 ? "n" + -oblique : oblique) + "_" + (y < 0 ? "n" + y: y);
