@@ -23,6 +23,7 @@ export class PortalLines extends React.Component {
   componentDidMount() {
     var portals = this.state.galaxy.portals;
     var sectors = this.state.galaxy.sectors;
+    var colors = this.state.galaxy.colors;
     var connections = {};
     var lines = [];
     var i, e;
@@ -48,26 +49,26 @@ export class PortalLines extends React.Component {
     for (var k in connections) {
       var points = [];
       var v = connections[k];
-      console.log("connections " + k + " -> " + v);
+      // console.log("connections " + k + " -> " + v);
       var from = sectors[k];
       var to = sectors[v];
-      console.log("from sector = " + from);
+      // console.log("from sector = " + from);
       var row = from.row;
       var col = from.column;
 
       var x1 = (this.getXCount(col)) * this.RADIUS + ((col % 2) * this.SHORT_SIDE) + this.X_OFFSET;
       var y1 = ((row + 1) * this.LONG_SIDE) + this.Y_OFFSET;
-      console.log("from sector x,y = " + x1 + "," + y1);
+      // console.log("from sector x,y = " + x1 + "," + y1);
 
       row = to.row;
       col = to.column;
       var x2 = (this.getXCount(col)) * this.RADIUS + ((col % 2) * this.SHORT_SIDE) + this.X_OFFSET;
       var y2 = ((row + 1) * this.LONG_SIDE) + this.Y_OFFSET;
       points.push(x1, y1, x2, y2);
-      console.log("portal line points = " + points);
+      // console.log("portal line points = " + points);
       var line = < Line
          points = { points }
-         stroke = { 'green' }
+         stroke = { colors['connection'] }
          strokeWidth = { 2 }
          key = { key++ }
         />  ;
