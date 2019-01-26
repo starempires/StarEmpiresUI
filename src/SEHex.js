@@ -115,6 +115,22 @@ export class Hex extends React.Component {
     var worldName = sector.world;
     if (worldName) {
       var world = galaxy.worlds[worldName];
+
+      // draw blockade/interdiction
+      context.beginPath();
+      context.strokeStyle = colors['prohibition'];
+      if (world.prohibition !== undefined) {
+          context.moveTo(-shortSide, -shortSide);
+          context.lineTo(shortSide, shortSide);
+          context.stroke();
+      }
+      if (world.prohibition === 'interdicted') {
+          context.moveTo(shortSide, -shortSide);
+          context.lineTo(-shortSide, shortSide);
+          context.stroke();
+      }       
+      context.closePath();      
+
       var owner = world.owner;
       var worldcolor;
       if (owner === undefined) {
@@ -140,21 +156,6 @@ export class Hex extends React.Component {
       context.strokeStyle = colors['text'];
       context.strokeText(world.production, 0, 5);
       context.closePath();      
-
-      // draw blockade/interdiction
-      context.beginPath();
-      context.strokeStyle = colors['prohibition'];
-      if (world.prohibition !== undefined) {
-          context.moveTo(-shortSide, -shortSide);
-          context.lineTo(shortSide, shortSide);
-          context.stroke();
-      }
-      if (world.prohibition === 'interdicted') {
-          context.moveTo(shortSide, -shortSide);
-          context.lineTo(-shortSide, shortSide);
-          context.stroke();
-      }       
-      context.closePath();
     }
 
     var portals = sector.portals;
@@ -162,15 +163,17 @@ export class Hex extends React.Component {
       // console.log("hex " + sector.oblique + "," + sector.y + " portals " + Object.values(portals));
       // if any portal collapsed, draw a smaller icon, else draw normal size
       var angleValue = 1;
+      var portalColor = colors['portal'];
       Object.values(portals).forEach((pname) => {
         var portal = galaxy.portals[pname];
         var collapsed = portal.collapsed;
         if (collapsed) {
+          portalColor = colors['collapsed'];
           angleValue = 0.3;
         }
       });
       context.beginPath();
-      context.strokeStyle = colors['portal'];
+      context.strokeStyle = portalColor;
       context.moveTo(0, 0);
       for (var i = 0; i < 150; i++) {
         var angle = 0.1 * i;
@@ -178,7 +181,6 @@ export class Hex extends React.Component {
         var y = (angleValue * angle) * Math.sin(angle);
         context.lineTo(x, y);
       }
-      console.log("portal color = " + colors['portal']);
       context.stroke();
       context.closePath();
     }
