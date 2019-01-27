@@ -83,6 +83,7 @@ export class Hex extends React.Component {
     if (scanStatus === 'visible' || scanStatus === 'scanned') {
         textColor = '#000000';
     }
+    //  console.log("sceneFunc hex " + sector.oblique + "," + sector.y);
     // console.log("x,y= " + x + "," + y);
     // console.log("keys = " + Object.keys(this.attrs));
  
@@ -209,36 +210,49 @@ export class Hex extends React.Component {
     // context.closePath();
 
     // draw ship dots
-    if (scanStatus === 'visible') {
-      var ships = sector.ships;
-      if (ships) {
-        var empires = Object.keys(ships).sort();
-        var num = empires.length;
-        console.log("ships %o %d", empires, num);
+    if (scanStatus === 'visible' || scanStatus === 'scanned') {
         var maxdots = 6;
         var sx = -shortSide;
         var sy = shortSide + 2;
-        var h = 6,
-          w = 6;
+        var h = 6, w = 6;
         var gap = 3;
-        for (i = 0; i < maxdots; i++) {
-          if (i === maxdots - 1 && maxdots < num) {
+        var start = 0;
+        if (sector.unidentifiedShipCount > 0) {
             context.beginPath();
-            context.strokeStyle = colors['text'];
-            context.moveTo(sx, sy + h / 2);
-            context.lineTo(sx + w, sy + h / 2);
-            context.moveTo(sx + w / 2, sy);
-            context.lineTo(sx + w / 2, sy + h);
+            context.strokeStyle = colors['unidentified'];
+            context.moveTo(sx, sy);
+            context.lineTo(sx + w, sy + h);
+            context.moveTo(sx + w, sy);
+            context.lineTo(sx, sy + h);
+            context.rect(sx, sy, w, h);
             context.stroke();
             context.closePath();
-          } else {
-            var e = empires[i];
-            context.fillStyle = colors[e]
-            context.fillRect(sx, sy, w, h);
+            start = 1;   
             sx += w + gap;
+        }
+        var ships = sector.ships;
+        if (ships) {
+          var empires = Object.keys(ships).sort();
+          var num = empires.length;
+          var end = Math.min(num + 1, maxdots);
+          for (i = start; i < end; i++) {
+            if (i === maxdots - 1 && maxdots < num) {
+              context.beginPath();
+              context.strokeStyle = colors['text'];
+              context.moveTo(sx, sy + h / 2);
+              context.lineTo(sx + w, sy + h / 2);
+              context.moveTo(sx + w / 2, sy);
+              context.lineTo(sx + w / 2, sy + h);
+              context.stroke();
+              context.closePath();
+            } else {
+              var e = empires[i];
+              context.fillStyle = colors[e]
+              context.fillRect(sx, sy, w, h);
+              sx += w + gap;
+            }
           }
         }
-      }
     }
 
     context.fillStrokeShape(this);
