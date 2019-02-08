@@ -17,8 +17,8 @@ export class Hex extends React.Component {
 
     var galaxy = props.galaxy;
     var hexid = props.hexid;
-    console.log("Creating hex " + hexid);
     var sector = galaxy.sectors[hexid];
+    console.log("Creating hex " + hexid + ", sector " + sector.oblique + "," + sector.y);
     //console.log("radius, short, long = " + this.RADIUS + "," + this.SHORT_SIDE + "," + this.LONG_SIDE);
     this.state = {
       row: props.row,
@@ -45,6 +45,28 @@ export class Hex extends React.Component {
       return this.getXCount(column - 2) + 3;
     }
   }
+
+  handleMouseEnter = (e) => {
+    var sector = this.state.sector;
+    var coordText = sector.oblique + "," + sector.y;
+    console.log("hex enter " + coordText);
+
+    // var x = this.state.x;
+    // var y = this.state.y;
+    // this.refs.tooltip.position({
+    //   x: x + 5,
+    //   y: y + 5
+    // });
+    // this.refs.tooltip.text(JSON.stringify(this.state.coord));
+    // console.log(JSON.stringify(this.refs.tooltip));
+    // this.refs.tooltip.show();
+  } 
+
+  handleMouseOut = (e) => {
+    var sector = this.state.sector;
+    var coordText = sector.oblique + "," + sector.y;
+    console.log("hex leave " + coordText);
+  }  
 
   handleHexMouseMove(event) {
     var x = this.state.x;
@@ -102,6 +124,7 @@ export class Hex extends React.Component {
     context.closePath();
     context.stroke();
     context.fill();
+    context.fillStrokeShape(this);
     
     // draw coords
     var coordText = sector.oblique + "," + sector.y;
@@ -255,7 +278,6 @@ export class Hex extends React.Component {
         }
     }
 
-    context.fillStrokeShape(this);
   }
 
   render() {
@@ -274,9 +296,9 @@ export class Hex extends React.Component {
       longSide = { this.LONG_SIDE }
       radius = { this.RADIUS }
       sceneFunc = { this.sceneFunc }
-      // stroke = { 'black' }
-      // strokeWidth = { this.STROKE_WIDTH }
       onClick = { this.handleClick }
+      onMouseEnter = { this.handleMouseEnter }
+      onMouseOut = { this.handleMouseOut }
       />
     );
   }
