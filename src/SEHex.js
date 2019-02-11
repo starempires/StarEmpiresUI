@@ -29,6 +29,8 @@ export class Hex extends React.Component {
       galaxy: galaxy,
       hexid: hexid,
       sector: sector,
+      mouseEnterFn: props.mouseEnterFn,
+      mouseOutFn: props.mouseOutFn
     };
     //console.log("(" +JSON.stringify(this.state.coord) + ") -> row,column = " +
     //             this.state.row+"," + this.state.column + " -> x,y= " +
@@ -50,16 +52,6 @@ export class Hex extends React.Component {
     var sector = this.state.sector;
     var coordText = sector.oblique + "," + sector.y;
     console.log("hex enter " + coordText);
-
-    // var x = this.state.x;
-    // var y = this.state.y;
-    // this.refs.tooltip.position({
-    //   x: x + 5,
-    //   y: y + 5
-    // });
-    // this.refs.tooltip.text(JSON.stringify(this.state.coord));
-    // console.log(JSON.stringify(this.refs.tooltip));
-    // this.refs.tooltip.show();
   } 
 
   handleMouseOut = (e) => {
@@ -285,6 +277,8 @@ export class Hex extends React.Component {
     var y = this.state.y;
     var hexText = this.state.coord;
     var hexTextY = -this.RADIUS * 0.5; // this would be better based on the height of the font
+    var mouseEnterFn = this.state.mouseEnterFn;
+    var mouseOutFn = this.state.mouseOutFn;
     return ( <Shape 
       x = { x }
       y = { y }
@@ -297,8 +291,9 @@ export class Hex extends React.Component {
       radius = { this.RADIUS }
       sceneFunc = { this.sceneFunc }
       onClick = { this.handleClick }
-      onMouseEnter = { this.handleMouseEnter }
-      onMouseOut = { this.handleMouseOut }
+      onMouseEnter = { mouseEnterFn }
+      onMouseOut = { mouseOutFn }
+      // onMouseOut = { this.handleMouseOut }
       />
     );
   }
