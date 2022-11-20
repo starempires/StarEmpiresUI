@@ -30,7 +30,8 @@ export class Hex extends React.Component {
       hexid: hexid,
       sector: sector,
       mouseEnterFn: props.mouseEnterFn,
-      mouseOutFn: props.mouseOutFn
+      mouseOutFn: props.mouseOutFn,
+      onClickFn: props.onClickFn
     };
     //console.log("(" +JSON.stringify(this.state.coord) + ") -> row,column = " +
     //             this.state.row+"," + this.state.column + " -> x,y= " +
@@ -48,36 +49,40 @@ export class Hex extends React.Component {
     }
   }
 
-  handleMouseEnter = (e) => {
-    var sector = this.state.sector;
-    var coordText = sector.oblique + "," + sector.y;
-    console.log("hex enter " + coordText);
-  } 
+  // handleMouseEnter = (e) => {
+  //   var sector = this.state.sector;
+  //   var coordText = sector.oblique + "," + sector.y;
+  //   console.log("hex enter " + coordText);
+  // } 
 
-  handleMouseOut = (e) => {
-    var sector = this.state.sector;
-    var coordText = sector.oblique + "," + sector.y;
-    console.log("hex leave " + coordText);
-  }  
+  // handleMouseOut = (e) => {
+  //   var sector = this.state.sector;
+  //   var coordText = sector.oblique + "," + sector.y;
+  //   console.log("hex leave " + coordText);
+  // }
 
-  handleHexMouseMove(event) {
-    var x = this.state.x;
-    var y = this.state.y;
-    this.refs.tooltip.position({
-      x: x + 5,
-      y: y + 5
-    });
-    this.refs.tooltip.text(JSON.stringify(this.state.coord));
-    console.log(JSON.stringify(this.refs.tooltip));
-    this.refs.tooltip.show();
-    //tooltipLayer.batchDraw();
-  }
+  handleContextMenu = (e) => {
+      e.evt.preventDefault();
+  }              
 
-  handleClick = (e) => {
-    var sector = e.target.attrs.sector;
-    var coordText = sector.oblique + "," + sector.y;
-    console.log("hex click on " + coordText);
-  };
+  // handleHexMouseMove(event) {
+  //   var x = this.state.x;
+  //   var y = this.state.y;
+  //   this.refs.tooltip.position({
+  //     x: x + 5,
+  //     y: y + 5
+  //   });
+  //   this.refs.tooltip.text(JSON.stringify(this.state.coord));
+  //   console.log(JSON.stringify(this.refs.tooltip));
+  //   this.refs.tooltip.show();
+  //   //tooltipLayer.batchDraw();
+  // }
+
+  // handleClick = (e) => {
+  //   var sector = e.target.attrs.sector;
+  //   var coordText = sector.oblique + "," + sector.y;
+  //   console.log("hex click on " + coordText);
+  // };
 
   componentDidMount() {
     console.log("hex did mount");
@@ -279,6 +284,7 @@ export class Hex extends React.Component {
     var hexTextY = -this.RADIUS * 0.5; // this would be better based on the height of the font
     var mouseEnterFn = this.state.mouseEnterFn;
     var mouseOutFn = this.state.mouseOutFn;
+    var onClickFn = this.state.onClickFn;
     return ( <Shape 
       x = { x }
       y = { y }
@@ -290,10 +296,10 @@ export class Hex extends React.Component {
       longSide = { this.LONG_SIDE }
       radius = { this.RADIUS }
       sceneFunc = { this.sceneFunc }
-      onClick = { this.handleClick }
+      onContextMenu = {this.handleContextMenu}
       onMouseEnter = { mouseEnterFn }
       onMouseOut = { mouseOutFn }
-      // onMouseOut = { this.handleMouseOut }
+      onClick = { onClickFn }
       />
     );
   }

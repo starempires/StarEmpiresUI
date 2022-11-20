@@ -1,64 +1,154 @@
-import React from 'react';
+
+import "./index.css";
+import React, { Component } from 'react';
+import Konva from 'konva';
 import ReactDOM from 'react-dom';
-import './index.css';
-import { Galaxy} from './SEGalaxy';
+//import { createRoot } from 'react-dom/client';
+import { Stage } from 'react-konva';
+import Galaxy from './Galaxy';
+import * as Constants from './Constants';
+import Drawer from '@mui/material/Drawer';
+import Divider from '@mui/material/Divider';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Typography from '@mui/material/Typography';
+import PropTypes from 'prop-types';
 
-const URL = "http://localhost:1337/";
+const TURNDATA = require("./TheCulture_turn0.json");
 
-class App extends React.Component {
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+TabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+class App extends Component {
+
   constructor(props) {
-    super(props);
-    console.log("App constructor");
-    this.state = {
-      data: null,
-    };
+     super(props);
+//     console.log("r = " + TURNDATA.radius);
+     this.handleDoubleClick = this.handleDoubleClick.bind(this);
+     this.handleOnTabChange = this.handleOnTabChange.bind(this);
+     this.state = {isOpen:false, tabIndex:0};
   }
 
-  componentDidCatch(error, info) {
-    // Display fallback UI
-    this.setState({
-      hasError: true
-    });
-    console.log("error = " + error);
-    console.log("info = " + info);
-  }
-
-  componentDidMount() {
-    console.log("App Component did mount");
-    fetch(URL)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Fetched " + URL);
-        console.log(data);
-        // data = data["data"];
-
-        // console.log(data);
-        console.log("Loaded data for " + data["name"] + ", turn " + data["turnNumber"]);
-        console.log("Portals = " + Object.keys(data.portals));
-        console.log("Sectors = " + Object.keys(data.sectors));
-        console.log("Sector 0,0 = " + Object.keys(data.sectors["0_0"]));
-        var galaxy = < Galaxy data = { data } />;
-
-        this.setState({
-          galaxy: galaxy
-        });
-      })
-  }
-
-  render()
+  handleDoubleClick()
   {
-    console.log("app render");
+     this.setState({isOpen: !this.state.isOpen})
+  }
 
-    // if (this.state.hexes == null) {
-    if (this.state.galaxy == null) {
-      return (<div> </div> ) 
-    }
+  handleOnTabChange(event, value)
+  {
+//    console.log("clicked tab v=" + value);
+    this.setState({tabIndex: value});
+  }
 
-    return ( <div> { this.state.galaxy } </div>)
+  render() {
+   const size = TURNDATA.radius * 10 * Constants.RADIUS;
+//   console.log("size = " + size);
+
+    const tabStyle = {fontSize:10, padding: 1, minWidth:"5%", fontFamily:'bold'};
+
+    return (
+      <div>
+        <Grid container spacing={2}>
+              <Grid item xs={10}>
+      <Stage width={size} height={size} >
+
+          <Galaxy turnData={TURNDATA} onDblClick={this.handleDoubleClick}/>
+      </Stage>
+      </Grid>
+      <Grid item xs={2} >
+             <Drawer
+                      sx={{
+                        '& .MuiDrawer-paper': {
+                        borderLeft: 1,
+                        borderLeftWidth: 5,
+                          width: "40%",
+                          boxSizing: 'border-box',
+                        },
+                      }}
+                      variant="permanent"
+                      anchor="right"
+            >
+
+                  <Box sx={{ width: '100%' }}>
+                       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                         <Tabs sx={{padding:0}} value={this.state.tabIndex} onChange={this.handleOnTabChange}>
+                           <Tab sx={tabStyle} label="Logistics" />
+                           <Tab sx={tabStyle} label="Combat" />
+                           <Tab sx={tabStyle} label="Movement" />
+                           <Tab sx={tabStyle} label="Maintenance" />
+                           <Tab sx={tabStyle} label="Research" />
+                           <Tab sx={tabStyle} label="Income" />
+                           <Tab sx={tabStyle} label="Scanning" />
+                         </Tabs>
+                       </Box>
+                       <TabPanel value={this.state.tabIndex} index={0}>
+                               Logistics
+                               <table>
+                                 <tr><th>Ship</th><th>Unload</th><th>Load</th></tr>
+                                 <tr><th>AB12345</th><th>Yes</th><th>list</th></tr>
+                               </table>
+                       </TabPanel>
+                       <TabPanel value={this.state.tabIndex} index={1}>
+                               Combat
+                       </TabPanel>
+                       <TabPanel value={this.state.tabIndex} index={2}>
+                               Movement
+                       </TabPanel>
+                       <TabPanel value={this.state.tabIndex} index={3}>
+                               Maintenance
+                       </TabPanel>
+                       <TabPanel value={this.state.tabIndex} index={4}>
+                               Research
+                       </TabPanel>
+                       <TabPanel value={this.state.tabIndex} index={5}>
+                               Income
+                       </TabPanel>
+                       <TabPanel value={this.state.tabIndex} index={6}>
+                               Scanning
+                       </TabPanel>
+                     </Box>
+            </Drawer>
+      </Grid>
+      </Grid>
+
+      </div>
+    );
   }
 }
 
+//const container = document.getElementById('root');
+//const root = createRoot(container);
+//root.render(<App />);
+
 ReactDOM.render(
-  <App />,
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
   document.getElementById('root')
 );

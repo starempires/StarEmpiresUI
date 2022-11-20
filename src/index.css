@@ -1,53 +1,47 @@
-
 body {
-  font: 14px "Century Gothic", Futura, sans-serif;
-  margin: 20px;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-ol, ul {
-  padding-left: 30px;
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
 }
 
-.board-row:after {
-  clear: both;
-  content: "";
-  display: table;
+.menu {
+  background-color: white;
+  border: 1px solid black;
+  font-size: 10px;
+  padding: 0px;
+  line-height: 2px;
+  margin: 0px;
+  width: 100px;
 }
 
-.status {
-  margin-bottom: 10px;
+.tooltip {
+  background-color: grey;
+  border: 1px solid black;
 }
 
-.square {
-  background: #fff;
-  border: 1px solid #999;
-  float: left;
-  font-size: 24px;
-  font-weight: bold;
-  line-height: 34px;
-  height: 34px;
-  margin-right: -1px;
-  margin-top: -1px;
+table, th, td {
+  border: 1px solid black;
+}
+
+ul,
+li {
   padding: 0;
-  text-align: center;
-  width: 34px;
+  margin: 0;
 }
 
-.square:focus {
-  outline: none;
+li {
+  padding: 10px;
+  list-style-type: none;
 }
 
-.kbd-navigation .square:focus {
-  background: #ddd;
+li:hover {
+  background-color: gray;
 }
-
-.game {
-  display: flex;
-  flex-direction: row;
-}
-
-.game-info {
-  margin-left: 20px;
-}
-
-
