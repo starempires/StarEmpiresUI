@@ -23,13 +23,11 @@ class Galaxy extends Component {
      this.handleMouseEnter = this.handleMouseEnter.bind(this);
      this.handleMouseLeave = this.handleMouseLeave.bind(this);
      this.handleMouseMove = this.handleMouseMove.bind(this);
-     this.handleClose = this.handleClose.bind(this);
+//     this.handleClose = this.handleClose.bind(this);
      var sectors = this.buildSectors(props.turnData);
      var connections = this.computeConnections(props.turnData);
 //     console.log("connections = " + connections);
      this.state = { contextMenuPosition: null, tooltipVisible: false, tooltipX: 0, tooltipY: 0, tooltipText: "",
-                    stickyHover: false,
-                    isPaneOpen: false,
                     contextMenuSectorData: null,
                     sectors: sectors, connections: connections };
   }
@@ -112,8 +110,9 @@ class Galaxy extends Component {
 
   handleClick = (e, sectorData) => {
     if (e.evt.button == 0) {
-        console.log("left click (button " + e.evt.button + ") = " + sectorData.oblique + "," + sectorData.y);
-        this.setState({ stickyHover: !this.state.stickyHover, contextMenuPosition: null, contextMenuSectorData: null });
+//        console.log("left click (button " + e.evt.button + ") = " + sectorData.oblique + "," + sectorData.y);
+        this.props.onClick(e, sectorData);
+//        this.setState({ contextMenuPosition: null, contextMenuSectorData: null });
     }
     else {
         //console.log("handleClick ignored");
@@ -124,32 +123,29 @@ class Galaxy extends Component {
   handleDoubleClick = e => {
 //      console.log("handleDoubleClick target = " + JSON.stringify(e) );
 //      this.setState({isPaneOpen:true});
-      this.props.onDblClick();
-      e.cancelBubble = true;
+      this.props.onDblClick(e);
+//      e.cancelBubble = true;
   };
 
   handleMouseEnter(x, y, text) {
 //    console.log("Called Galaxy.handleMouseEnter state = " + " " + x + "," + y + "  " + text);
-    if (!this.state.stickyHover) {
         this.setState({tooltipVisible: true, tooltipX: x, tooltipY:y, tooltipText: text } );
-    }
   }
 
    handleMouseMove(x, y) {
 //  console.log("Enter handleMouseMove");
-       if (this.state.tooltipVisible && !this.state.stickyHover) {
+       if (this.state.tooltipVisible) {
            this.setState({tooltipX: x, tooltipY:y } );
        }
   }
 
    handleMouseLeave(e) {
-   var visible = !this.state.stickyHover;
-    this.setState({tooltipVisible: this.state.stickyHover } );
+    this.setState({tooltipVisible: false} );
   }
 
-  handleClose() {
-     this.setState({isPaneOpen:false});
-  }
+//  handleClose() {
+//     this.setState({isPaneOpen:false});
+//  }
 
   render() {
   const width = (this.props.turnData.radius * 10 * Constants.RADIUS) + " px";

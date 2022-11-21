@@ -16,6 +16,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
+import LogisticsPanel from './LogisticsPanel';
 
 const TURNDATA = require("./TheCulture_turn0.json");
 
@@ -51,14 +52,22 @@ class App extends Component {
      super(props);
 //     console.log("r = " + TURNDATA.radius);
      this.handleDoubleClick = this.handleDoubleClick.bind(this);
+     this.handleClick = this.handleClick.bind(this);
      this.handleOnTabChange = this.handleOnTabChange.bind(this);
-     this.state = {isOpen:false, tabIndex:0};
+     this.state = {isOpen:false, tabIndex:0, sectorData: null};
   }
 
-  handleDoubleClick()
+  handleDoubleClick(event)
   {
+     event.evt.preventDefault(true);
      this.setState({isOpen: !this.state.isOpen})
   }
+
+   handleClick(event, sectorData)
+   {
+       event.evt.preventDefault(true);
+       console.log("left click (button " + event.evt.button + ") = " + sectorData.oblique + "," + sectorData.y);
+    }
 
   handleOnTabChange(event, value)
   {
@@ -78,7 +87,7 @@ class App extends Component {
               <Grid item xs={10}>
       <Stage width={size} height={size} >
 
-          <Galaxy turnData={TURNDATA} onDblClick={this.handleDoubleClick}/>
+          <Galaxy turnData={TURNDATA} onDblClick={this.handleDoubleClick} onClick={this.handleClick}/>
       </Stage>
       </Grid>
       <Grid item xs={2} >
@@ -108,11 +117,8 @@ class App extends Component {
                          </Tabs>
                        </Box>
                        <TabPanel value={this.state.tabIndex} index={0}>
-                               Logistics
-                               <table>
-                                 <tr><th>Ship</th><th>Unload</th><th>Load</th></tr>
-                                 <tr><th>AB12345</th><th>Yes</th><th>list</th></tr>
-                               </table>
+                           Logistics
+                           <LogisticsPanel sectorData={this.state.sectorData}/>
                        </TabPanel>
                        <TabPanel value={this.state.tabIndex} index={1}>
                                Combat
