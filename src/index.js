@@ -3,7 +3,7 @@ import "./index.css";
 import React, { Component } from 'react';
 import Konva from 'konva';
 import ReactDOM from 'react-dom';
-//import { createRoot } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { Stage } from 'react-konva';
 import Galaxy from './Galaxy';
 import * as Constants from './Constants';
@@ -148,13 +148,13 @@ class App extends Component {
   }
 }
 
-//const container = document.getElementById('root');
-//const root = createRoot(container);
-//root.render(<App />);
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+//ReactDOM.render(
+//  <React.StrictMode>
+//    <App />
+//  </React.StrictMode>,
+//  document.getElementById('root')
+//);
