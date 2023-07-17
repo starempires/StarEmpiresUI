@@ -41,6 +41,11 @@ export const BORDER_TYPE = {
    Storm: "storm"
 }
 
+export const ORDER_TYPE = {
+   Load: "load",
+   Unload: "unload",
+}
+
 // color maps
 export const BORDER_TYPE_COLOR_MAP = new Map([
    [BORDER_TYPE.Regular, "black"],
@@ -77,4 +82,9 @@ export function coordsToPosition(radius, oblique, y) {
      var xpos = this.getXCount(column) * RADIUS + (column % 2) * SHORT_SIDE;
      var ypos = (row +1) * LONG_SIDE;
      return [xpos, ypos];
+}
+
+export function getCoordinateKey(oblique, y) {
+     const key = (oblique < 0 ? "n" : "") + Math.abs(oblique) + "_" + (y < 0 ? "n" : "") + Math.abs(y);
+     return key;
 }

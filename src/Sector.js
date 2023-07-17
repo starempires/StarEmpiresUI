@@ -8,6 +8,7 @@ import Border from './Border';
 import Hex from './Hex';
 import ShipDots from './ShipDots';
 import * as Constants from './Constants';
+import {buildSectorText} from './SectorTextBuilder';
 
 class Sector extends Component {
 
@@ -15,7 +16,7 @@ class Sector extends Component {
      super(props);
      var turnData = this.props.turnData;
      var [xpos, ypos] = Constants.coordsToPosition(turnData.radius, this.props.oblique, this.props.y);
-     var sectorKey = (this.props.oblique < 0 ? "n" : "") + Math.abs(this.props.oblique) + "_" + (this.props.y < 0 ? "n" : "") + Math.abs(this.props.y);
+     const sectorKey = Constants.getCoordinateKey(this.props.oblique, this.props.y);
 //     console.log("construct sectior " + this.props.oblique + ", " + this.props.y);
      var sectorData = turnData.sectors[sectorKey];
      const scanColor = Constants.SECTOR_STATUS_COLOR_MAP.get(sectorData.scanStatus);
@@ -57,7 +58,8 @@ class Sector extends Component {
            console.log(coordsText + ", empireColors = " + shipDotColors);
      }
 
-     const hoverText = this.buildHoverText(turnData, sectorData);
+//     const hoverText = this.buildHoverText(turnData, sectorData);
+     const hoverText = buildSectorText(turnData, sectorData);
 
 //     console.log(coordsText + " border = " + borderType);
      this.state = { scanColor: scanColor, coordsText: coordsText, borderType: borderType, coordsColor: coordsColor,
@@ -69,112 +71,6 @@ class Sector extends Component {
                     worldColor: worldColor, prohibition: prohibition};
 //    console.log("Sector.render props = " + JSON.stringify(this.props));
 //    console.log("Sector.render state = " + JSON.stringify(this.state));
-  }
-
-  buildHoverText(turnData, sectorData) {
-     var text = "";
-     text += this.buildCoordsText(sectorData) + "\n";
-     if (sectorData.world) {
-         text += this.buildWorldText(sectorData) + "\n";
-     }
-     else if (sectorData.portal) {
-         text += this.buildPortalText(sectorData) + "\n";
-     }
-     else {
-         text += "empty space\n";
-     }
-     text += this.buildStormText(sectorData);
-     text += this.buildShipsText(sectorData, turnData);
-     return text;
-  }
-
-  buildCoordsText(sectorData)
-  {
-     var text = "(" + sectorData.oblique + "," + sectorData.y + ")";
-     if (sectorData.scanStatus == Constants.SCAN_STATUS_TYPE.Stale) {
-         text += "[last scanned turn " + sectorData.lastTurnScanned + "]";
-     }
-     return text;
-  }
-
-  buildStormText(sectorData, turnData)
-  {
-        var text = "";
-        if (sectorData.storm) {
-            if (sectorData.scanStatus != Constants.SCAN_STATUS_TYPE.Unknown) {
-                text = sectorData.storm.intensity > 0 ? ("ion storm (intensity " + sectorData.storm.intensity + ")") : "nebula";
-            }
-        }
-        return text;
-  }
-
-  buildPortalText(sectorData, turnData)
-  {
-      var text = "";
-      const portal = sectorData.portal;
-      if (portal) {
-          text = portal.name;
-          var exits = "";
-          switch (sectorData.scanStatus) {
-              case Constants.SCAN_STATUS_TYPE.Scanned:
-              case Constants.SCAN_STATUS_TYPE.Visible:
-                   text += portal.collapsed ? " (collapsed)" : "";
-                   break;
-              default:
-                   break;
-          }
-          if (portal.navDataKnown && portal.exits) {
-              text += ", exits: " + portal.exits.sort().join();
-          }
-      }
-      return text;
-  }
-
-  buildWorldText(sectorData, turnData)
-  {
-      var text = "";
-      const world = sectorData.world;
-      if (world) {
-          const owner = world.owner ? world.owner : "unowned";
-          const homeworld = world.homeworld ? " homeworld" : "";
-
-          switch (sectorData.scanStatus) {
-              case Constants.SCAN_STATUS_TYPE.Stale:
-                  text = world.name + ", production " +
-                         " [" + owner + "]" +
-                         ", production " + world.production;
-                  break;
-              case Constants.SCAN_STATUS_TYPE.Scanned:
-                   text = world.name + " [" + owner + homeworld + "]" +
-                          ", production " + world.production;
-                   break;
-              case Constants.SCAN_STATUS_TYPE.Visible:
-                   text = world.name + " [" + owner + homeworld + "]" +
-                          ", production " + world.production +
-                          (world.stockpile ? ", stockpile " + world.stockpile : "") +
-                          (world.prohibition ? ", " + world.prohibition : "");
-                   break;
-              default:
-                   break;
-          }
-      }
-      return text;
-  }
-
-  buildShipsText(sectorData, turnData) {
-      var text = "";
-      if (sectorData.ships) {
-          var empiresPresent = Object.keys(sectorData.ships);
-          empiresPresent.sort();
-          text += "\n";
-          for (var i = 0; i < empiresPresent.length; i++) {
-               var empireName = empiresPresent[i];
-               var empireShips = sectorData.ships[empireName];
-               text += empireName + ": " + empireShips.count + " ship" + (empireShips.count > 1 ? "s" : "") +
-                      ", " + empireShips.tonnage + " tonne" + (empireShips.tonnage > 1 ? "s": "") + "\n";
-          }
-      }
-      return text;
   }
 
     handleMouseEnter = e => {

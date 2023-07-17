@@ -17,34 +17,10 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
 import LogisticsPanel from './LogisticsPanel';
+import OrdersPanel from './OrdersPanel';
+import {OrdersProvider} from './OrdersContext';
 
 const TURNDATA = require("./TheCulture_turn0.json");
-
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
-    </div>
-  );
-}
-
-TabPanel.propTypes = {
-  children: PropTypes.node,
-  index: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
-};
 
 class App extends Component {
 
@@ -66,6 +42,7 @@ class App extends Component {
    handleClick(event, sectorData)
    {
        event.evt.preventDefault(true);
+       this.setState({sectorData: sectorData});
        console.log("left click (button " + event.evt.button + ") = " + sectorData.oblique + "," + sectorData.y);
     }
 
@@ -103,42 +80,9 @@ class App extends Component {
                       variant="permanent"
                       anchor="right"
             >
-
-                  <Box sx={{ width: '100%' }}>
-                       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                         <Tabs sx={{padding:0}} value={this.state.tabIndex} onChange={this.handleOnTabChange}>
-                           <Tab sx={tabStyle} label="Logistics" />
-                           <Tab sx={tabStyle} label="Combat" />
-                           <Tab sx={tabStyle} label="Movement" />
-                           <Tab sx={tabStyle} label="Maintenance" />
-                           <Tab sx={tabStyle} label="Research" />
-                           <Tab sx={tabStyle} label="Income" />
-                           <Tab sx={tabStyle} label="Scanning" />
-                         </Tabs>
-                       </Box>
-                       <TabPanel value={this.state.tabIndex} index={0}>
-                           Logistics
-                           <LogisticsPanel sectorData={this.state.sectorData}/>
-                       </TabPanel>
-                       <TabPanel value={this.state.tabIndex} index={1}>
-                               Combat
-                       </TabPanel>
-                       <TabPanel value={this.state.tabIndex} index={2}>
-                               Movement
-                       </TabPanel>
-                       <TabPanel value={this.state.tabIndex} index={3}>
-                               Maintenance
-                       </TabPanel>
-                       <TabPanel value={this.state.tabIndex} index={4}>
-                               Research
-                       </TabPanel>
-                       <TabPanel value={this.state.tabIndex} index={5}>
-                               Income
-                       </TabPanel>
-                       <TabPanel value={this.state.tabIndex} index={6}>
-                               Scanning
-                       </TabPanel>
-                     </Box>
+               <OrdersProvider>
+                  <OrdersPanel turnData={TURNDATA} sectorData={this.state.sectorData}/>
+               </OrdersProvider>
             </Drawer>
       </Grid>
       </Grid>

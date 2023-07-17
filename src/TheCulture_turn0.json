@@ -1,45 +1,47 @@
 {
-    "name": "GM",
-    "abbreviation": "GM",
-    "adjective": "GM",
+    "name": "The Culture",
+    "abbreviation": "CU",
+    "adjective": "Culture",
     "radius": 2,
     "rows": 9,
     "columns": 5,
     "turnNumber": 0,
     "sectors": {
         "0_0": {
+            "scanStatus": "visible",
+            "column": 2,
             "storm": {
                 "intensity": 0
             },
-            "column": 2,
+            "row": 4,
             "world": {
                 "production": 6,
                 "owner": "unowned",
                 "name": "Planetworld"
             },
-            "row": 4,
-            "scanStatus": "visible",
             "y": 0,
             "oblique": 0
         },
         "1_0": {
+            "scanStatus": "unknown",
             "column": 3,
             "row": 5,
-            "scanStatus": "unknown",
             "name": "1_0",
             "y": 0,
             "oblique": 1
         },
         "0_1": {
+            "scanStatus": "unknown",
             "column": 2,
             "row": 2,
-            "scanStatus": "unknown",
             "name": "0_1",
             "y": 1,
             "oblique": 0
         },
         "1_1": {
+            "scanStatus": "visible",
             "column": 3,
+            "row": 3,
             "world": {
                 "production": 6,
                 "stockpile": 4,
@@ -53,10 +55,17 @@
                     "count": 1,
                     "ships": {
                         "KR12345": {
-                            "serialNumber": "KR12345",
+                            "opRating": 1.0,
                             "shipClass": "scout",
                             "dpRemaining": 1,
-                            "opRating": 1.0,
+                            "serialNumber": "KR12345",
+                            "hull": "scout",
+                            "guns": 1,
+                            "dp": 1,
+                            "engines": 3,
+                            "scan": 3,
+                            "cost": 2,
+                            "tonnage": 2,
                             "owner": "KRATOS",
                             "name": "KRATOS scout"
                         }
@@ -67,47 +76,105 @@
                     "count": 5,
                     "ships": {
                         "CU56789": {
-                            "serialNumber": "CU56789",
+                            "opRating": 1.0,
                             "shipClass": "scout",
                             "dpRemaining": 1,
-                            "opRating": 1.0,
+                            "serialNumber": "CU56789",
+                            "hull": "scout",
+                            "guns": 1,
+                            "dp": 1,
+                            "engines": 3,
+                            "scan": 3,
+                            "cost": 2,
+                            "tonnage": 2,
                             "owner": "The Culture",
                             "name": "Cultured scout3"
                         },
                         "CU12345": {
-                            "serialNumber": "CU12345",
+                            "opRating": 1.0,
                             "shipClass": "scout",
                             "dpRemaining": 1,
-                            "opRating": 1.0,
+                            "serialNumber": "CU12345",
+                            "hull": "scout",
+                            "guns": 1,
+                            "dp": 1,
+                            "engines": 3,
+                            "scan": 3,
+                            "cost": 2,
+                            "tonnage": 2,
                             "owner": "The Culture",
                             "name": "Cultured scout"
                         },
                         "CU45678": {
-                            "serialNumber": "CU45678",
+                            "opRating": 1.0,
                             "shipClass": "scout",
                             "dpRemaining": 1,
-                            "opRating": 1.0,
+                            "carrier": "CU23456",
+                            "serialNumber": "CU45678",
+                            "hull": "scout",
+                            "guns": 1,
+                            "dp": 1,
+                            "engines": 3,
+                            "scan": 3,
+                            "cost": 2,
+                            "tonnage": 2,
                             "owner": "The Culture",
                             "name": "Cultured scout2"
                         },
                         "CU23456": {
-                            "cargo": [
-                                "CU34567"
-                            ],
-                            "serialNumber": "CU23456",
+                            "opRating": 1.0,
                             "shipClass": "transport",
                             "dpRemaining": 10,
-                            "emptyRacks": 3,
-                            "opRating": 1.0,
+                            "emptyRacks": 1,
+                            "serialNumber": "CU23456",
+                            "hull": "transport",
+                            "cargo": [
+                                "CU34567", "CU45678"
+                            ],
+                            "guns": 2,
+                            "dp": 10,
+                            "engines": 2,
+                            "scan": 1,
+                            "racks": 5,
+                            "cost": 10,
+                            "ar": 1,
+                            "tonnage": 15,
                             "owner": "The Culture",
                             "name": "Cultured transport"
                         },
+                        "CU14567": {
+                            "opRating": 1.0,
+                            "shipClass": "transport",
+                            "dpRemaining": 10,
+                            "emptyRacks": 5,
+                            "serialNumber": "CU14567",
+                            "hull": "transport",
+                            "cargo": [
+                            ],
+                            "guns": 2,
+                            "dp": 10,
+                            "engines": 2,
+                            "scan": 1,
+                            "racks": 5,
+                            "cost": 10,
+                            "ar": 1,
+                            "tonnage": 15,
+                            "owner": "The Culture",
+                            "name": "Cultured transport 2"
+                        },
                         "CU34567": {
-                            "carrier": "CU23456",
-                            "serialNumber": "CU34567",
+                            "opRating": 1.0,
                             "shipClass": "scout",
                             "dpRemaining": 1,
-                            "opRating": 1.0,
+                            "serialNumber": "CU34567",
+                            "hull": "scout",
+                            "carrier": "CU23456",
+                            "guns": 1,
+                            "dp": 1,
+                            "engines": 3,
+                            "scan": 3,
+                            "cost": 2,
+                            "tonnage": 2,
                             "owner": "The Culture",
                             "name": "Cultured scout1"
                         }
@@ -115,160 +182,158 @@
                     "tonnage": 23
                 }
             },
-            "row": 3,
-            "scanStatus": "visible",
             "name": "1_1",
             "y": 1,
             "oblique": 1
         },
         "0_2": {
+            "scanStatus": "unknown",
             "column": 2,
             "row": 0,
-            "scanStatus": "unknown",
             "name": "0_2",
             "y": 2,
             "oblique": 0
         },
         "2_0": {
+            "scanStatus": "unknown",
             "column": 4,
             "row": 6,
-            "scanStatus": "unknown",
             "name": "2_0",
             "y": 0,
             "oblique": 2
         },
         "2_1": {
+            "scanStatus": "unknown",
             "column": 4,
             "row": 4,
-            "scanStatus": "unknown",
             "name": "2_1",
             "y": 1,
             "oblique": 2
         },
         "1_2": {
+            "scanStatus": "unknown",
             "column": 3,
             "row": 1,
-            "scanStatus": "unknown",
             "name": "1_2",
             "y": 2,
             "oblique": 1
         },
         "0_n2": {
+            "scanStatus": "unknown",
             "column": 2,
             "row": 8,
-            "scanStatus": "unknown",
             "name": "0_n2",
             "y": -2,
             "oblique": 0
         },
         "0_n1": {
+            "scanStatus": "unknown",
             "column": 2,
             "row": 6,
-            "scanStatus": "unknown",
             "name": "0_n1",
             "y": -1,
             "oblique": 0
         },
         "n1_n2": {
+            "scanStatus": "visible",
             "column": 1,
+            "row": 7,
             "portal": {
-                "exits": [
-                    "Via Media"
-                ],
                 "navDataKnown": true,
                 "entrances": [
                     "Via Media"
                 ],
+                "exits": [
+                    "Via Media"
+                ],
                 "name": "Glidepath"
             },
-            "row": 7,
-            "scanStatus": "visible",
             "name": "n1_n2",
             "y": -2,
             "oblique": -1
         },
         "2_2": {
+            "scanStatus": "visible",
             "column": 4,
+            "row": 2,
             "world": {
                 "production": 5,
                 "owner": "The Culture",
                 "name": "Narpet"
             },
-            "row": 2,
-            "scanStatus": "visible",
             "name": "2_2",
             "y": 2,
             "oblique": 2
         },
         "n1_0": {
+            "scanStatus": "unknown",
             "column": 1,
             "row": 3,
-            "scanStatus": "unknown",
             "name": "n1_0",
             "y": 0,
             "oblique": -1
         },
         "1_n1": {
+            "scanStatus": "unknown",
             "column": 3,
             "row": 7,
-            "scanStatus": "unknown",
             "name": "1_n1",
             "y": -1,
             "oblique": 1
         },
         "n1_1": {
+            "scanStatus": "unknown",
             "column": 1,
             "row": 1,
-            "scanStatus": "unknown",
             "name": "n1_1",
             "y": 1,
             "oblique": -1
         },
         "n2_0": {
+            "scanStatus": "unknown",
             "column": 0,
             "row": 2,
-            "scanStatus": "unknown",
             "name": "n2_0",
             "y": 0,
             "oblique": -2
         },
         "n2_n1": {
+            "scanStatus": "visible",
             "column": 0,
+            "row": 4,
             "portal": {
-                "exits": [
-                    "Glidepath"
-                ],
-                "collapsed": true,
                 "navDataKnown": true,
                 "entrances": [
                     "Glidepath"
                 ],
+                "collapsed": true,
+                "exits": [
+                    "Glidepath"
+                ],
                 "name": "Via Media"
             },
-            "row": 4,
-            "scanStatus": "visible",
             "name": "n2_n1",
             "y": -1,
             "oblique": -2
         },
         "n2_n2": {
+            "scanStatus": "visible",
+            "column": 0,
             "storm": {
                 "intensity": 2
             },
-            "column": 0,
             "row": 6,
-            "scanStatus": "visible",
             "name": "n2_n2",
             "y": -2,
             "oblique": -2
         },
         "n1_n1": {
+            "scanStatus": "visible",
+            "column": 1,
             "storm": {
                 "intensity": 1
             },
-            "column": 1,
             "row": 5,
-            "scanStatus": "visible",
             "name": "n1_n1",
             "y": -1,
             "oblique": -1
@@ -276,19 +341,20 @@
     },
     "shipClasses": {
         "gunship": {
+            "hullType": "gunship",
             "gunship": true,
-            "tonnage": 10,
             "guns": 20,
             "dp": 15,
             "engines": 2,
             "cost": 15,
             "ar": 3,
-            "hullType": "gunship",
+            "tonnage": 10,
             "name": "gunship",
             "id": 5
         },
         "capital ship": {
-            "tonnage": 30,
+            "capitalShip": true,
+            "hullType": "capital ship",
             "guns": 35,
             "dp": 40,
             "engines": 2,
@@ -296,48 +362,47 @@
             "racks": 2,
             "cost": 28,
             "ar": 16,
-            "hullType": "capital ship",
-            "capitalShip": true,
+            "tonnage": 30,
             "name": "capital ship",
             "id": 1
         },
         "orbital": {
+            "hullType": "orbital",
             "orbital": true,
-            "tonnage": 20,
             "guns": 30,
             "dp": 40,
             "scan": 1,
             "racks": 2,
             "cost": 25,
             "ar": 16,
-            "hullType": "orbital",
+            "tonnage": 20,
             "name": "orbital",
             "id": 4
         },
         "starbase": {
+            "hullType": "orbital",
             "orbital": true,
-            "tonnage": 999,
             "guns": 150,
             "dp": 200,
             "scan": 2,
             "racks": 10,
             "cost": 999,
             "ar": 15,
-            "hullType": "orbital",
+            "tonnage": 999,
             "name": "starbase",
             "id": 16
         },
         "missile": {
+            "hullType": "missile",
             "missile": true,
-            "tonnage": 1,
             "dp": 1,
             "cost": 1,
-            "hullType": "missile",
+            "tonnage": 1,
             "name": "missile",
             "id": 8
         },
         "transport": {
-            "tonnage": 15,
+            "hullType": "transport",
             "guns": 2,
             "dp": 10,
             "engines": 2,
@@ -345,38 +410,38 @@
             "racks": 5,
             "cost": 10,
             "ar": 1,
-            "hullType": "transport",
+            "tonnage": 15,
             "name": "transport",
             "id": 3
         },
         "wing": {
+            "hullType": "wing",
             "wing": true,
-            "tonnage": 1,
             "guns": 5,
             "dp": 5,
             "cost": 1,
             "ar": 1,
-            "hullType": "wing",
+            "tonnage": 1,
             "name": "wing",
             "id": 6
         },
         "device": {
             "device": true,
-            "tonnage": 1,
+            "hullType": "device",
             "dp": 1,
             "cost": 1,
-            "hullType": "device",
+            "tonnage": 1,
             "name": "device",
             "id": 7
         },
         "scout": {
-            "tonnage": 2,
+            "hullType": "scout",
             "guns": 1,
             "dp": 1,
             "engines": 3,
             "scan": 3,
             "cost": 2,
-            "hullType": "scout",
+            "tonnage": 2,
             "name": "scout",
             "id": 2
         }

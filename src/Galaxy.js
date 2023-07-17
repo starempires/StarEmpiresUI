@@ -62,8 +62,9 @@ class Galaxy extends Component {
 
      for (var y = radius; y >= 0; y--) {
           for (var oblique = y - radius; oblique <= radius; oblique++) {
-              var sector = <Sector
-                                key={key++}
+              const key = Constants.getCoordinateKey(oblique, y);
+              const sector = <Sector
+                                key={key}
                                 turnData={turnData}
                                 oblique={oblique} y={y}
                                 onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onMouseMove={this.handleMouseMove}
@@ -76,8 +77,9 @@ class Galaxy extends Component {
 
     for (var y = -1; y >= -radius; y--) {
          for (var oblique = -radius; oblique <= radius + y; oblique++) {
-              var sector = <Sector
-                                key={key++}
+              const key = Constants.getCoordinateKey(oblique, y);
+              const sector = <Sector
+                                key={key}
                                 turnData={turnData}
                                 oblique={oblique} y={y}
                                 onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onMouseMove={this.handleMouseMove}
