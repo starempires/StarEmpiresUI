@@ -1,4 +1,4 @@
-import {useState, useContext} from 'react';
+import {useContext} from 'react';
 import * as Constants from './Constants';
 import Paper from '@mui/material/Paper';
 import Accordion from '@mui/material/Accordion';
@@ -18,7 +18,7 @@ function createCarrierMap(empireShipsInSector, loadOrders, unloadOrders) {
 // cargo data includes all existing and possible cargo, carrier rack status,etc. -- basically anything
 // needed to display the current load status of that carrier and its cargo
 
-//    console.log("Called create Carrier map");
+    console.log("Called create Carrier map");
 //    console.log("load orders = " + JSON.stringify(Array.from(loadOrders.entries())));
     const carrierMap = new Map();
 
@@ -85,7 +85,7 @@ function createCarrierMap(empireShipsInSector, loadOrders, unloadOrders) {
 }
 
 export default function LogisticsPanel(props) {
-//    console.log("Called LogisticsPanel");
+    console.log("Called LogisticsPanel");
     const carriers = [];
     const sectorData = props.sectorData;
     const turnData = props.turnData;
@@ -93,11 +93,12 @@ export default function LogisticsPanel(props) {
     const { loadOrders, addLoadOrder, deleteLoadOrder,
             unloadOrders, addUnloadOrder, deleteUnloadOrder } = useContext(OrdersContext);
 
-//    const [loadOrders, setLoadOrders] = useState(() => new Map());
-//    const [unloadOrders, setUnloadOrders] = useState(() => new Map());
     var carrierMap = new Map();
     if (sectorData && sectorData.ships) {
+//        console.log("ships = " + JSON.stringify(sectorData.ships));
         const empireInSector = sectorData.ships[turnData.name];
+//        console.log("turnData = " + turnData.name);
+//        console.log("empireInSector = " + JSON.stringify(empireInSector));
         if (empireInSector) {
             const empireShipsInSector = empireInSector.ships;
             carrierMap = createCarrierMap(empireShipsInSector, loadOrders, unloadOrders);
@@ -123,8 +124,8 @@ export default function LogisticsPanel(props) {
 
     // create a Carrier widget for each carrier in sector
     carrierMap.forEach((carrierData, carrier) => {
-//                      console.log("key = " + JSON.stringify(carrier));
-//                      console.log("value = " + JSON.stringify(carrierData));
+                      console.log("key = " + JSON.stringify(carrier));
+                      console.log("value = " + JSON.stringify(carrierData));
 //console.log("carrier data " + JSON.stringify(carrierData));
           carriers.push(<Carrier key={carrier.name} carrier={carrier} carrierData={carrierData}
                                  handleLoadShip={handleLoadShip}

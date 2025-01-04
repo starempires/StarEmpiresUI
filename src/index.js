@@ -20,7 +20,7 @@ import LogisticsPanel from './LogisticsPanel';
 import OrdersPanel from './OrdersPanel';
 import {OrdersProvider} from './OrdersContext';
 
-const TURNDATA = require("./TheCulture_turn0.json");
+const TURNDATA = require("./snapshot.json");
 
 class App extends Component {
 

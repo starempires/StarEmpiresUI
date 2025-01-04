@@ -6,6 +6,7 @@ const OrdersProvider = ({ children }) => {
 // orders are optimized for UI. They're expected to be reformatted as needed for submission
   const [loadOrders, setLoadOrders] = useState(new Map());
   const [unloadOrders, setUnloadOrders] = useState(new Map());
+  const [fireOrders, setFireOrders] = useState(new Map());
 
   const addLoadOrder = (cargo, carrier) => {
       const carrierLoads = loadOrders.get(carrier) || [];
@@ -40,11 +41,53 @@ const OrdersProvider = ({ children }) => {
       }
   };
 
+  const hasLoadOrder = (ship) => {
+     for (let cargoList of loadOrders.values()) {
+        if (cargoList.includes(ship)) {
+            return true;
+        }
+     }
+     return false;
+  };
+
+  const hasUnloadOrder = (ship) => {
+     for (let cargoList of unloadOrders.values()) {
+        if (cargoList.includes(ship)) {
+            return true;
+        }
+     }
+     return false;
+  };
+
   const deleteUnloadOrder = (cargo, carrier) => {
       let pendingUnloads = unloadOrders.get(carrier) || [];
       pendingUnloads = pendingUnloads.filter(ship => ship != cargo);
       setUnloadOrders(new Map(unloadOrders.set(carrier, pendingUnloads)));
       console.log("delete order: unload " + cargo.name + " onto " + carrier.name);
+  };
+
+  const addFireOrder = (attacker, targets, ascending) => {
+      const attackerData = fireOrders.get(attacker) || [];
+      const data = { targets: targets, ascending: ascending };
+      attackerData.push(data);
+      const newFireOrders = new Map(fireOrders.set(attacker, attackerData));
+      setFireOrders(fireOrders);
+      console.log("add order: fire " + attacker.name + " at " + targets + " (ascending " + ascending + ")");
+  };
+
+  const deleteFireOrder = (attacker) => {
+      let newFireOrders = fireOrders.filter(ship => ship != attacker);
+      setFireOrders(newFireOrders);
+      console.log("delete order: fire " + attacker.name);
+  };
+
+  const hasFireOrder = (ship) => {
+       for (let fireList of fireOrders.keys()) {
+          if (fireList.includes(ship)) {
+              return true;
+          }
+       }
+       return false;
   };
 
 //  const submitOrders = async () => {
@@ -73,10 +116,15 @@ const OrdersProvider = ({ children }) => {
     loadOrders,
     addLoadOrder,
     deleteLoadOrder,
+    hasLoadOrder,
     unloadOrders,
     addUnloadOrder,
     deleteUnloadOrder,
-//    deleteOrder,
+    hasUnloadOrder,
+    fireOrders,
+    addFireOrder,
+    deleteFireOrder,
+    hasFireOrder,
 //    submitOrders,
   };
 

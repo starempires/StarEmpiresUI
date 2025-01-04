@@ -10,6 +10,7 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
 import LogisticsPanel from './LogisticsPanel';
+import CombatPanel from './CombatPanel';
 import {buildSectorText} from './SectorTextBuilder';
 
 function TabPanel(props) {
@@ -68,11 +69,10 @@ export default function OrdersPanel(props) {
                 </Tabs>
            </Box>
             <TabPanel value={tabIndex} index={0}>
-               <Typography component="span">Logistics</Typography>
               <LogisticsPanel turnData={props.turnData} sectorData={props.sectorData}/>
             </TabPanel>
             <TabPanel value={tabIndex} index={1}>
-               Combat
+              <CombatPanel turnData={props.turnData} sectorData={props.sectorData}/>
             </TabPanel>
             <TabPanel value={tabIndex} index={2}>
                Movement

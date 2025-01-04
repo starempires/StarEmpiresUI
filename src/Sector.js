@@ -17,13 +17,13 @@ class Sector extends Component {
      var turnData = this.props.turnData;
      var [xpos, ypos] = Constants.coordsToPosition(turnData.radius, this.props.oblique, this.props.y);
      const sectorKey = Constants.getCoordinateKey(this.props.oblique, this.props.y);
-//     console.log("construct sectior " + this.props.oblique + ", " + this.props.y);
+//     console.log("construct sector " + this.props.oblique + ", " + this.props.y);
      var sectorData = turnData.sectors[sectorKey];
-     const scanColor = Constants.SECTOR_STATUS_COLOR_MAP.get(sectorData.scanStatus);
-//    console.log("Sector lookup color " + this.props.scanStatus + " scan color = " + scanColor);
-//    console.log("Sector " + scanStatus === Constants.SECTOR_STATUS_TYPE.Visible);
+     const scanColor = Constants.SECTOR_STATUS_COLOR_MAP.get(sectorData.status);
+//    console.log("Sector lookup color " + this.props.status + " scan color = " + scanColor);
+//    console.log("Sector " + status === Constants.SECTOR_STATUS_TYPE.Visible);
      const coordsText = sectorData.oblique + "," + sectorData.y;
-     const coordsColor = Constants.COORDS_STATUS_COLOR_MAP.get(sectorData.scanStatus);
+     const coordsColor = Constants.COORDS_STATUS_COLOR_MAP.get(sectorData.status);
      var borderType = Constants.BORDER_TYPE.Regular;
 
      if (sectorData.storm) {
@@ -34,6 +34,7 @@ class Sector extends Component {
      var prohibition;
      const world = sectorData.world;
      if (world) {
+//    console.log("Sector world " + JSON.stringify(world));
            if (world.owner) {
                worldColor = this.props.turnData.colors[world.owner];
                prohibition = world.prohibition;
@@ -55,7 +56,7 @@ class Sector extends Component {
                }
                shipDotColors = empiresPresent.map((e) => turnData.colors[e]);
           }
-           console.log(coordsText + ", empireColors = " + shipDotColors);
+//           console.log(coordsText + ", empireColors = " + shipDotColors);
      }
 
 //     const hoverText = this.buildHoverText(turnData, sectorData);

@@ -96,10 +96,10 @@ export class Hex extends React.Component {
     var sector = this.attrs.sector;
     var galaxy = this.attrs.galaxy;
     var colors = galaxy.colors;
-    var scanStatus = sector.scanStatus;
-    var bgColor = colors[scanStatus];
+    var status = sector.status;
+    var bgColor = colors[status];
     var textColor = '#ffffff';
-    if (scanStatus === 'visible' || scanStatus === 'scanned') {
+    if (status === 'visible' || status === 'scanned') {
         textColor = '#000000';
     }
     //  console.log("sceneFunc hex " + sector.oblique + "," + sector.y);
@@ -152,7 +152,7 @@ export class Hex extends React.Component {
 
       var owner = world.owner;
       var worldcolor;
-      if (scanStatus === 'stale') {
+      if (status === 'stale') {
           worldcolor = colors['staleworld'];
       }
       else if (owner === undefined) {
@@ -230,7 +230,7 @@ export class Hex extends React.Component {
     // context.closePath();
 
     // draw ship dots
-    if (scanStatus === 'visible' || scanStatus === 'scanned') {
+    if (status === 'visible' || status === 'scanned') {
         var maxdots = 6;
         var sx = -shortSide;
         var sy = shortSide + 2;

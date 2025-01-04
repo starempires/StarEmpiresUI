@@ -36,18 +36,20 @@ class Galaxy extends Component {
   {
     var connections = [];
     //console.log("conns " + JSON.stringify(turnData.connections));
-    var fromNames = Object.keys(turnData.connections);
-    for (var i = 0; i < fromNames.length; i++) {
-        var fromName = fromNames[i];
-        const toNames = turnData.connections[fromName];
-         for (var j = 0; j < toNames.length; j++) {
-           var toName = toNames[j];
+    if (turnData.connections) {
+        var fromNames = Object.keys(turnData.connections);
+        for (var i = 0; i < fromNames.length; i++) {
+            var fromName = fromNames[i];
+            const toNames = turnData.connections[fromName];
+             for (var j = 0; j < toNames.length; j++) {
+               var toName = toNames[j];
 
-            var fromSector = turnData.sectors[fromName];
-            var toSector = turnData.sectors[toName];
-            var [fromx, fromy] = Constants.coordsToPosition(turnData.radius, fromSector.oblique, fromSector.y);
-            var [tox, toy] = Constants.coordsToPosition(turnData.radius, toSector.oblique, toSector.y);
-            connections.push([fromx, fromy, tox, toy]);
+                var fromSector = turnData.sectors[fromName];
+                var toSector = turnData.sectors[toName];
+                var [fromx, fromy] = Constants.coordsToPosition(turnData.radius, fromSector.oblique, fromSector.y);
+                var [tox, toy] = Constants.coordsToPosition(turnData.radius, toSector.oblique, toSector.y);
+                connections.push([fromx, fromy, tox, toy]);
+            }
         }
     }
     return connections;
@@ -59,6 +61,7 @@ class Galaxy extends Component {
      var radius = turnData.radius;
      var cols = 2 * radius + 1;
      var key = 0;
+     console.log("build sectors radius = " + radius);
 
      for (var y = radius; y >= 0; y--) {
           for (var oblique = y - radius; oblique <= radius; oblique++) {
