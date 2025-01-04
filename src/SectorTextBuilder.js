@@ -27,9 +27,11 @@ const buildCoordsText = (sectorData) =>
  const buildStormText = (sectorData, turnData) =>
   {
         var text = "";
-        if (sectorData.storm) {
+        if (sectorData.storms) {
             if (sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
-                text = "\n" + (sectorData.storm.intensity > 0 ? ("ion storm (intensity " + sectorData.storm.intensity + ")") : "nebula");
+                sectorData.storms.forEach(storm => {
+                    text = "\n" + storm.name + " (" + (storm.intensity > 0 ? ("intensity  " + storm.intensity + " ion storm") : "nebula") + ")";
+                });
             }
         }
         return text;
@@ -93,12 +95,19 @@ const buildShipsText = (sectorData, turnData) => {
       if (sectorData.ships) {
           var empiresPresent = Object.keys(sectorData.ships);
           empiresPresent.sort();
+          empiresPresent.filter(item => item !== turnData.name).unshift(turnData.name);
           text += "\n";
-          for (var i = 0; i < empiresPresent.length; i++) {
-               var empireName = empiresPresent[i];
-               var empireShips = sectorData.ships[empireName];
-               text += empireName + ": " + empireShips.count + " ship" + (empireShips.count > 1 ? "s" : "") +
-                      ", " + empireShips.tonnage + " tonne" + (empireShips.tonnage > 1 ? "s": "") + "\n";
+          empiresPresent.forEach((e) => {
+               var empireShips = sectorData.ships[e].ships;
+//               console.log( "empireShips = " + JSON.stringify(empireShips));
+               for (const shipName in empireShips) {
+                    var ship = empireShips[shipName];
+                    text += e + ": " + ship.name + " (" + ship.shipClass + ", dp " + ship.dpRemaining + ")\n";
+               };
+          });
+          if (sectorData.unidentifiedShipCount > 0) {
+              text += sectorData.unidentifiedShipCount + " unidentified ship" + (sectorData.unidentifiedShipCount > 1 ? "s": "") +
+                      "(" + sectorData.unidentifiedShipTonnage + " tonne" + (sectorData.unidentifiedShipTonnage > 1 ? "s": "") + ")\n";
           }
       }
       return text;

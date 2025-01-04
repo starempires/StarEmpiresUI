@@ -132,9 +132,9 @@ class Galaxy extends Component {
 //      e.cancelBubble = true;
   };
 
-  handleMouseEnter(x, y, text) {
+  handleMouseEnter(x, y, coordText, text) {
 //    console.log("Called Galaxy.handleMouseEnter state = " + " " + x + "," + y + "  " + text);
-        this.setState({tooltipVisible: true, tooltipX: x, tooltipY:y, tooltipText: text } );
+        this.setState({tooltipVisible: true, tooltipX: x, tooltipY:y, coordText: coordText, tooltipText: text } );
   }
 
    handleMouseMove(x, y) {

@@ -26,8 +26,11 @@ class Sector extends Component {
      const coordsColor = Constants.COORDS_STATUS_COLOR_MAP.get(sectorData.status);
      var borderType = Constants.BORDER_TYPE.Regular;
 
-     if (sectorData.storm) {
-         borderType = sectorData.storm.intensity > 0 ? Constants.BORDER_TYPE.Storm : Constants.BORDER_TYPE.Nebula;
+     if (sectorData.storms) {
+         borderType = Constants.BORDER_TYPE.Nebula;
+         if (sectorData.storms.find(storm => storm.intensity > 0)) {
+             borderType = Constants.BORDER_TYPE.Storm;
+         }
      }
 
      var worldColor;
@@ -77,7 +80,7 @@ class Sector extends Component {
     handleMouseEnter = e => {
         const mousePosition = e.target.getStage().getPointerPosition();
 //        console.log("mouse enter " + mousePosition.x);
-        this.props.onMouseEnter(mousePosition.x, mousePosition.y, this.state.hoverText);
+        this.props.onMouseEnter(mousePosition.x, mousePosition.y, this.state.coordText, this.state.hoverText);
       }
 
       handleMouseMove = e => {
