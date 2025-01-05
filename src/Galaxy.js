@@ -35,8 +35,8 @@ class Galaxy extends Component {
   computeConnections(turnData, radius)
   {
     var connections = [];
-    //console.log("conns " + JSON.stringify(turnData.connections));
     if (turnData.connections) {
+        //console.log("conns " + JSON.stringify(turnData.connections));
         var fromNames = Object.keys(turnData.connections);
         for (var i = 0; i < fromNames.length; i++) {
             var fromName = fromNames[i];

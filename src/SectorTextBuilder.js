@@ -30,7 +30,7 @@ const buildCoordsText = (sectorData) =>
         if (sectorData.storms) {
             if (sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
                 sectorData.storms.forEach(storm => {
-                    text = "\n" + storm.name + " (" + (storm.intensity > 0 ? ("intensity  " + storm.intensity + " ion storm") : "nebula") + ")";
+                    text = "\n" + storm.name + " (" + (storm.rating > 0 ? ("intensity " + storm.rating + " ion storm") : "nebula") + ")";
                 });
             }
         }
@@ -40,21 +40,23 @@ const buildCoordsText = (sectorData) =>
   const buildPortalText = (sectorData, turnData) =>
   {
       var text = "";
-      const portal = sectorData.portal;
-      if (portal) {
-          text = "\n" + portal.name;
-          var exits = "";
-          switch (sectorData.status) {
-              case Constants.SCAN_STATUS_TYPE.Scanned:
-              case Constants.SCAN_STATUS_TYPE.Visible:
-                   text += portal.collapsed ? " (collapsed)" : "";
-                   break;
-              default:
-                   break;
-          }
-          if (portal.navDataKnown && portal.exits) {
-              text += ", exits: " + portal.exits.sort().join();
-          }
+      const portals = sectorData.portals;
+      if (portals) {
+          portals.forEach(portal => {
+              text = "\n" + portal.name;
+              var exits = "";
+              switch (sectorData.status) {
+                  case Constants.SCAN_STATUS_TYPE.Scanned:
+                  case Constants.SCAN_STATUS_TYPE.Visible:
+                       text += portal.collapsed ? " (collapsed)" : "";
+                       break;
+                  default:
+                       break;
+              }
+              if (portal.navDataKnown && portal.exits) {
+                  text += ", exits: " + portal.exits.sort().join(", ");
+              }
+          });
       }
       return text;
   }

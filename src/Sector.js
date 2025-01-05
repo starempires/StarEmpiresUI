@@ -28,7 +28,7 @@ class Sector extends Component {
 
      if (sectorData.storms) {
          borderType = Constants.BORDER_TYPE.Nebula;
-         if (sectorData.storms.find(storm => storm.intensity > 0)) {
+         if (sectorData.storms.find(storm => storm.rating > 0)) {
              borderType = Constants.BORDER_TYPE.Storm;
          }
      }
@@ -47,17 +47,13 @@ class Sector extends Component {
            }
      }
 
-     const portal = sectorData.portal
+     const portals = sectorData.portals;
 
      var shipDotColors;
      if (sectorData.ships) {
          var empiresPresent = Object.keys(sectorData.ships);
          if (world) {
-             var index = empiresPresent.indexOf(world.owner);
-               if (index > -1) {
-                   empiresPresent.splice(index, 1);
-               }
-               shipDotColors = empiresPresent.map((e) => turnData.colors[e]);
+             shipDotColors = empiresPresent.map((e) => turnData.colors[e]);
           }
 //           console.log(coordsText + ", empireColors = " + shipDotColors);
      }
@@ -67,7 +63,7 @@ class Sector extends Component {
 
 //     console.log(coordsText + " border = " + borderType);
      this.state = { scanColor: scanColor, coordsText: coordsText, borderType: borderType, coordsColor: coordsColor,
-                    world: world, portal: portal, shipDotColors: shipDotColors,
+                    world: world, portals: portals, shipDotColors: shipDotColors,
                     xpos: xpos, ypos: ypos,
                     sectorData: sectorData,
                     hoverText: hoverText,
@@ -105,6 +101,17 @@ class Sector extends Component {
     const ypos = this.state.ypos;
 //    console.log(this.state.coordsText + " state = " + JSON.stringify(this.state));
 
+    const portals = this.state.portals;
+    var collapsed = false;
+    if (portals) {
+        if (portals.length > 1) {
+            collapsed = true;
+        }
+        else {
+            collapsed = portals[0].collapsed;
+        }
+   }
+
     return (
         <Group
                onClick={this.handleClick}
@@ -121,7 +128,7 @@ class Sector extends Component {
                    prohibition={this.state.prohibition}
                    border={this.state.world.homeworld}
                    /> }
-              {this.state.portal && <Portal x={xpos} y={ypos} collapsed={this.state.portal.collapsed}/> }
+              {this.state.portals && <Portal x={xpos} y={ypos} collapsed={collapsed}/> }
               <ShipDots x={xpos} y={ypos} unidentifiedShips={this.state.unidentifiedShips}
                         shipDotColors={this.state.shipDotColors}
                       />
