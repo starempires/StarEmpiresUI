@@ -19,7 +19,12 @@ const buildCoordsText = (sectorData) =>
   {
      var text = "Sector (" + sectorData.oblique + "," + sectorData.y + ")";
      if (sectorData.status == Constants.SCAN_STATUS_TYPE.Stale) {
-         text += "[last scanned turn " + sectorData.lastTurnScanned + "]";
+         if (sectorData.lastTurnScanned) {
+             text += " [last scanned turn " + sectorData.lastTurnScanned + "]";
+         }
+         else {
+             text += " [never scanned]";
+         }
      }
      return text;
   }
