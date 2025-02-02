@@ -10,14 +10,16 @@
          objectsText += buildPortalText(sectorData);
          objectsText += buildStormText(sectorData);
          objectsText += buildShipsText(sectorData, turnData);
-         text += objectsText.length > 0 ? objectsText : "\nempty space";
+         if (sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
+             text += objectsText.length > 0 ? objectsText : "\nempty space";
+         }
      }
      return text;
   }
 
 const buildCoordsText = (sectorData) =>
   {
-     var text = "Sector (" + sectorData.oblique + "," + sectorData.y + ")";
+     var text = "(" + sectorData.oblique + "," + sectorData.y + ")";
      if (sectorData.status == Constants.SCAN_STATUS_TYPE.Stale) {
          if (sectorData.lastTurnScanned) {
              text += " [last scanned turn " + sectorData.lastTurnScanned + "]";
@@ -35,7 +37,7 @@ const buildCoordsText = (sectorData) =>
         if (sectorData.storms) {
             if (sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
                 sectorData.storms.forEach(storm => {
-                    text = "\n" + storm.name + " (" + (storm.rating > 0 ? ("intensity " + storm.rating + " ion storm") : "nebula") + ")";
+                    text += "\n" + storm.name + " (" + (storm.rating > 0 ? ("intensity " + storm.rating + " ion storm") : "nebula") + ")";
                 });
             }
         }
@@ -112,10 +114,11 @@ const buildShipsText = (sectorData, turnData) => {
                     text += e + ": " + ship.name + " (" + ship.shipClass + ", dp " + ship.dpRemaining + ")\n";
                };
           });
-          if (sectorData.unidentifiedShipCount > 0) {
-              text += sectorData.unidentifiedShipCount + " unidentified ship" + (sectorData.unidentifiedShipCount > 1 ? "s": "") +
-                      "(" + sectorData.unidentifiedShipTonnage + " tonne" + (sectorData.unidentifiedShipTonnage > 1 ? "s": "") + ")\n";
-          }
+      }
+      if (sectorData.unidentifiedShipCount > 0) {
+          text += "\n";
+          text += sectorData.unidentifiedShipCount + " unidentified ship" + (sectorData.unidentifiedShipCount > 1 ? "s": "") +
+                  " (" + sectorData.unidentifiedShipTonnage + " tonne" + (sectorData.unidentifiedShipTonnage > 1 ? "s": "") + ")\n";
       }
       return text;
   }

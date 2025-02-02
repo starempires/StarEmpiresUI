@@ -66,30 +66,36 @@ class Galaxy extends Component {
      for (var y = radius; y >= 0; y--) {
           for (var oblique = y - radius; oblique <= radius; oblique++) {
               const key = Constants.getCoordinateKey(oblique, y);
-              const sector = <Sector
-                                key={key}
-                                turnData={turnData}
-                                oblique={oblique} y={y}
-                                onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onMouseMove={this.handleMouseMove}
-                                onClick={this.handleClick}
-                                onContextMenu={this.handleContextMenu}
-                            />
-              sectors.push(sector);
+              var sectorData = turnData.sectors[key];
+              if (sectorData && sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
+                  const sector = <Sector
+                                    key={key}
+                                    turnData={turnData}
+                                    oblique={oblique} y={y}
+                                    onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onMouseMove={this.handleMouseMove}
+                                    onClick={this.handleClick}
+                                    onContextMenu={this.handleContextMenu}
+                                />
+                  sectors.push(sector);
+              }
           }
      }
 
     for (var y = -1; y >= -radius; y--) {
          for (var oblique = -radius; oblique <= radius + y; oblique++) {
               const key = Constants.getCoordinateKey(oblique, y);
-              const sector = <Sector
-                                key={key}
-                                turnData={turnData}
-                                oblique={oblique} y={y}
-                                onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onMouseMove={this.handleMouseMove}
-                                onClick={this.handleClick}
-                                onContextMenu={this.handleContextMenu}
-                            />
-              sectors.push(sector);
+              var sectorData = turnData.sectors[key];
+              if (sectorData && sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
+                  const sector = <Sector
+                                    key={key}
+                                    turnData={turnData}
+                                    oblique={oblique} y={y}
+                                    onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onMouseMove={this.handleMouseMove}
+                                    onClick={this.handleClick}
+                                    onContextMenu={this.handleContextMenu}
+                                />
+                  sectors.push(sector);
+              }
          }
     }
     return sectors;

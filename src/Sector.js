@@ -17,8 +17,11 @@ class Sector extends Component {
      var turnData = this.props.turnData;
      var [xpos, ypos] = Constants.coordsToPosition(turnData.radius, this.props.oblique, this.props.y);
      const sectorKey = Constants.getCoordinateKey(this.props.oblique, this.props.y);
-//     console.log("construct sector " + this.props.oblique + ", " + this.props.y);
      var sectorData = turnData.sectors[sectorKey];
+     if (!sectorData) {
+         sectorData = {status: "unknown", oblique: this.props.oblique, y: this.props.y};
+     }
+//     console.log("construct sector " + this.props.oblique + ", " + this.props.y + ", status " + (sectorData.status ? sectorData.status : "undefined"));
      const scanColor = Constants.SECTOR_STATUS_COLOR_MAP.get(sectorData.status);
 //    console.log("Sector lookup color " + this.props.status + " scan color = " + scanColor);
 //    console.log("Sector " + status === Constants.SECTOR_STATUS_TYPE.Visible);
@@ -61,8 +64,8 @@ class Sector extends Component {
 //     const hoverText = this.buildHoverText(turnData, sectorData);
      const hoverText = buildSectorText(turnData, sectorData);
 
-//     console.log(coordsText + " border = " + borderType);
-     this.state = { scanColor: scanColor, coordsText: coordsText, borderType: borderType, coordsColor: coordsColor,
+//     console.log(coordsText + " hover text = " + hoverText);
+     this.state ={ scanColor: scanColor, coordsText: coordsText, borderType: borderType, coordsColor: coordsColor,
                     world: world, portals: portals, shipDotColors: shipDotColors,
                     xpos: xpos, ypos: ypos,
                     sectorData: sectorData,
