@@ -98,6 +98,23 @@ const buildCoordsText = (sectorData) =>
       }
       return text;
   }
+const formatShipStats = (ship, turnData) => {
+   var text = "";
+   if (ship.owner == turnData.name || turnData.shipClasses[ship.shipClass]) {
+       text += "  " + ship.name + " (" + ship.shipClass + "/" + ship.hull +
+                            ", g/e/s " +
+                            (ship.opGuns ? ship.opGuns : 0) + "/" +
+                            (ship.opEngines ? ship.opEngines: 0) + "/" +
+                            (ship.opScan ? ship.opScan : 0) +
+                            ", dp " + ship.dpRemaining + ")\n";
+   }
+   else {
+       text += "  " + ship.name + " (" + ship.shipClass +
+                            "/" + ship.hull + " " +
+                            ship.tonnage + " tonne" + (ship.tonnage > 1 ? "s": "") + ")\n";
+   }
+   return text;
+}
 
 const buildShipsText = (sectorData, turnData) => {
       var text = "";
@@ -107,11 +124,12 @@ const buildShipsText = (sectorData, turnData) => {
           empiresPresent.filter(item => item !== turnData.name).unshift(turnData.name);
           text += "\n";
           empiresPresent.forEach((e) => {
+                text += e + ":\n";
                var empireShips = sectorData.ships[e].ships;
 //               console.log( "empireShips = " + JSON.stringify(empireShips));
                for (const shipName in empireShips) {
                     var ship = empireShips[shipName];
-                    text += e + ": " + ship.name + " (" + ship.shipClass + ", dp " + ship.dpRemaining + ")\n";
+                    text += formatShipStats(ship, turnData);
                };
           });
       }

@@ -55,9 +55,7 @@ class Sector extends Component {
      var shipDotColors;
      if (sectorData.ships) {
          var empiresPresent = Object.keys(sectorData.ships);
-         if (world) {
-             shipDotColors = empiresPresent.map((e) => turnData.colors[e]);
-          }
+         shipDotColors = empiresPresent.map((e) => turnData.colors[e]);
 //           console.log(coordsText + ", empireColors = " + shipDotColors);
      }
 

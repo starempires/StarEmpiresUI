@@ -61,12 +61,13 @@ class Galaxy extends Component {
      var radius = turnData.radius;
      var cols = 2 * radius + 1;
      var key = 0;
-     console.log("build sectors radius = " + radius);
+//     console.log("build sectors radius = " + radius);
 
      for (var y = radius; y >= 0; y--) {
           for (var oblique = y - radius; oblique <= radius; oblique++) {
               const key = Constants.getCoordinateKey(oblique, y);
               var sectorData = turnData.sectors[key];
+//              console.log("sector " + key + " = " + JSON.stringify(sectorData));
               if (sectorData && sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
                   const sector = <Sector
                                     key={key}
