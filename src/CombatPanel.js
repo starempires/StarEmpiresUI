@@ -72,7 +72,7 @@ export default function CombatPanel(props) {
 
 
     function handleFireShip(attacker, targets, ascending) {
-      console.log("toggled = " + checked + ", " + attacker.name);
+//      console.log("toggled = " + checked + ", " + attacker.name);
     }
 
     sortedAttackers.map((attacker) => {

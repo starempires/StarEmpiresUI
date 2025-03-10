@@ -1,4 +1,3 @@
-
 import "./index.css";
 import React, { Component } from 'react';
 import Konva from 'konva';
@@ -40,7 +39,7 @@ class App extends Component {
 //                  "Authorization": "Bearer REAL_JWT_TOKEN",
                   "Content-Type": "application/json"
               },
-              body: JSON.stringify({ sessionName: "alpha", empireName: "Federation", turnNumber: 0, sessionObject: "SNAPSHOT" })
+              body: JSON.stringify({ sessionName: "alpha", empireName: "GM", turnNumber: 0, sessionObject: "SNAPSHOT" })
           })
           .then(response => response.json())
           .then(apiData => {
