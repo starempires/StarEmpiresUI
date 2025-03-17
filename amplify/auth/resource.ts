@@ -10,6 +10,6 @@ export const auth = defineAuth({
   },
   userAttributes: {
      email: { required: true },   // Require email during signup
-     preferred_username: { required: true },  // Require a username
+     preferredUsername: { required: true },  // Require a username
    },
 });
