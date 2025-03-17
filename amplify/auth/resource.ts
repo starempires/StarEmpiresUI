@@ -8,9 +8,9 @@ export const auth = defineAuth({
   loginWith: {
     email: true,
   },
-  userAttributes: {
-     email: { required: true },   // Require email during signup
-     preferredUsername: { required: true },  // Require a username
-   },
-   signInMechanisms: ['email']
+  //userAttributes: {
+  //   email: { required: true },   // Require email during signup
+  //   preferredUsername: { required: true },  // Require a username
+  // },
+  // signInMechanisms: ['email']
 });
