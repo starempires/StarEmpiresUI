@@ -11,7 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aws-amplify/ui-react": "^6.9.3",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.7",
@@ -20,22 +19,21 @@
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.6.1",
-    "aws-amplify": "^6.13.4",
+    "aws-amplify": "^6.13.5",
     "konva": "^9.3.18",
     "mui": "^0.0.1",
     "react-dom": "^19.0.0",
     "react-konva": "^19.0.3",
     "react-konva-utils": "^1.1.0",
-    "react-scripts": "^5.0.1",
     "react-sliding-pane": "^7.3.0",
     "styled-components": "^6.1.15",
     "web-vitals": "^4.2.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite",
+    "preview": "vite preview"
   },
   "eslintConfig": {
     "extends": [
@@ -54,5 +52,20 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.14.3",
+    "@aws-amplify/backend-cli": "^1.5.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "aws-cdk": "^2.1003.0",
+    "aws-cdk-lib": "^2.180.0",
+    "constructs": "^10.4.2",
+    "esbuild": "^0.25.1",
+    "eslint": "^9.22.0",
+    "eslint-plugin-react": "^7.37.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.2"
   }
 }
