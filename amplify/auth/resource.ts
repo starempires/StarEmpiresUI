@@ -8,8 +8,8 @@ export const auth = defineAuth({
   loginWith: {
     email: true,
   },
-  signUpAttributes: {
-    email: true,  // Require email during signup
-    username: true,  // Require username during signup
-  },
+  userAttributes: {
+     email: { required: true },   // Require email during signup
+     preferred_username: { required: true },  // Require a username
+   },
 });
