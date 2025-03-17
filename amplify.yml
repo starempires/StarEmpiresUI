@@ -9,12 +9,12 @@ frontend:
   phases:
     build:
       commands:
-        - mkdir ./dist && touch ./dist/index.html
-        - curl -X POST -d {} "https://webhooks.amplify.ca-central-1.amazonaws.com/prod/webhooks?id=WEBHOOK-ID&token=TOKEN&operation=startbuild" -H "Content-Type:application/json"
+        - npm run build
   artifacts:
     baseDirectory: dist
     files:
       - '**/*'
   cache:
     paths:
+      - .npm/**/*
       - node_modules/**/*
