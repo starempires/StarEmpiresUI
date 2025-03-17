@@ -71,7 +71,7 @@ export function getXCount(column) {
       if (column < 2) {
         return column + 1;
       } else {
-        return this.getXCount(column - 2) + 3;
+        return getXCount(column - 2) + 3;
       }
   }
 
@@ -79,7 +79,7 @@ export function coordsToPosition(radius, oblique, y) {
      var cols = 2 * radius + 1;
      var row = -2 * y + oblique + 2 * radius;
      var column = oblique + Math.floor(cols / 2);
-     var xpos = this.getXCount(column) * RADIUS + (column % 2) * SHORT_SIDE;
+     var xpos = getXCount(column) * RADIUS + (column % 2) * SHORT_SIDE;
      var ypos = (row +1) * LONG_SIDE;
      return [xpos, ypos];
 }
