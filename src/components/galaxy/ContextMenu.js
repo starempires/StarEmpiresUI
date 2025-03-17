@@ -1,5 +1,4 @@
-
-import React, { Component } from 'react';
+import React from 'react';
 import { Html } from 'react-konva-utils';
 
 const ContextMenu = ({ position, onOptionSelected, sectorData }) => {

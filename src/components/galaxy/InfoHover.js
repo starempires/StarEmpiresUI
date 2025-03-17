@@ -1,9 +1,6 @@
-import './index.css';
-import React, { Component } from 'react';
-import Konva from 'konva';
-import { Group, Rect, Text, Label, Tag } from 'react-konva';
-import { Html} from 'react-konva-utils';
-import * as Constants from './Constants';
+import React from 'react';
+import { Text, Label, Tag } from 'react-konva';
+import * as Constants from '../../Constants';
 
 export default function InfoHover(props) {
 

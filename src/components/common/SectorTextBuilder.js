@@ -1,5 +1,4 @@
-  import React from 'react';
-  import * as Constants from './Constants';
+  import * as Constants from '../../Constants';
 
   export const buildSectorText = (turnData, sectorData) => {
      var text = "";
@@ -10,7 +9,7 @@
          objectsText += buildPortalText(sectorData);
          objectsText += buildStormText(sectorData);
          objectsText += buildShipsText(sectorData, turnData);
-         if (sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
+         if (sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
              text += objectsText.length > 0 ? objectsText : "\nempty space";
          }
      }
@@ -20,7 +19,7 @@
 const buildCoordsText = (sectorData) =>
   {
      var text = "(" + sectorData.oblique + "," + sectorData.y + ")";
-     if (sectorData.status == Constants.SCAN_STATUS_TYPE.Stale) {
+     if (sectorData.status === Constants.SCAN_STATUS_TYPE.Stale) {
          if (sectorData.lastTurnScanned) {
              text += " [last scanned turn " + sectorData.lastTurnScanned + "]";
          }
@@ -35,7 +34,7 @@ const buildCoordsText = (sectorData) =>
   {
         var text = "";
         if (sectorData.storms) {
-            if (sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
+            if (sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
                 sectorData.storms.forEach(storm => {
                     text += "\n" + storm.name + " (" + (storm.rating > 0 ? ("intensity " + storm.rating + " ion storm") : "nebula") + ")";
                 });
@@ -51,7 +50,6 @@ const buildCoordsText = (sectorData) =>
       if (portals) {
           portals.forEach(portal => {
               text = "\n" + portal.name;
-              var exits = "";
               switch (sectorData.status) {
                   case Constants.SCAN_STATUS_TYPE.Scanned:
                   case Constants.SCAN_STATUS_TYPE.Visible:
@@ -100,7 +98,7 @@ const buildCoordsText = (sectorData) =>
   }
 const formatShipStats = (ship, turnData) => {
    var text = "";
-   if (ship.owner == turnData.name || turnData.shipClasses[ship.shipClass]) {
+   if (ship.owner === turnData.name || turnData.shipClasses[ship.shipClass]) {
        text += "  " + ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
                             (ship.opGuns ? ship.opGuns : 0) + "/" +

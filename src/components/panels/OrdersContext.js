@@ -18,7 +18,7 @@ const OrdersProvider = ({ children }) => {
 
   const deleteLoadOrder = (cargo, carrier) => {
      let pendingLoads = loadOrders.get(carrier) || [];
-     pendingLoads = pendingLoads.filter(ship => ship != cargo);
+     pendingLoads = pendingLoads.filter(ship => ship !== cargo);
      setLoadOrders(new Map(loadOrders.set(carrier, pendingLoads)));
       console.log("delete order: load " + cargo.name + " onto " + carrier.name);
   };
@@ -61,7 +61,7 @@ const OrdersProvider = ({ children }) => {
 
   const deleteUnloadOrder = (cargo, carrier) => {
       let pendingUnloads = unloadOrders.get(carrier) || [];
-      pendingUnloads = pendingUnloads.filter(ship => ship != cargo);
+      pendingUnloads = pendingUnloads.filter(ship => ship !== cargo);
       setUnloadOrders(new Map(unloadOrders.set(carrier, pendingUnloads)));
       console.log("delete order: unload " + cargo.name + " onto " + carrier.name);
   };
@@ -70,13 +70,12 @@ const OrdersProvider = ({ children }) => {
       const attackerData = fireOrders.get(attacker) || [];
       const data = { targets: targets, ascending: ascending };
       attackerData.push(data);
-      const newFireOrders = new Map(fireOrders.set(attacker, attackerData));
       setFireOrders(fireOrders);
       console.log("add order: fire " + attacker.name + " at " + targets + " (ascending " + ascending + ")");
   };
 
   const deleteFireOrder = (attacker) => {
-      let newFireOrders = fireOrders.filter(ship => ship != attacker);
+      let newFireOrders = fireOrders.filter(ship => ship !== attacker);
       setFireOrders(newFireOrders);
       console.log("delete order: fire " + attacker.name);
   };

@@ -5,7 +5,6 @@ import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import UndoIcon from '@mui/icons-material/Undo';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
@@ -55,4 +54,3 @@ export default function Cargo(props) {
          </Box>
     );
 }
-

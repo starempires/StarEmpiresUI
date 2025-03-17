@@ -1,15 +1,4 @@
 import {useContext} from 'react';
-import * as Constants from './Constants';
-import Paper from '@mui/material/Paper';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CancelIcon from '@mui/icons-material/Cancel';
-import IconButton from '@mui/material/IconButton';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
 import Carrier from './Carrier';
 import {OrdersContext} from './OrdersContext';
 
@@ -44,12 +33,14 @@ function createCarrierMap(empireShipsInSector, loadOrders, unloadOrders) {
 //             console.log("cargoList " + JSON.stringify(originalCargo));
 
         // compute loaded tonnage and free racks for this carrier based on existing cargo
-        var loadedTonnage = 0;
-        originalCargo.map(cargo => { loadedTonnage += cargo.tonnage});
-        var pendingLoads = loadOrders.get(carrier) || [];
-        pendingLoads.map(ship => { loadedTonnage += ship.tonnage});
-        var pendingUnloads = unloadOrders.get(carrier) || [];
-        pendingUnloads.map(ship => { loadedTonnage -= ship.tonnage});
+        var loadedTonnage = originalCargo.reduce((sum, cargo) => sum + cargo.tonnage, 0);
+        const pendingLoads = loadOrders.get(carrier) || [];
+        const pendingUnloads = unloadOrders.get(carrier) || [];
+
+        const totalLoadTonnage = pendingLoads.reduce((sum, ship) => sum + ship.tonnage, 0);
+        const totalUnloadTonnage = pendingUnloads.reduce((sum, ship) => sum + ship.tonnage, 0);
+
+        loadedTonnage += totalLoadTonnage - totalUnloadTonnage;
 //        console.log("loaded tonnage pending unloads " + loadedTonnage);
 
         const freeRacks = carrier.racks - loadedTonnage;
@@ -63,7 +54,7 @@ function createCarrierMap(empireShipsInSector, loadOrders, unloadOrders) {
                       .filter(ship => !ship.carrier || allPendingCargoUnloads.has(ship)) // ship is not loaded cargo or has pending unload
                       .filter(ship => !allPendingCargoLoads.has(ship)) // no pending load order for ship
                       //TODO remove anything already pending load
-                      .filter(ship => (ship.racks || 0) == 0) // ship is not a carrier (no racks)
+                      .filter(ship => (ship.racks || 0) === 0) // ship is not a carrier (no racks)
                       .sort((a, b) => a.name.localeCompare(b.name));
 //        console.log("loadable ships " + JSON.stringify(loadableShips));
 

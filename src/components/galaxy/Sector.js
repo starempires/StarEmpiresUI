@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Konva from 'konva';
 import { Group } from 'react-konva';
 import Coords from './Coords';
 import World from './World';
@@ -7,8 +6,8 @@ import Portal from './Portal';
 import Border from './Border';
 import Hex from './Hex';
 import ShipDots from './ShipDots';
-import * as Constants from './Constants';
-import {buildSectorText} from './SectorTextBuilder';
+import * as Constants from '../../Constants';
+import {buildSectorText} from '../common/SectorTextBuilder';
 
 class Sector extends Component {
 

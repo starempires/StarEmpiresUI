@@ -1,7 +1,6 @@
 import React from 'react';
-import Konva from 'konva';
-import { Shape, Label, Tag, Text} from 'react-konva';
-import * as Constants from './Constants';
+import { Text} from 'react-konva';
+import * as Constants from '../../Constants';
 
 export default function Coords(props) {
 

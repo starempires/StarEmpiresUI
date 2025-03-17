@@ -1,13 +1,13 @@
 import React from 'react';
-import Konva from 'konva';
 import { Group, Rect } from 'react-konva';
-import * as Constants from './Constants';
+import * as Constants from '../../Constants';
 
 export default function ShipDots(props) {
     var dots = [];
     var key = 0;
+    var rect;
     if (props.unidentifiedShips) {
-      var rect = <Rect
+      rect = <Rect
                 key={key}
                 x={props.x - Constants.RADIUS/2 + key * Constants.SHIP_DOT_SIZE}
                 y={props.y + Constants.RADIUS/3}
@@ -21,7 +21,7 @@ export default function ShipDots(props) {
     }
 
     for (var i in props.shipDotColors) {
-      var rect = <Rect
+      rect = <Rect
                 key={key}
                 x={props.x - Constants.RADIUS/2 + key * Constants.SHIP_DOT_SIZE + key}
                 y={props.y + Constants.RADIUS/3}

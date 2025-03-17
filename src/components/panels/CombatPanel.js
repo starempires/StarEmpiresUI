@@ -1,11 +1,5 @@
 import {useState, useContext} from 'react';
-import * as Constants from './Constants';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CancelIcon from '@mui/icons-material/Cancel';
-import IconButton from '@mui/material/IconButton';
-import { List, ListItem, ListItemIcon, ListItemText, Checkbox, ListItemButton } from '@mui/material';
+import { List, ListItemIcon, ListItemText, Checkbox, ListItemButton } from '@mui/material';
 import Attacker from './Attacker';
 import {OrdersContext} from './OrdersContext';
 
@@ -23,12 +17,11 @@ function createAttackerMap(empireShipsInSector, fireOrders, hasLoadOrder, hasUnl
        return attackerMap();
    }
 
-   const targetEmpires = [];
    // filter loaded attackers that are (a) not missiles and (b) have no unload order
    // filter unloaded attackers that are (a) not missiles or (b) have no load order
    for (const i in attackers) {
         const attacker = attackers[i];
-        if (attacker.shipClass == 'missile') {
+        if (attacker.shipClass === 'missile') {
            if (!attacker.carrier && !hasLoadOrder(attacker)) {
                continue;
            }
@@ -47,9 +40,9 @@ export default function CombatPanel(props) {
     const turnData = props.turnData;
     const attackers = [];
     let attackerMap = new Map();
-    const [checkedItems, setCheckedItems] = useState({});
+    const [checkedItems] = useState({});
 
-   const { fireOrders, addFireOrder, deleteFireOrder, hasLoadOrder, hasUnloadOrder } = useContext(OrdersContext);
+   const { fireOrders, hasLoadOrder, hasUnloadOrder } = useContext(OrdersContext);
 
     if (sectorData && sectorData.ships) {
         const empireInSector = sectorData.ships[turnData.name];
@@ -75,7 +68,7 @@ export default function CombatPanel(props) {
 //      console.log("toggled = " + checked + ", " + attacker.name);
     }
 
-    sortedAttackers.map((attacker) => {
+    sortedAttackers.forEach((attacker) => {
        let attackerData = attackerMap.get(attacker);
        attackers.push(<Attacker key={attacker.name} attacker={attacker} attackerData={attackerData}
                                 handleFireShip={handleFireShip}

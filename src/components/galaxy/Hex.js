@@ -1,7 +1,6 @@
 import React from 'react';
-import Konva from 'konva';
 import { RegularPolygon } from 'react-konva';
-import * as Constants from './Constants';
+import * as Constants from '../../Constants';
 
 export default function Hex(props) {
 

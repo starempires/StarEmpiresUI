@@ -1,11 +1,8 @@
 import {useState} from 'react';
-import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import MenuList from '@mui/material/MenuList';
 import Slide from '@mui/material/Slide';
 
 export default function LoadNewShip(props) {

@@ -1,8 +1,6 @@
 import React from 'react';
-import Konva from 'konva';
 import { Line, Text, Group, Circle } from 'react-konva';
-import * as Constants from './Constants';
-
+import * as Constants from '../../Constants';
 
 export default function World (props) {
       const element = document.createElement('canvas');

@@ -23,8 +23,8 @@ export default function Carrier(props) {
 
     const cargoItems = [];
     const originalCargo = carrierData.originalCargo;
-    var order = null;
-    for (var i = 0; i < originalCargo.length; i++) {
+    var i;
+    for (i = 0; i < originalCargo.length; i++) {
          const cargo = originalCargo[i];
     //             console.log("stack Found cargo " + ship);
          cargoItems.push(<Cargo key={cargo.name} carrier={carrier} cargo={cargo}
@@ -33,7 +33,7 @@ export default function Carrier(props) {
                                 handleCancelUnloadShip={props.handleCancelUnloadShip}
                                 handleUnloadShip={props.handleUnloadShip} />);
     }
-    for (var i = 0; i < pendingLoads.length; i++) {
+    for (i = 0; i < pendingLoads.length; i++) {
          const cargo = pendingLoads[i];
          cargoItems.push(<Cargo key={cargo.name} carrier={carrier} cargo={cargo}
                                 hasOrder={Constants.ORDER_TYPE.Load}

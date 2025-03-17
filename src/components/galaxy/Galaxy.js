@@ -1,16 +1,10 @@
-import "./index.css";
 import React, { Component } from 'react';
-import Konva from 'konva';
-import ReactDOM from 'react-dom';
-import { Layer, Label, Text, Tag } from 'react-konva';
-import { Html} from 'react-konva-utils';
-
+import { Layer } from 'react-konva';
 import Sector from './Sector';
 import Connections from './Connections';
 import ContextMenu from './ContextMenu';
 import InfoHover from './InfoHover';
-import * as Constants from './Constants';
-import SlidingPane from "react-sliding-pane";
+import * as Constants from '../../Constants';
 
 class Galaxy extends Component {
 
@@ -59,16 +53,16 @@ class Galaxy extends Component {
   {
      var sectors = []
      var radius = turnData.radius;
-     var cols = 2 * radius + 1;
-     var key = 0;
 //     console.log("build sectors radius = " + radius);
 
-     for (var y = radius; y >= 0; y--) {
-          for (var oblique = y - radius; oblique <= radius; oblique++) {
+     var oblique, y;
+     var sectorData;
+     for (y = radius; y >= 0; y--) {
+          for (oblique = y - radius; oblique <= radius; oblique++) {
               const key = Constants.getCoordinateKey(oblique, y);
-              var sectorData = turnData.sectors[key];
+              sectorData = turnData.sectors[key];
 //              console.log("sector " + key + " = " + JSON.stringify(sectorData));
-              if (sectorData && sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
+              if (sectorData && sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
                   const sector = <Sector
                                     key={key}
                                     turnData={turnData}
@@ -82,11 +76,11 @@ class Galaxy extends Component {
           }
      }
 
-    for (var y = -1; y >= -radius; y--) {
-         for (var oblique = -radius; oblique <= radius + y; oblique++) {
+    for (y = -1; y >= -radius; y--) {
+         for (oblique = -radius; oblique <= radius + y; oblique++) {
               const key = Constants.getCoordinateKey(oblique, y);
-              var sectorData = turnData.sectors[key];
-              if (sectorData && sectorData.status != Constants.SCAN_STATUS_TYPE.Unknown) {
+              sectorData = turnData.sectors[key];
+              if (sectorData && sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
                   const sector = <Sector
                                     key={key}
                                     turnData={turnData}
@@ -121,7 +115,7 @@ class Galaxy extends Component {
   }
 
   handleClick = (e, sectorData) => {
-    if (e.evt.button == 0) {
+    if (e.evt.button === 0) {
 //        console.log("left click (button " + e.evt.button + ") = " + sectorData.oblique + "," + sectorData.y);
         this.props.onClick(e, sectorData);
 //        this.setState({ contextMenuPosition: null, contextMenuSectorData: null });
@@ -160,7 +154,7 @@ class Galaxy extends Component {
 //  }
 
   render() {
-  const width = (this.props.turnData.radius * 10 * Constants.RADIUS) + " px";
+//  const width = (this.props.turnData.radius * 10 * Constants.RADIUS) + " px";
     return (
         <Layer onDblClick={this.handleDoubleClick}>
           {this.state.sectors}
