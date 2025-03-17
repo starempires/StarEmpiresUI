@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Layer } from 'react-konva';
-import Sector from './Sector';
-import Connections from './Connections';
-import ContextMenu from './ContextMenu';
-import InfoHover from './InfoHover';
+import Sector from './Sector.jsx';
+import Connections from './Connections.jsx';
+import ContextMenu from './ContextMenu.jsx';
+import InfoHover from './InfoHover.jsx';
 import * as Constants from '../../Constants';
 
 class Galaxy extends Component {

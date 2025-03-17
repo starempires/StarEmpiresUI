@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Group } from 'react-konva';
-import Coords from './Coords';
-import World from './World';
-import Portal from './Portal';
-import Border from './Border';
-import Hex from './Hex';
-import ShipDots from './ShipDots';
+import Coords from './Coords.jsx';
+import World from './World.jsx';
+import Portal from './Portal.jsx';
+import Border from './Border.jsx';
+import Hex from './Hex.jsx';
+import ShipDots from './ShipDots.jsx';
 import * as Constants from '../../Constants';
-import {buildSectorText} from '../common/SectorTextBuilder';
+import {buildSectorText} from '../common/SectorTextBuilder.jsx';
 
 class Sector extends Component {
 

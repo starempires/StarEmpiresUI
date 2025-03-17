@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Stage } from 'react-konva';
-import Galaxy from './components/galaxy/Galaxy';
+import Galaxy from './components/galaxy/Galaxy.jsx';
 import * as Constants from './Constants';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
