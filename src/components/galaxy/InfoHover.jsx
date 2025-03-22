@@ -6,8 +6,8 @@ export default function InfoHover(props) {
 
     return (
           <Label visible={props.visible}
-                 x={props.x + Constants.INFO_HOVER_OFFSET }
-                 y={props.y + Constants.INFO_HOVER_OFFSET }
+                 x={props.x + Constants.INFO_HOVER_X_OFFSET }
+                 y={props.y + Constants.INFO_HOVER_Y_OFFSET }
                  >
              <Tag
              pointerDirection="left"

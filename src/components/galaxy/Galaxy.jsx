@@ -10,7 +10,7 @@ class Galaxy extends Component {
 
   constructor(props) {
      super(props);
-     console.log(JSON.stringify(props));
+//      console.log(JSON.stringify(props));
      this.handleClick = this.handleClick.bind(this);
      this.handleDoubleClick = this.handleDoubleClick.bind(this);
      this.handleContextMenu = this.handleContextMenu.bind(this);
@@ -156,7 +156,7 @@ class Galaxy extends Component {
   render() {
 //  const width = (this.props.turnData.radius * 10 * Constants.RADIUS) + " px";
     return (
-        <Layer onDblClick={this.handleDoubleClick}>
+        <Layer offset={{y:-30}} onDblClick={this.handleDoubleClick}>
           {this.state.sectors}
           <Connections connections={this.state.connections} />
 

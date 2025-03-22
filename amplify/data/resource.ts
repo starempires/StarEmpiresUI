@@ -7,11 +7,51 @@ specifies that any unauthenticated user can "create", "read", "update",
 and "delete" any "Todo" records.
 =========================================================================*/
 const schema = a.schema({
-  Todo: a
+        SessionEmpire: a
+            .model({
+              userId: a.string().required(),
+              sessionId: a.id(),
+              session: a.belongsTo('Session', 'sessionId'),
+              empireName: a.string().required(),
+              ordersLocked: a.boolean().required(),
+              empireType: a.enum([
+                'ABANDONED',
+                'ACTIVE',
+                'GM',
+                'HOMELESS',
+                'INACTIVE',
+                'NPC',
+                'OBSERVER',
+              ]),
+            })
+            .authorization((allow) => [ allow.authenticated()]),
+  Session: a
     .model({
-      content: a.string(),
+      id: a.id().required(),
+      name: a.string().required(),
+      created: a.datetime().required(),
+      started: a.datetime(), // optional
+      status: a.enum([
+        'ABANDONED',
+        'ARCHIVED',
+        'CREATED',
+        'GAME_OVER',
+        'IN_PROGRESS',
+        'REPLACEMENT_NEEDED',
+        'TEMPORARILY_CLOSED',
+        'UPDATE_BEING_RUN',
+        'WAITING_FOR_PLAYERS',
+      ]),
+      sessionType: a.enum(['DEMO', 'STANDARD', 'TEST']),
+      numPlayers: a.integer().required(),
+      updateHours: a.integer().required(),
+      pendingTurnNumber: a.integer().required().default(1),
+      nextDeadline: a.datetime(), // optional
+      maxTurns: a.integer(), // optional
+      sessionEmpire: a.hasMany('SessionEmpire', 'sessionId'),
     })
-    .authorization((allow) => [allow.guest()]),
+    .authorization((allow) => [allow.authenticated()]),
+
 });
 
 export type Schema = ClientSchema<typeof schema>;

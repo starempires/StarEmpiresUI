@@ -5,9 +5,9 @@ import * as Constants from './Constants';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { fetchUserAttributes } from '@aws-amplify/auth';
 
 //const TURNDATA = require("./snapshot.json");
-
 export default class App extends Component {
 
   constructor(props) {
@@ -16,7 +16,8 @@ export default class App extends Component {
      this.handleDoubleClick = this.handleDoubleClick.bind(this);
      this.handleClick = this.handleClick.bind(this);
      this.handleOnTabChange = this.handleOnTabChange.bind(this);
-     this.state = {isOpen:false, tabIndex:0, sectorData: null};
+     this.state = {isOpen:false, loading: true, tabIndex:0, sectorData: null, user: props.user};
+//      console.log("Construct user = " + JSON.stringify(this.state.user));
   }
 
   componentDidMount() {
@@ -36,7 +37,15 @@ export default class App extends Component {
               console.error("Error fetching data:", error);
               this.setState({ loading: false });
           });
-      }
+       // ✅ Fetch `preferred_username` using Amplify Auth API (Gen 2)
+          fetchUserAttributes()
+              .then(attributes => {
+                  console.log("Fetched user attributes:", JSON.stringify(attributes));
+                  this.setState({ user: { ...this.state.user, preferred_username: attributes.preferred_username } });
+
+              })
+              .catch(error => console.error("Error fetching preferred_username:", error));
+  }
 
   handleDoubleClick(event) {
      event.evt.preventDefault();
@@ -57,8 +66,8 @@ export default class App extends Component {
   }
 
   render() {
-//   console.log("size = " + size);
-    const { data, loading } = this.state;
+    const { data, loading, user } = this.state;
+    const { signOut } = this.props; // Access signOut from props
 
     if (loading) {
         return <Typography variant="h6" sx={{ ml: 5 }}>Loading...</Typography>;
@@ -69,17 +78,23 @@ export default class App extends Component {
         return <Typography variant="h6" sx={{ ml: 5, color: "red" }}>Error loading data.</Typography>;
     }
 
-   const size = data.radius * 10 * Constants.RADIUS;
+   // width, height enough room for hover text
+   const width = (data.radius * 6) * Constants.RADIUS;
+   const height = (data.radius * 5) * Constants.RADIUS;
 
     return (
       <div>
         <Grid container spacing={2}>
           <Grid item xs={10}>
             <Typography variant="h6" gutterBottom gutterLeft sx={{ ml:5, color: data.colors["visible"] }}>
+                  Welcome, {this.state.user?.preferred_username}
+            <button onClick={signOut}>Sign out</button>
+            </Typography>
+            <Typography variant="h6" gutterBottom gutterLeft sx={{ ml:5, color: data.colors["visible"] }}>
                   {data.name} galactic map for session {data.session}, turn {data.turnNumber}
             </Typography>
             <Box sx={{ ml: 5 }}>
-              <Stage width={size} height={size}>
+              <Stage width={width} height={height}>
                 <Galaxy turnData={data} onDblClick={this.handleDoubleClick} onClick={this.handleClick}/>
               </Stage>
             </Box>
