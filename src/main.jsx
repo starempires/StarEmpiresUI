@@ -4,10 +4,10 @@ import App from './App.jsx'; // Ensure this is correct
 import './index.css'; // Ensure this file exists
 import { Authenticator } from '@aws-amplify/ui-react';
 import { Amplify } from "aws-amplify";
-import outputs from "../amplify_outputs.json";
+import amplifyConfig from "../amplify_outputs.json";
 import '@aws-amplify/ui-react/styles.css';
 
-Amplify.configure(outputs);
+Amplify.configure(amplifyConfig);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

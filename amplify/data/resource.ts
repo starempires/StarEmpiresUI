@@ -7,14 +7,14 @@ specifies that any unauthenticated user can "create", "read", "update",
 and "delete" any "Todo" records.
 =========================================================================*/
 const schema = a.schema({
-        SessionEmpire: a
-            .model({
-              userId: a.string().required(),
-              sessionId: a.id(),
-              session: a.belongsTo('Session', 'sessionId'),
-              empireName: a.string().required(),
-              ordersLocked: a.boolean().required(),
-              empireType: a.enum([
+  SessionEmpire: a
+    .model({
+       userId: a.string().required(),
+       sessionId: a.id(),
+       session: a.belongsTo('Session', 'sessionId'),
+       empireName: a.string().required(),
+       ordersLocked: a.boolean().required(),
+       empireType: a.enum([
                 'ABANDONED',
                 'ACTIVE',
                 'GM',
@@ -22,9 +22,10 @@ const schema = a.schema({
                 'INACTIVE',
                 'NPC',
                 'OBSERVER',
-              ]),
-            })
-            .authorization((allow) => [ allow.authenticated()]),
+       ]),
+    })
+    .secondaryIndexes((index) => [index("sessionId")])
+    .authorization((allow) => [ allow.authenticated()]),
   Session: a
     .model({
       id: a.id().required(),
@@ -45,13 +46,12 @@ const schema = a.schema({
       sessionType: a.enum(['DEMO', 'STANDARD', 'TEST']),
       numPlayers: a.integer().required(),
       updateHours: a.integer().required(),
-      pendingTurnNumber: a.integer().required().default(1),
+      currentTurnNumber: a.integer().required().default(0),
       nextDeadline: a.datetime(), // optional
       maxTurns: a.integer(), // optional
       sessionEmpire: a.hasMany('SessionEmpire', 'sessionId'),
     })
     .authorization((allow) => [allow.authenticated()]),
-
 });
 
 export type Schema = ClientSchema<typeof schema>;
