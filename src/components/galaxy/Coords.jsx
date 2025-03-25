@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text} from 'react-konva';
-import * as Constants from '../../Constants';
+import * as Constants from '../../Constants.jsx';
 
 export default function Coords(props) {
 

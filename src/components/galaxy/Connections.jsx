@@ -1,6 +1,6 @@
 import React from 'react';
 import { Line, Group } from 'react-konva';
-import * as Constants from '../../Constants';
+import * as Constants from '../../Constants.jsx';
 
 export default function Connections(props) {
     var lines = [];

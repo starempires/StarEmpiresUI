@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Stage } from 'react-konva';
 import Galaxy from '../components/galaxy/Galaxy.jsx';
-import * as Constants from '../Constants';
+import * as Constants from '../Constants.jsx';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-export default function MapPage({signOut, user, userAttributes}) {
+type CustomKonvaEventObject<T extends Event> = {
+  evt: T;
+  // Add any additional properties if needed
+};
+
+export default function MapPage({ signOut, userAttributes }: { signOut: () => void; userAttributes: any }) {
+
   const { sessionName, empireName, turnNumber } = useParams();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -41,13 +47,13 @@ export default function MapPage({signOut, user, userAttributes}) {
       fetchSessionObject();
     }, []);
 
-  const handleDoubleClick = (event) => {
+  const handleDoubleClick = (event: CustomKonvaEventObject<MouseEvent>) => {
     event.evt.preventDefault();
 //     setIsOpen(!isOpen);
   };
 
-  const handleClick = (event, sectorData) => {
-    event.evt.preventDefault(true);
+  const handleClick = (event: CustomKonvaEventObject<MouseEvent>, sectorData: any) => {
+    event.evt.preventDefault();
 //     setSectorData(sectorData);
     console.log(
       "left click (button " + event.evt.button + ") = " +

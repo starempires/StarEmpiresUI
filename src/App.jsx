@@ -1,10 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
-import { Stage } from 'react-konva';
-import Galaxy from './components/galaxy/Galaxy.jsx';
-import * as Constants from './Constants';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { fetchUserAttributes } from '@aws-amplify/auth';
 import { Authenticator } from '@aws-amplify/ui-react';

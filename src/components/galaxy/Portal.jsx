@@ -1,6 +1,6 @@
 import React from 'react';
 import { Group, Circle } from 'react-konva';
-import * as Constants from '../../Constants';
+import * as Constants from '../../Constants.jsx';
 
 export default function Portal(props) {
 

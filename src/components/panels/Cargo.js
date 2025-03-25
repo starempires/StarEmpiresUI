@@ -1,4 +1,4 @@
-import * as Constants from './Constants';
+import * as Constants from './Constants.jsx';
 import Typography from '@mui/material/Typography';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DownloadIcon from '@mui/icons-material/Download';

@@ -6,7 +6,7 @@ import Portal from './Portal.jsx';
 import Border from './Border.jsx';
 import Hex from './Hex.jsx';
 import ShipDots from './ShipDots.jsx';
-import * as Constants from '../../Constants';
+import * as Constants from '../../Constants.jsx';
 import {buildSectorText} from '../common/SectorTextBuilder.jsx';
 
 class Sector extends Component {

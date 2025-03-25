@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
-import { Authenticator } from '@aws-amplify/ui-react';
 import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '@/amplify/data/resource';
+import type { Schema } from '../../amplify/data/resource';
 import { Link } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import '../index.css';
 
 const client = generateClient<Schema>({ authMode: 'userPool' });
+
+interface Empire {
+  empireName: string;
+  empireType: string;
+  sessionId: string;
+  ordersLocked: boolean;
+}
 
 export default function HomePage({ signOut, user, userAttributes }: { signOut: () => void; user: any; userAttributes: any }) {
   const [sessions, setSessions] = useState<any[]>([]);
@@ -28,7 +34,7 @@ export default function HomePage({ signOut, user, userAttributes }: { signOut: (
 
   async function fetchEmpiresForUser(userId: string): Promise<any> {
     const result = await client.models.SessionEmpire.list({
-      filter: { userId: { eq: user.userId } }
+      filter: { userId: { eq: userId } }
     });
     return result.data || [];
   }
@@ -43,24 +49,24 @@ export default function HomePage({ signOut, user, userAttributes }: { signOut: (
           // join session w/empire data
         const empires = await fetchEmpiresForUser(user.userId);
 
-        const gmEmpires = empires.filter(empire => empire.empireType === "GM");
-        const nonGMEmpires = empires.filter(empire => empire.empireType !== "GM");
+        const gmEmpires = empires.filter((empire: Empire) => empire.empireType === "GM");
+        const nonGMEmpires = empires.filter((empire: Empire) => empire.empireType !== "GM");
 
-        const gmSessionIds = Array.from(new Set(gmEmpires.map(empire => empire.sessionId)));
-        const gmEmpiresPromises = gmSessionIds.map(sessionId => fetchEmpiresForSession(sessionId));
+        const gmSessionIds: string[] = Array.from(new Set(gmEmpires.map((empire: Empire) => empire.sessionId)));
+        const gmEmpiresPromises = gmSessionIds.map((sessionId: string) => fetchEmpiresForSession(sessionId));
         const results = await Promise.all(gmEmpiresPromises);
         const gmOtherEmpires = results.flat();
 
         const combinedEmpires = [...nonGMEmpires, ...gmOtherEmpires];
 
         // all sessionIds, whether GM or not
-        const allSessionIds = Array.from(new Set(empires.map(empire => empire.sessionId)));
-        const allSessionPromises = allSessionIds.map(sessionId => fetchSession(sessionId));
+        const allSessionIds: string[] = Array.from(new Set(empires.map((empire: Empire) => empire.sessionId)));
+        const allSessionPromises = allSessionIds.map((sessionId: string) => fetchSession(sessionId));
         const allSessionResults = await Promise.all(allSessionPromises);
         const allSessions = allSessionResults.flat();
 
         const sessionsWithEmpires = allSessions.map(session => {
-          const sessionEmpires = combinedEmpires.filter(empire => empire.sessionId === session.id);
+          const sessionEmpires = combinedEmpires.filter((empire: Empire) => empire.sessionId === session.id);
           return {
             sessionName: session.name,
             sessionId: session.id,
@@ -103,7 +109,7 @@ export default function HomePage({ signOut, user, userAttributes }: { signOut: (
             <h2 className="text-blue-500 hover:underline text-xl">Session {session.sessionName}</h2>
             <p>Current Turn {session.currentTurnNumber}, Deadline {session.deadline}</p>
             <ul className="ml-4 mt-2">
-              {session.empires.map((empire, index) => (
+              {session.empires.map((empire: Empire, index: number) => (
                 <li key={index} className="mb-1">
                   <Link
                     to={`/session/${session.sessionName}/${empire.empireName}/${session.currentTurnNumber}`}

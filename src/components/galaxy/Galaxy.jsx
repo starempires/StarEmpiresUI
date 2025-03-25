@@ -4,7 +4,7 @@ import Sector from './Sector.jsx';
 import Connections from './Connections.jsx';
 import ContextMenu from './ContextMenu.jsx';
 import InfoHover from './InfoHover.jsx';
-import * as Constants from '../../Constants';
+import * as Constants from '../../Constants.jsx';
 
 class Galaxy extends Component {
 

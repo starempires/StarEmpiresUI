@@ -1,6 +1,6 @@
 import React from 'react';
 import { Group, Rect } from 'react-konva';
-import * as Constants from '../../Constants';
+import * as Constants from '../../Constants.jsx';
 
 export default function ShipDots(props) {
     var dots = [];

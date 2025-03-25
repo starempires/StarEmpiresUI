@@ -8,10 +8,16 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "allowJs": true,
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "paths": {
-      "$amplify/*": [
-        "../.amplify/generated/*"
-      ]
+      "@/*": ["src/*"],
+      "@amplify/*": ["amplify/*"]
     }
-  }
+  },
+  "include": ["src", "amplify"]
 }
