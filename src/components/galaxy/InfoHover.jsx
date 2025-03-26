@@ -1,4 +1,3 @@
-import React from 'react';
 import { Text, Label, Tag } from 'react-konva';
 import * as Constants from '../../Constants.jsx';
 

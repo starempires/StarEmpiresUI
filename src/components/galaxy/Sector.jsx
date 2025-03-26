@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useMemo } from 'react';
 import { Group } from 'react-konva';
 import Coords from './Coords.jsx';
 import World from './World.jsx';
@@ -9,45 +9,74 @@ import ShipDots from './ShipDots.jsx';
 import * as Constants from '../../Constants.jsx';
 import {buildSectorText} from '../common/SectorTextBuilder.jsx';
 
-class Sector extends Component {
+// interface SectorProps {
+//   turnData: TurnData;
+//   oblique: number;
+//   y: number;
+//   onClick: (e: Konva.KonvaEventObject<MouseEvent>, sector: SectorData) => void;
+//   onContextMenu: (e: Konva.KonvaEventObject<MouseEvent>, sector: SectorData) => void;
+//   onMouseEnter: (x: number, y: number, label: string, text: string) => void;
+//   onMouseLeave: () => void;
+//   onMouseMove: (x: number, y: number) => void;
+// }
 
-  constructor(props) {
-     super(props);
-     var turnData = this.props.turnData;
-     var [xpos, ypos] = Constants.coordsToPosition(turnData.radius, this.props.oblique, this.props.y);
-     const sectorKey = Constants.getCoordinateKey(this.props.oblique, this.props.y);
-     var sectorData = turnData.sectors[sectorKey];
-     if (!sectorData) {
-         sectorData = {status: "unknown", oblique: this.props.oblique, y: this.props.y};
-     }
-//     console.log("construct sector " + this.props.oblique + ", " + this.props.y + ", status " + (sectorData.status ? sectorData.status : "undefined"));
-     const scanColor = Constants.SECTOR_STATUS_COLOR_MAP.get(sectorData.status);
-//    console.log("Sector lookup color " + this.props.status + " scan color = " + scanColor);
-//    console.log("Sector " + status === Constants.SECTOR_STATUS_TYPE.Visible);
-     const coordsText = sectorData.oblique + "," + sectorData.y;
-     const coordsColor = Constants.COORDS_STATUS_COLOR_MAP.get(sectorData.status);
-     var borderType = Constants.BORDER_TYPE.Regular;
+export default function Sector(props) {
+      const {
+        turnData,
+        oblique,
+        y,
+        onMouseEnter,
+        onMouseMove,
+        onMouseLeave,
+        onClick,
+        onContextMenu
+      } = props;
 
-     if (sectorData.storms) {
-         borderType = Constants.BORDER_TYPE.Nebula;
-         if (sectorData.storms.find(storm => storm.rating > 0)) {
-             borderType = Constants.BORDER_TYPE.Storm;
-         }
-     }
+    const {
+      scanColor,
+      coordsText,
+      borderType,
+      coordsColor,
+      world,
+      portals,
+      shipDotColors,
+      xpos,
+      ypos,
+      sectorData,
+      hoverText,
+      unidentifiedShips,
+      worldColor,
+      prohibition
+    } = useMemo(() => {
+      const [xpos, ypos] = Constants.coordsToPosition(turnData.radius, oblique, y);
+      const sectorKey = Constants.getCoordinateKey(oblique, y);
+      let sectorData = turnData.sectors[sectorKey];
+      if (!sectorData) {
+          sectorData = { status: 'unknown', oblique, y };
+      }
+      const scanColor = Constants.SECTOR_STATUS_COLOR_MAP.get(sectorData.status);
+      const coordsText = `${sectorData.oblique},${sectorData.y}`;
+      const coordsColor = Constants.COORDS_STATUS_COLOR_MAP.get(sectorData.status);
 
-     var worldColor;
-     var prohibition;
-     const world = sectorData.world;
-     if (world) {
-//    console.log("Sector world " + JSON.stringify(world));
-           if (world.owner) {
-               worldColor = this.props.turnData.colors[world.owner];
-               prohibition = world.prohibition;
-           }
-           else {
-               worldColor = this.props.turnData.colors["unowned"];
-           }
-     }
+      let borderType = Constants.BORDER_TYPE.Regular;
+      if (sectorData.storms) {
+          borderType = Constants.BORDER_TYPE.Nebula;
+          if (sectorData.storms.find(storm => storm.rating > 0)) {
+              borderType = Constants.BORDER_TYPE.Storm;
+          }
+      }
+
+    let worldColor;
+    let prohibition;
+    const world = sectorData.world;
+    if (world) {
+      if (world.owner) {
+        worldColor = turnData.colors[world.owner];
+        prohibition = world.prohibition;
+      } else {
+        worldColor = turnData.colors['unowned'];
+      }
+    }
 
      const portals = sectorData.portals;
 
@@ -55,87 +84,67 @@ class Sector extends Component {
      if (sectorData.ships) {
          var empiresPresent = Object.keys(sectorData.ships);
          shipDotColors = empiresPresent.map((e) => turnData.colors[e]);
-//           console.log(coordsText + ", empireColors = " + shipDotColors);
      }
 
-//     const hoverText = this.buildHoverText(turnData, sectorData);
      const hoverText = buildSectorText(turnData, sectorData);
+     const unidentifiedShips = sectorData.unidentifiedShipCount || 0;
 
-//     console.log(coordsText + " hover text = " + hoverText);
-     this.state ={ scanColor: scanColor, coordsText: coordsText, borderType: borderType, coordsColor: coordsColor,
-                    world: world, portals: portals, shipDotColors: shipDotColors,
-                    xpos: xpos, ypos: ypos,
-                    sectorData: sectorData,
-                    hoverText: hoverText,
-                    unidentifiedShips: sectorData.unidentifiedShipCount ? sectorData.unidentifiedShipCount : 0,
-                    worldColor: worldColor, prohibition: prohibition};
-//    console.log("Sector.render props = " + JSON.stringify(this.props));
-//    console.log("Sector.render state = " + JSON.stringify(this.state));
-  }
+    return {
+      scanColor,
+      coordsText,
+      borderType,
+      coordsColor,
+      world,
+      portals,
+      shipDotColors,
+      xpos,
+      ypos,
+      sectorData,
+      hoverText,
+      unidentifiedShips,
+      worldColor,
+      prohibition
+    };
+  }, [turnData, oblique, y]);
 
-    handleMouseEnter = e => {
-        const mousePosition = e.target.getStage().getPointerPosition();
-//        console.log("mouse enter " + mousePosition.x);
-        this.props.onMouseEnter(mousePosition.x, mousePosition.y, this.state.coordText, this.state.hoverText);
-      }
-
-      handleMouseMove = e => {
-        const mousePosition = e.target.getStage().getPointerPosition();
-         this.props.onMouseMove(mousePosition.x, mousePosition.y);
-      }
-
-      handleMouseLeave = e => {
-        this.props.onMouseLeave(e);
-      }
-
-      handleClick = e => {
-        this.props.onClick(e, this.state.sectorData);
-      }
-
-      handleContextMenu = e => {
-        this.props.onContextMenu(e, this.state.sectorData);
-      }
-
-  render() {
-    const xpos = this.state.xpos;
-    const ypos = this.state.ypos;
-//    console.log(this.state.coordsText + " state = " + JSON.stringify(this.state));
-
-    const portals = this.state.portals;
-    var collapsed = false;
-    if (portals) {
-        if (portals.length > 1) {
-            collapsed = true;
-        }
-        else {
-            collapsed = portals[0].collapsed;
-        }
-   }
+  const collapsed = portals && (portals.length > 1 || portals[0]?.collapsed);
 
     return (
-        <Group
-               onClick={this.handleClick}
-               onContextMenu={this.handleContextMenu}
-               onMouseEnter={this.handleMouseEnter}
-               onMouseLeave={this.handleMouseLeave}
-               onMouseMove={this.handleMouseMove}
-        >
-              <Hex color={this.state.scanColor} x={xpos} y={ypos} />
-              <Coords x={xpos} y={ypos} text={this.state.coordsText} color={this.state.coordsColor}/>
-              {this.state.world && <World x={xpos} y={ypos}
-                   color={this.state.worldColor}
-                   production={this.state.world.production}
-                   prohibition={this.state.prohibition}
-                   border={this.state.world.homeworld}
-                   /> }
-              {this.state.portals && <Portal x={xpos} y={ypos} collapsed={collapsed}/> }
-              <ShipDots x={xpos} y={ypos} unidentifiedShips={this.state.unidentifiedShips}
-                        shipDotColors={this.state.shipDotColors}
-                      />
-              <Border x={xpos} y={ypos} type={this.state.borderType} />
-        </Group>
-    );
-  }
-}
+      <Group
+        onClick={(e) => onClick(e, sectorData)}
+        onContextMenu={(e) => onContextMenu(e, sectorData)}
+        onMouseEnter={(e) => {
+          const mousePosition = e.target.getStage().getPointerPosition();
+          onMouseEnter(mousePosition.x, mousePosition.y, coordsText, hoverText);
+        }}
+        onMouseMove={(e) => {
+          const mousePosition = e.target.getStage().getPointerPosition();
+//               console.log("sector mouse move " + mousePosition.x + "," + mousePosition.y);
 
-export default Sector;
+          onMouseMove(mousePosition.x, mousePosition.y);
+        }}
+        onMouseLeave={onMouseLeave}
+      >
+        <Hex color={scanColor} x={xpos} y={ypos} />
+        <Coords x={xpos} y={ypos} text={coordsText} color={coordsColor} />
+        {world && (
+          <World
+            x={xpos}
+            y={ypos}
+            color={worldColor}
+            production={world.production}
+            prohibition={prohibition}
+            border={world.homeworld}
+          />
+        )}
+        {portals && <Portal x={xpos} y={ypos} collapsed={collapsed} />}
+        <ShipDots
+          x={xpos}
+          y={ypos}
+          unidentifiedShips={unidentifiedShips}
+          shipDotColors={shipDotColors}
+        />
+        <Border x={xpos} y={ypos} type={borderType} />
+      </Group>
+    );
+}

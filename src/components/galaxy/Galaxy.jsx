@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Layer } from 'react-konva';
 import Sector from './Sector.jsx';
 import Connections from './Connections.jsx';
@@ -6,173 +6,169 @@ import ContextMenu from './ContextMenu.jsx';
 import InfoHover from './InfoHover.jsx';
 import * as Constants from '../../Constants.jsx';
 
-class Galaxy extends Component {
+export default function Galaxy({ turnData, onClick, onDblClick }) {
+  const [contextMenuPosition, setContextMenuPosition] = useState(null);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [tooltipX, setTooltipX] = useState(0);
+  const [tooltipY, setTooltipY] = useState(0);
+  const [tooltipText, setTooltipText] = useState("");
+  const [coordText, setCoordText] = useState("");
+  const [contextMenuSectorData, setContextMenuSectorData] = useState(null);
 
-  constructor(props) {
-     super(props);
-//      console.log(JSON.stringify(props));
-     this.handleClick = this.handleClick.bind(this);
-     this.handleDoubleClick = this.handleDoubleClick.bind(this);
-     this.handleContextMenu = this.handleContextMenu.bind(this);
-     this.handleMouseEnter = this.handleMouseEnter.bind(this);
-     this.handleMouseLeave = this.handleMouseLeave.bind(this);
-     this.handleMouseMove = this.handleMouseMove.bind(this);
-//     this.handleClose = this.handleClose.bind(this);
-     var sectors = this.buildSectors(props.turnData);
-     var connections = this.computeConnections(props.turnData);
-//     console.log("connections = " + connections);
-     this.state = { contextMenuPosition: null, tooltipVisible: false, tooltipX: 0, tooltipY: 0, tooltipText: "",
-                    contextMenuSectorData: null,
-                    sectors: sectors, connections: connections };
-  }
-
-  computeConnections(turnData, radius)
-  {
-    var connections = [];
+  const computeConnections = (turnData) => {
+    const connections = [];
     if (turnData.connections) {
-        //console.log("conns " + JSON.stringify(turnData.connections));
-        var fromNames = Object.keys(turnData.connections);
-        for (var i = 0; i < fromNames.length; i++) {
-            var fromName = fromNames[i];
-            const toNames = turnData.connections[fromName];
-             for (var j = 0; j < toNames.length; j++) {
-               var toName = toNames[j];
-
-                var fromSector = turnData.sectors[fromName];
-                var toSector = turnData.sectors[toName];
-                var [fromx, fromy] = Constants.coordsToPosition(turnData.radius, fromSector.oblique, fromSector.y);
-                var [tox, toy] = Constants.coordsToPosition(turnData.radius, toSector.oblique, toSector.y);
-                connections.push([fromx, fromy, tox, toy]);
-            }
+      const fromNames = Object.keys(turnData.connections);
+      for (let fromName of fromNames) {
+        const toNames = turnData.connections[fromName];
+        for (let toName of toNames) {
+          const fromSector = turnData.sectors[fromName];
+          const toSector = turnData.sectors[toName];
+          const [fromx, fromy] = Constants.coordsToPosition(turnData.radius, fromSector.oblique, fromSector.y);
+          const [tox, toy] = Constants.coordsToPosition(turnData.radius, toSector.oblique, toSector.y);
+          connections.push([fromx, fromy, tox, toy]);
         }
+      }
     }
     return connections;
-  }
-
-  buildSectors(turnData)
-  {
-     var sectors = []
-     var radius = turnData.radius;
-//     console.log("build sectors radius = " + radius);
-
-     var oblique, y;
-     var sectorData;
-     for (y = radius; y >= 0; y--) {
-          for (oblique = y - radius; oblique <= radius; oblique++) {
-              const key = Constants.getCoordinateKey(oblique, y);
-              sectorData = turnData.sectors[key];
-//              console.log("sector " + key + " = " + JSON.stringify(sectorData));
-              if (sectorData && sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
-                  const sector = <Sector
-                                    key={key}
-                                    turnData={turnData}
-                                    oblique={oblique} y={y}
-                                    onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onMouseMove={this.handleMouseMove}
-                                    onClick={this.handleClick}
-                                    onContextMenu={this.handleContextMenu}
-                                />
-                  sectors.push(sector);
-              }
-          }
-     }
-
-    for (y = -1; y >= -radius; y--) {
-         for (oblique = -radius; oblique <= radius + y; oblique++) {
-              const key = Constants.getCoordinateKey(oblique, y);
-              sectorData = turnData.sectors[key];
-              if (sectorData && sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
-                  const sector = <Sector
-                                    key={key}
-                                    turnData={turnData}
-                                    oblique={oblique} y={y}
-                                    onMouseEnter={this.handleMouseEnter} onMouseLeave={this.handleMouseLeave} onMouseMove={this.handleMouseMove}
-                                    onClick={this.handleClick}
-                                    onContextMenu={this.handleContextMenu}
-                                />
-                  sectors.push(sector);
-              }
-         }
-    }
-    return sectors;
-  }
-
-  handleOptionSelected = option => {
-    console.log("handleOptionSelected " + option);
-    this.setState({ contextMenuPosition: null });
   };
 
-  handleContextMenu = (e, sectorData) => {
-  console.log("Enter handleContextMenu " + JSON.stringify(sectorData));
-    e.evt.preventDefault(true); // NB!!!! Remember the ***TRUE***
-    const mousePosition = e.target.getStage().getPointerPosition();
-//    const x = mousePosition.x | 0;
-//    const y = mousePosition.y | 0;
-//    console.log("right click (button " + e.evt.button + ") = " + JSON.stringify(mousePosition) + ", x=" + x + ", y=" + y);
-     this.setState({
-            contextMenuPosition: mousePosition,
-            contextMenuSectorData: sectorData
-        });
-  }
-
-  handleClick = (e, sectorData) => {
+  const handleClick = useCallback((e, sectorData) => {
     if (e.evt.button === 0) {
-//        console.log("left click (button " + e.evt.button + ") = " + sectorData.oblique + "," + sectorData.y);
-        this.props.onClick(e, sectorData);
-//        this.setState({ contextMenuPosition: null, contextMenuSectorData: null });
-    }
-    else {
-        //console.log("handleClick ignored");
+      onClick(e, sectorData);
     }
     e.cancelBubble = true;
-  }
+  }, [onClick]);
 
-  handleDoubleClick = e => {
-//      console.log("handleDoubleClick target = " + JSON.stringify(e) );
-//      this.setState({isPaneOpen:true});
-      this.props.onDblClick(e);
-//      e.cancelBubble = true;
+  const handleDoubleClick = useCallback((e) => {
+    onDblClick(e);
+  }, [onDblClick]);
+
+const handleContextMenu = useCallback((e, sectorData) => {
+    e.evt.preventDefault(true);
+    const mousePosition = e.target.getStage().getPointerPosition();
+    setContextMenuPosition(mousePosition);
+    setContextMenuSectorData(sectorData);
+  }, []);
+
+  const handleMouseEnter = useCallback((x, y, coordText, text) => {
+    setTooltipVisible(true);
+    setTooltipX(x);
+    setTooltipY(y);
+    setCoordText(coordText);
+    setTooltipText(text);
+  }, []);
+
+  const handleMouseMove = useCallback((x, y) => {
+//     console.log("handle mouse move " + x + "," + y + ", tooltipVisible: " + tooltipVisible);
+    if (tooltipVisible) {
+      setTooltipX(x);
+      setTooltipY(y);
+    }
+  }, [tooltipVisible]);
+
+  const handleMouseLeave = useCallback(() => {
+    setTooltipVisible(false);
+  }, []);
+
+  const handleOptionSelected = useCallback((option) => {
+    console.log("handleOptionSelected", option);
+    setContextMenuPosition(null);
+  }, []);
+
+  // Create a ref for the dynamic mouse handlers.
+  const handlersRef = useRef({
+    handleMouseEnter,
+    handleMouseLeave,
+    handleMouseMove,
+    handleClick,
+    handleContextMenu,
+  });
+
+// Update the ref whenever any of the handlers change.
+  useEffect(() => {
+    handlersRef.current = {
+      handleMouseEnter,
+      handleMouseLeave,
+      handleMouseMove,
+      handleClick,
+      handleContextMenu,
+    };
+  }, [handleMouseEnter, handleMouseLeave, handleMouseMove, handleClick, handleContextMenu]);
+
+  const buildSectors = (turnData) => {
+    const sectors = [];
+    const radius = turnData.radius;
+    for (let y = radius; y >= 0; y--) {
+      for (let oblique = y - radius; oblique <= radius; oblique++) {
+        const key = Constants.getCoordinateKey(oblique, y);
+        const sectorData = turnData.sectors[key];
+        if (sectorData && sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
+          sectors.push(
+            <Sector
+              key={key}
+              turnData={turnData}
+              oblique={oblique}
+              y={y}
+            // Instead of passing the handlers directly,
+              // pass wrapper functions that read the current handlers from the ref.
+              onMouseEnter={(...args) => handlersRef.current.handleMouseEnter(...args)}
+              onMouseLeave={(...args) => handlersRef.current.handleMouseLeave(...args)}
+              onMouseMove={(...args) => handlersRef.current.handleMouseMove(...args)}
+              onClick={(...args) => handlersRef.current.handleClick(...args)}
+              onContextMenu={(...args) => handlersRef.current.handleContextMenu(...args)}
+
+            />
+          );
+        }
+      }
+    }
+    for (let y = -1; y >= -radius; y--) {
+      for (let oblique = -radius; oblique <= radius + y; oblique++) {
+        const key = Constants.getCoordinateKey(oblique, y);
+        const sectorData = turnData.sectors[key];
+        if (sectorData && sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
+          sectors.push(
+            <Sector
+              key={key}
+              turnData={turnData}
+              oblique={oblique}
+              y={y}
+                     // Instead of passing the handlers directly,
+                       // pass wrapper functions that read the current handlers from the ref.
+                       onMouseEnter={(...args) => handlersRef.current.handleMouseEnter(...args)}
+                       onMouseLeave={(...args) => handlersRef.current.handleMouseLeave(...args)}
+                       onMouseMove={(...args) => handlersRef.current.handleMouseMove(...args)}
+                       onClick={(...args) => handlersRef.current.handleClick(...args)}
+                       onContextMenu={(...args) => handlersRef.current.handleContextMenu(...args)}
+
+            />
+          );
+        }
+      }
+    }
+    return sectors;
   };
 
-  handleMouseEnter(x, y, coordText, text) {
-//    console.log("Called Galaxy.handleMouseEnter state = " + " " + x + "," + y + "  " + text);
-        this.setState({tooltipVisible: true, tooltipX: x, tooltipY:y, coordText: coordText, tooltipText: text } );
-  }
+  const sectors = useMemo(() => buildSectors(turnData), [turnData]);
+  const connections = useMemo(() => computeConnections(turnData), [turnData]);
 
-   handleMouseMove(x, y) {
-//  console.log("Enter handleMouseMove");
-       if (this.state.tooltipVisible) {
-           this.setState({tooltipX: x, tooltipY:y } );
-       }
-  }
 
-   handleMouseLeave(e) {
-    this.setState({tooltipVisible: false} );
-  }
-
-//  handleClose() {
-//     this.setState({isPaneOpen:false});
-//  }
-
-  render() {
-//  const width = (this.props.turnData.radius * 10 * Constants.RADIUS) + " px";
-    return (
-        <Layer offset={{y:-30}} onDblClick={this.handleDoubleClick}>
-          {this.state.sectors}
-          <Connections connections={this.state.connections} />
-
-         <InfoHover
-            visible={this.state.tooltipVisible} x={this.state.tooltipX} y={this.state.tooltipY }
-             text ={this.state.tooltipText}
-            />
-
-          <ContextMenu
-                position={this.state.contextMenuPosition}
-                onOptionSelected={this.handleOptionSelected}
-                sectorData={this.state.contextMenuSectorData}
-              />
-        </Layer>
-    );
-  }
+  return (
+    <Layer offset={{ y: -30 }} onDblClick={handleDoubleClick}>
+      {sectors}
+      <Connections connections={connections} />
+      <InfoHover
+        visible={tooltipVisible}
+        x={tooltipX}
+        y={tooltipY}
+        text={tooltipText}
+      />
+      <ContextMenu
+        position={contextMenuPosition}
+        onOptionSelected={handleOptionSelected}
+        sectorData={contextMenuSectorData}
+      />
+    </Layer>
+  );
 }
-
-export default Galaxy;
