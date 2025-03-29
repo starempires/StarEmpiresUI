@@ -1,30 +1,29 @@
-import React from 'react';
 import { Group, Circle } from 'react-konva';
-import * as Constants from '../../Constants.jsx';
+import * as Constants from '../../Constants';
 
-export default function Portal(props) {
+export default function Portal({x, y, collapsed}: {x: number; y: number; collapsed: boolean}) {
 
     return (
        <Group listening={false}>
-               {!props.collapsed && <Circle
-                   x={props.x}
-                   y={props.y - Constants.WORLD_RADIUS/2}
+               {!collapsed && <Circle
+                   x={x}
+                   y={y - Constants.WORLD_RADIUS/2}
                    radius={Constants.WORLD_RADIUS}
                    stroke={Constants.PORTAL_COLOR}
                    shadowEnabled={false}
                    listening={false}
                  />}
-               {!props.collapsed && <Circle
-                   x={props.x}
-                   y={props.y - Constants.WORLD_RADIUS/2}
+               {!collapsed && <Circle
+                   x={x}
+                   y={y - Constants.WORLD_RADIUS/2}
                    radius={Constants.WORLD_RADIUS/1.5}
                    stroke={Constants.PORTAL_COLOR}
                    shadowEnabled={false}
                    listening={false}
                  />}
                <Circle
-                   x={props.x}
-                   y={props.y - Constants.WORLD_RADIUS/2}
+                   x={x}
+                   y={y - Constants.WORLD_RADIUS/2}
                    radius={Constants.WORLD_RADIUS/3}
                    stroke={Constants.PORTAL_COLOR}
                    shadowEnabled={false}

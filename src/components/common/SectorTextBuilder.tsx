@@ -1,10 +1,10 @@
-  import * as Constants from '../../Constants.jsx';
+  import * as Constants from '../../Constants';
 
-  export const buildSectorText = (turnData, sectorData) => {
-     var text = "";
+  export const buildSectorText = (turnData: any, sectorData: any): string => {
+     let text = "";
      if (sectorData) {
          text += buildCoordsText(sectorData);
-         var objectsText = ""
+         let objectsText = ""
          objectsText += buildWorldText(sectorData);
          objectsText += buildPortalText(sectorData);
          objectsText += buildStormText(sectorData);
@@ -16,9 +16,9 @@
      return text;
   }
 
-const buildCoordsText = (sectorData) =>
+const buildCoordsText = (sectorData: any): string =>
   {
-     var text = "(" + sectorData.oblique + "," + sectorData.y + ")";
+     let text = "(" + sectorData.oblique + "," + sectorData.y + ")";
      if (sectorData.status === Constants.SCAN_STATUS_TYPE.Stale) {
          if (sectorData.lastTurnScanned) {
              text += " [last scanned turn " + sectorData.lastTurnScanned + "]";
@@ -30,12 +30,12 @@ const buildCoordsText = (sectorData) =>
      return text;
   }
 
- const buildStormText = (sectorData, turnData) =>
+ const buildStormText = (sectorData: any): string =>
   {
-        var text = "";
+        let text = "";
         if (sectorData.storms) {
             if (sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
-                sectorData.storms.forEach(storm => {
+                sectorData.storms.forEach((storm: any) => {
                     text += "\n" + storm.name + " (" + (storm.rating > 0 ? ("intensity " + storm.rating + " ion storm") : "nebula") + ")";
                 });
             }
@@ -43,12 +43,12 @@ const buildCoordsText = (sectorData) =>
         return text;
   }
 
-  const buildPortalText = (sectorData, turnData) =>
+  const buildPortalText = (sectorData: any): string =>
   {
-      var text = "";
+      let text = "";
       const portals = sectorData.portals;
       if (portals) {
-          portals.forEach(portal => {
+          portals.forEach((portal:any) => {
               text = "\n" + portal.name;
               switch (sectorData.status) {
                   case Constants.SCAN_STATUS_TYPE.Scanned:
@@ -66,9 +66,9 @@ const buildCoordsText = (sectorData) =>
       return text;
   }
 
-  const buildWorldText = (sectorData, turnData) =>
+  const buildWorldText = (sectorData: any): string =>
   {
-      var text = "";
+      let text = "";
       const world = sectorData.world;
       if (world) {
           const owner = world.owner ? world.owner : "unowned";
@@ -96,8 +96,8 @@ const buildCoordsText = (sectorData) =>
       }
       return text;
   }
-const formatShipStats = (ship, turnData) => {
-   var text = "";
+const formatShipStats = (ship: any, turnData: any): string => {
+   let text = "";
    if (ship.owner === turnData.name || turnData.shipClasses[ship.shipClass]) {
        text += "  " + ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
@@ -114,19 +114,19 @@ const formatShipStats = (ship, turnData) => {
    return text;
 }
 
-const buildShipsText = (sectorData, turnData) => {
-      var text = "";
+const buildShipsText = (sectorData: any, turnData: any): string => {
+      let text = "";
       if (sectorData.ships) {
-          var empiresPresent = Object.keys(sectorData.ships);
+          let empiresPresent = Object.keys(sectorData.ships);
           empiresPresent.sort();
           empiresPresent.filter(item => item !== turnData.name).unshift(turnData.name);
           text += "\n";
           empiresPresent.forEach((e) => {
                 text += e + ":\n";
-               var empireShips = sectorData.ships[e].ships;
+               let empireShips = sectorData.ships[e].ships;
 //               console.log( "empireShips = " + JSON.stringify(empireShips));
                for (const shipName in empireShips) {
-                    var ship = empireShips[shipName];
+                    let ship = empireShips[shipName];
                     text += formatShipStats(ship, turnData);
                };
           });

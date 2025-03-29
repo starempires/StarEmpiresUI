@@ -1,21 +1,22 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Layer } from 'react-konva';
-import Sector from './Sector.jsx';
-import Connections from './Connections.jsx';
-import ContextMenu from './ContextMenu.jsx';
-import InfoHover from './InfoHover.jsx';
-import * as Constants from '../../Constants.jsx';
+import Sector from './Sector';
+import Connections from './Connections';
+import ContextMenu from './ContextMenu';
+import InfoHover from './InfoHover';
+import * as Constants from '../../Constants';
 
-export default function Galaxy({ turnData, onClick, onDblClick }) {
-  const [contextMenuPosition, setContextMenuPosition] = useState(null);
+export default function Galaxy({turnData, onClick, onDblClick }: {turnData: any;
+                                                                   onClick: (e: any, sectorData: any) => void;
+                                                                   onDblClick: (e: any) => void;}) {
+  const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [tooltipX, setTooltipX] = useState(0);
   const [tooltipY, setTooltipY] = useState(0);
   const [tooltipText, setTooltipText] = useState("");
-  const [coordText, setCoordText] = useState("");
   const [contextMenuSectorData, setContextMenuSectorData] = useState(null);
 
-  const computeConnections = (turnData) => {
+  const computeConnections = (turnData: any) => {
     const connections = [];
     if (turnData.connections) {
       const fromNames = Object.keys(turnData.connections);
@@ -33,33 +34,32 @@ export default function Galaxy({ turnData, onClick, onDblClick }) {
     return connections;
   };
 
-  const handleClick = useCallback((e, sectorData) => {
+  const handleClick = useCallback((e: any, sectorData: any) => {
     if (e.evt.button === 0) {
       onClick(e, sectorData);
     }
     e.cancelBubble = true;
   }, [onClick]);
 
-  const handleDoubleClick = useCallback((e) => {
+  const handleDoubleClick = useCallback((e: any) => {
     onDblClick(e);
   }, [onDblClick]);
 
-const handleContextMenu = useCallback((e, sectorData) => {
+const handleContextMenu = useCallback((e: any, sectorData: any) => {
     e.evt.preventDefault(true);
     const mousePosition = e.target.getStage().getPointerPosition();
     setContextMenuPosition(mousePosition);
     setContextMenuSectorData(sectorData);
   }, []);
 
-  const handleMouseEnter = useCallback((x, y, coordText, text) => {
+  const handleMouseEnter = useCallback((x: number, y: number, text: string) => {
     setTooltipVisible(true);
     setTooltipX(x);
     setTooltipY(y);
-    setCoordText(coordText);
     setTooltipText(text);
   }, []);
 
-  const handleMouseMove = useCallback((x, y) => {
+  const handleMouseMove = useCallback((x: number, y: number) => {
 //     console.log("handle mouse move " + x + "," + y + ", tooltipVisible: " + tooltipVisible);
     if (tooltipVisible) {
       setTooltipX(x);
@@ -71,8 +71,8 @@ const handleContextMenu = useCallback((e, sectorData) => {
     setTooltipVisible(false);
   }, []);
 
-  const handleOptionSelected = useCallback((option) => {
-    console.log("handleOptionSelected", option);
+  const handleOptionSelected = useCallback((option: any, sectorData: any) => {
+    console.log("handleOptionSelected " + option + ", sector was " + sectorData.oblique + "," + sectorData.y);
     setContextMenuPosition(null);
   }, []);
 
@@ -96,7 +96,7 @@ const handleContextMenu = useCallback((e, sectorData) => {
     };
   }, [handleMouseEnter, handleMouseLeave, handleMouseMove, handleClick, handleContextMenu]);
 
-  const buildSectors = (turnData) => {
+  const buildSectors = (turnData: any) => {
     const sectors = [];
     const radius = turnData.radius;
     for (let y = radius; y >= 0; y--) {
@@ -110,14 +110,13 @@ const handleContextMenu = useCallback((e, sectorData) => {
               turnData={turnData}
               oblique={oblique}
               y={y}
-            // Instead of passing the handlers directly,
+              // Instead of passing the handlers directly,
               // pass wrapper functions that read the current handlers from the ref.
-              onMouseEnter={(...args) => handlersRef.current.handleMouseEnter(...args)}
-              onMouseLeave={(...args) => handlersRef.current.handleMouseLeave(...args)}
-              onMouseMove={(...args) => handlersRef.current.handleMouseMove(...args)}
-              onClick={(...args) => handlersRef.current.handleClick(...args)}
-              onContextMenu={(...args) => handlersRef.current.handleContextMenu(...args)}
-
+              onMouseEnter={(...args: [number, number, string]) => handlersRef.current.handleMouseEnter(...args)}
+              onMouseLeave={() => handlersRef.current.handleMouseLeave()}
+              onMouseMove={(...args: [number, number]) => handlersRef.current.handleMouseMove(...args)}
+              onClick={(...args: [any, any]) => handlersRef.current.handleClick(...args)}
+              onContextMenu={(...args: [any, any]) => handlersRef.current.handleContextMenu(...args)}
             />
           );
         }
@@ -136,12 +135,11 @@ const handleContextMenu = useCallback((e, sectorData) => {
               y={y}
                      // Instead of passing the handlers directly,
                        // pass wrapper functions that read the current handlers from the ref.
-                       onMouseEnter={(...args) => handlersRef.current.handleMouseEnter(...args)}
-                       onMouseLeave={(...args) => handlersRef.current.handleMouseLeave(...args)}
-                       onMouseMove={(...args) => handlersRef.current.handleMouseMove(...args)}
-                       onClick={(...args) => handlersRef.current.handleClick(...args)}
-                       onContextMenu={(...args) => handlersRef.current.handleContextMenu(...args)}
-
+                       onMouseEnter={(...args: [number, number, string]) => handlersRef.current.handleMouseEnter(...args)}
+                       onMouseLeave={() => handlersRef.current.handleMouseLeave()}
+                       onMouseMove={(...args: [number, number]) => handlersRef.current.handleMouseMove(...args)}
+                       onClick={(...args: [any, any]) => handlersRef.current.handleClick(...args)}
+                       onContextMenu={(...args: [any, any]) => handlersRef.current.handleContextMenu(...args)}
             />
           );
         }
@@ -153,9 +151,8 @@ const handleContextMenu = useCallback((e, sectorData) => {
   const sectors = useMemo(() => buildSectors(turnData), [turnData]);
   const connections = useMemo(() => computeConnections(turnData), [turnData]);
 
-
   return (
-    <Layer offset={{ y: -30 }} onDblClick={handleDoubleClick}>
+    <Layer offset={{ x: 0, y: -30 }} onDblClick={handleDoubleClick}>
       {sectors}
       <Connections connections={connections} />
       <InfoHover

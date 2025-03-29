@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Stage } from 'react-konva';
-import Galaxy from '../components/galaxy/Galaxy.jsx';
-import * as Constants from '../Constants.jsx';
+import Galaxy from '../components/galaxy/Galaxy';
+import * as Constants from '../Constants';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';

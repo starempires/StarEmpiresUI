@@ -1,26 +1,27 @@
 import { useMemo } from 'react';
 import { Group } from 'react-konva';
-import Coords from './Coords.jsx';
-import World from './World.jsx';
-import Portal from './Portal.jsx';
-import Border from './Border.jsx';
-import Hex from './Hex.jsx';
-import ShipDots from './ShipDots.jsx';
-import * as Constants from '../../Constants.jsx';
-import {buildSectorText} from '../common/SectorTextBuilder.jsx';
+import Coords from './Coords';
+import World from './World';
+import Portal from './Portal';
+import Border from './Border';
+import Hex from './Hex';
+import ShipDots from './ShipDots';
+import * as Constants from '../../Constants';
+import { BorderType } from '../../Constants';
+import {buildSectorText} from '../common/SectorTextBuilder';
 
-// interface SectorProps {
-//   turnData: TurnData;
-//   oblique: number;
-//   y: number;
-//   onClick: (e: Konva.KonvaEventObject<MouseEvent>, sector: SectorData) => void;
-//   onContextMenu: (e: Konva.KonvaEventObject<MouseEvent>, sector: SectorData) => void;
-//   onMouseEnter: (x: number, y: number, label: string, text: string) => void;
-//   onMouseLeave: () => void;
-//   onMouseMove: (x: number, y: number) => void;
-// }
+interface SectorProps {
+  turnData: any;
+  oblique: number;
+  y: number;
+  onClick: (e: any, sector: any) => void;
+  onContextMenu: (e: any, sector: any) => void;
+  onMouseEnter: (x: number, y: number, text: string) => void;
+  onMouseLeave: () => void;
+  onMouseMove: (x: number, y: number) => void;
+}
 
-export default function Sector(props) {
+export default function Sector(props: SectorProps) {
       const {
         turnData,
         oblique,
@@ -46,7 +47,8 @@ export default function Sector(props) {
       hoverText,
       unidentifiedShips,
       worldColor,
-      prohibition
+      prohibition,
+      collapsed
     } = useMemo(() => {
       const [xpos, ypos] = Constants.coordsToPosition(turnData.radius, oblique, y);
       const sectorKey = Constants.getCoordinateKey(oblique, y);
@@ -54,14 +56,14 @@ export default function Sector(props) {
       if (!sectorData) {
           sectorData = { status: 'unknown', oblique, y };
       }
-      const scanColor = Constants.SECTOR_STATUS_COLOR_MAP.get(sectorData.status);
-      const coordsText = `${sectorData.oblique},${sectorData.y}`;
-      const coordsColor = Constants.COORDS_STATUS_COLOR_MAP.get(sectorData.status);
+      const scanColor = Constants.SECTOR_STATUS_COLOR_MAP.get(sectorData.status) || "black";
+      const coordsText = `${sectorData.oblique ?? '?'},${sectorData.y ?? '?'}`;
+      const coordsColor = Constants.COORDS_STATUS_COLOR_MAP.get(sectorData.status) || "white";
 
-      let borderType = Constants.BORDER_TYPE.Regular;
+      let borderType: BorderType = Constants.BORDER_TYPE.Regular;
       if (sectorData.storms) {
           borderType = Constants.BORDER_TYPE.Nebula;
-          if (sectorData.storms.find(storm => storm.rating > 0)) {
+          if (sectorData.storms.find((storm: any) => storm.rating > 0)) {
               borderType = Constants.BORDER_TYPE.Storm;
           }
       }
@@ -80,14 +82,15 @@ export default function Sector(props) {
 
      const portals = sectorData.portals;
 
-     var shipDotColors;
+     let shipDotColors: string[] = [];
      if (sectorData.ships) {
-         var empiresPresent = Object.keys(sectorData.ships);
+         let empiresPresent = Object.keys(sectorData.ships);
          shipDotColors = empiresPresent.map((e) => turnData.colors[e]);
      }
 
      const hoverText = buildSectorText(turnData, sectorData);
      const unidentifiedShips = sectorData.unidentifiedShipCount || 0;
+     const collapsed = portals && (portals.length > 1 || portals[0]?.collapsed);
 
     return {
       scanColor,
@@ -103,24 +106,21 @@ export default function Sector(props) {
       hoverText,
       unidentifiedShips,
       worldColor,
-      prohibition
+      prohibition,
+      collapsed
     };
   }, [turnData, oblique, y]);
 
-  const collapsed = portals && (portals.length > 1 || portals[0]?.collapsed);
-
     return (
       <Group
-        onClick={(e) => onClick(e, sectorData)}
-        onContextMenu={(e) => onContextMenu(e, sectorData)}
-        onMouseEnter={(e) => {
+        onClick={(e: any) => onClick(e, sectorData)}
+        onContextMenu={(e: any) => onContextMenu(e, sectorData)}
+        onMouseEnter={(e: any) => {
           const mousePosition = e.target.getStage().getPointerPosition();
-          onMouseEnter(mousePosition.x, mousePosition.y, coordsText, hoverText);
+          onMouseEnter(mousePosition.x, mousePosition.y, hoverText);
         }}
-        onMouseMove={(e) => {
+        onMouseMove={(e: any) => {
           const mousePosition = e.target.getStage().getPointerPosition();
-//               console.log("sector mouse move " + mousePosition.x + "," + mousePosition.y);
-
           onMouseMove(mousePosition.x, mousePosition.y);
         }}
         onMouseLeave={onMouseLeave}
