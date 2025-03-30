@@ -149,12 +149,12 @@ export default function HomePage({ signOut, user, userGroups, userAttributes }: 
          <Table>
            <TableHead>
              <TableRow>
-               <TableCell>Session Name</TableCell>
-               <TableCell>Current Turn</TableCell>
-               <TableCell>Deadline</TableCell>
-               <TableCell>Empire Name</TableCell>
-               <TableCell>Empire Type</TableCell>
-               <TableCell>Orders Locked</TableCell>
+               <TableCell sx={{ fontWeight: 'bold' }}>Session Name</TableCell>
+               <TableCell sx={{ fontWeight: 'bold' }}>Current Turn</TableCell>
+               <TableCell sx={{ fontWeight: 'bold' }}>Deadline</TableCell>
+               <TableCell sx={{ fontWeight: 'bold' }}>Empire Name</TableCell>
+               <TableCell sx={{ fontWeight: 'bold' }}>Empire Type</TableCell>
+               <TableCell sx={{ fontWeight: 'bold' }}>Orders Locked</TableCell>
              </TableRow>
            </TableHead>
            <TableBody>

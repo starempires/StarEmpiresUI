@@ -6,6 +6,9 @@ import * as Constants from '../Constants';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import { SplitPane } from "react-collapse-pane";
 
 type CustomKonvaEventObject<T extends Event> = {
   evt: T;
@@ -17,6 +20,8 @@ export default function MapPage({ signOut, userAttributes }: { signOut: () => vo
   const { sessionName, empireName, turnNumber } = useParams();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  // State for the text entry box.
+  const [entryText, setEntryText] = useState<string>("");
 
     useEffect(() => {
       // Define an async function to call the API
@@ -76,23 +81,86 @@ export default function MapPage({ signOut, userAttributes }: { signOut: () => vo
    const height = (data.radius * 6) * Constants.RADIUS;
 
     return (
-      <div>
-        <Grid container spacing={2}>
-          <Grid item xs={10}>
-            <Typography variant="h6" gutterBottom sx={{ ml:5, color: data.colors["visible"] }}>
-                  Welcome, {userAttributes?.preferred_username}
+    <div>
+          <Typography variant="h6" gutterBottom sx={{ ml: 5, color: data.colors["visible"] }}>
+            Welcome, {userAttributes?.preferred_username}
             <button onClick={signOut}>Sign out</button>
-            </Typography>
-            <Typography variant="h6" gutterBottom sx={{ ml:5, color: data.colors["visible"] }}>
-                  {data.name} galactic map for session {data.session}, turn {data.turnNumber}
-            </Typography>
-            <Box sx={{ ml: 5 }}>
-              <Stage width={width} height={height}>
-                <Galaxy turnData={data} onDblClick={handleDoubleClick} onClick={handleClick}/>
-              </Stage>
-            </Box>
+          </Typography>
+          <Typography variant="h6" gutterBottom sx={{ ml: 5, color: data.colors["visible"] }}>
+            {data.name} galactic map for session {data.session}, turn {data.turnNumber}
+          </Typography>
+      <Grid container spacing={2}>
+        {/* Left Pane: Galaxy Map */}
+        <SplitPane split="vertical" collapse={true} initialSizes={[1.5,1]} minSizes={[300, 300]} >
+        <Grid item xs={8}>
+          <Box sx={{ ml: 5 }}>
+            <Stage width={width} height={height}>
+              <Galaxy turnData={data} onDblClick={handleDoubleClick} onClick={handleClick} />
+            </Stage>
+          </Box>
+        </Grid>
+        {/* Right Pane: Two stacked panes */}
+        <Grid item xs={4}>
+          <Grid container direction="column" spacing={2}>
+            {/* Top Right Pane: Display Selected Sector Data */}
+            <SplitPane split="horizontal" collapse={true}  minSizes={[150, 250]}>
+            <Grid item xs={6}>
+              <Typography sx={{ml: 5}} variant="h6" gutterBottom>
+                Selected Sector Data
+              </Typography>
+              <Box
+                sx={{
+                  ml: 5,
+                  backgroundColor: "#f5f5f5",
+                  padding: 2,
+                  height: "100%",
+                  overflow: "auto",
+                  border: "1px solid #ccc",
+                  color: "black"
+                }}
+              >
+                <pre style={{ whiteSpace: "pre-wrap" }}>
+                  Click on a sector to view details.
+                </pre>
+              </Box>
             </Grid>
+            {/* Bottom Right Pane: Text Entry for Orders */}
+            <Grid item xs={6}>
+              <Typography sx={{ml:5}} variant="h6" gutterBottom>
+                Enter Orders
+              </Typography>
+              <TextField
+                fullWidth
+                variant="outlined"
+                value={entryText}
+                onChange={(e) => setEntryText(e.target.value)}
+                  sx={{
+                      ml: 5,
+                    backgroundColor: 'white', // sets the overall background color of the TextField
+                    '& .MuiInputBase-input': {
+                      color: 'black', // sets the text color of the input
+                    },
+                  }}
+                placeholder="Enter your orders here"
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ ml: 5,mt: 1 }}
+                onClick={() => {
+                  console.log("Submitting orders:", entryText);
+                  // Implement your submit logic here.
+                  setEntryText("");
+                }}
+              >
+                Submit Orders
+              </Button>
+            </Grid>
+            </SplitPane>
           </Grid>
-      </div>
+        </Grid>
+      </SplitPane>
+      </Grid>
+    </div>
     );
 }
