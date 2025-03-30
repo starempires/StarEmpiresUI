@@ -13,6 +13,7 @@ export const auth = defineAuth({
     email: { required: true }, // Require email during signup
     preferredUsername: { required: true }, // Require a username
   },
+  groups: ["ADMINS", "GAMEMASTERS"],
   //senders: {
   //   email: {
   //      fromName: "Star Empires",
