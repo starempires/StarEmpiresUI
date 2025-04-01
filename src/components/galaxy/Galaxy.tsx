@@ -7,7 +7,7 @@ import InfoHover from './InfoHover';
 import * as Constants from '../../Constants';
 
 export default function Galaxy({turnData, onClick, onDblClick }: {turnData: any;
-                                                                   onClick: (e: any, sectorData: any, hoverText: string) => void;
+                                                                   onClick: (e: any, hoverText: string) => void;
                                                                    onDblClick: (e: any) => void;}) {
   const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const [tooltipVisible, setTooltipVisible] = useState(false);
@@ -34,9 +34,9 @@ export default function Galaxy({turnData, onClick, onDblClick }: {turnData: any;
     return connections;
   };
 
-  const handleClick = useCallback((e: any, sectorData: any, hoverText: string) => {
+  const handleClick = useCallback((e: any, hoverText: string) => {
     if (e.evt.button === 0) {
-      onClick(e, sectorData, hoverText);
+      onClick(e, hoverText);
     }
     e.cancelBubble = true;
   }, [onClick]);
@@ -115,7 +115,7 @@ const handleContextMenu = useCallback((e: any, sectorData: any) => {
               onMouseEnter={(...args: [number, number, string]) => handlersRef.current.handleMouseEnter(...args)}
               onMouseLeave={() => handlersRef.current.handleMouseLeave()}
               onMouseMove={(...args: [number, number]) => handlersRef.current.handleMouseMove(...args)}
-              onClick={(...args: [any, any, any]) => handlersRef.current.handleClick(...args)}
+              onClick={(...args: [any, any]) => handlersRef.current.handleClick(...args)}
               onContextMenu={(...args: [any, any]) => handlersRef.current.handleContextMenu(...args)}
             />
           );
@@ -138,7 +138,7 @@ const handleContextMenu = useCallback((e: any, sectorData: any) => {
                        onMouseEnter={(...args: [number, number, string]) => handlersRef.current.handleMouseEnter(...args)}
                        onMouseLeave={() => handlersRef.current.handleMouseLeave()}
                        onMouseMove={(...args: [number, number]) => handlersRef.current.handleMouseMove(...args)}
-                       onClick={(...args: [any, any, any]) => handlersRef.current.handleClick(...args)}
+                       onClick={(...args: [any, any]) => handlersRef.current.handleClick(...args)}
                        onContextMenu={(...args: [any, any]) => handlersRef.current.handleContextMenu(...args)}
             />
           );

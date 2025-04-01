@@ -57,7 +57,7 @@ export default function MapPage({ signOut, userAttributes }: { signOut: () => vo
 //     setIsOpen(!isOpen);
   };
 
-  const handleClick = (event: CustomKonvaEventObject<MouseEvent>, sectorData: any, hoverText: string) => {
+  const handleClick = (event: CustomKonvaEventObject<MouseEvent>, hoverText: string) => {
     event.evt.preventDefault();
     setSelectedSectorText(hoverText);
 //     console.log("left click (button " + event.evt.button + ") = " + sectorData.oblique + ", " + sectorData.y);

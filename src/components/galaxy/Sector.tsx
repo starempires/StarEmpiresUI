@@ -14,7 +14,7 @@ interface SectorProps {
   turnData: any;
   oblique: number;
   y: number;
-  onClick: (e: any, sector: any, sectorText: string) => void;
+  onClick: (e: any, sectorText: string) => void;
   onContextMenu: (e: any, sector: any) => void;
   onMouseEnter: (x: number, y: number, text: string) => void;
   onMouseLeave: () => void;
@@ -116,7 +116,7 @@ export default function Sector(props: SectorProps) {
 
     return (
       <Group
-        onClick={(e: any) => onClick(e, sectorData, sectorText)}
+        onClick={(e: any) => onClick(e, sectorText)}
         onContextMenu={(e: any) => onContextMenu(e, sectorData)}
         onMouseEnter={(e: any) => {
           const mousePosition = e.target.getStage().getPointerPosition();

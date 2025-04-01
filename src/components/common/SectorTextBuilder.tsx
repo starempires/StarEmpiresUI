@@ -179,7 +179,7 @@ const buildCoordsText = (sectorData: any): string =>
 
 const formatShipStats = (ship: any, turnData: any): string => {
    let text = "";
-   const foundShip = turnData.shipClasses.find(shipClass => shipClass.name === ship.shipClass);
+   const foundShip = turnData.shipClasses.find((shipClass:any) => shipClass.name === ship.shipClass);
    if (foundShip) {
        text += "  " + ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
