@@ -1,9 +1,25 @@
   import * as Constants from '../../Constants';
 
+  export const buildHoverText = (sectorData: any): string => {
+      let text = "";
+      if (sectorData) {
+          text += buildCoordsText(sectorData);
+          let objectsText = ""
+          objectsText += buildWorldText(sectorData);
+          objectsText += buildPortalHoverText(sectorData);
+          objectsText += buildStormHoverText(sectorData);
+          objectsText += buildShipsHoverText(sectorData);
+          if (sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
+              text += objectsText.length > 0 ? objectsText : "\nempty space";
+          }
+      }
+      return text;
+  }
+
   export const buildSectorText = (turnData: any, sectorData: any): string => {
      let text = "";
      if (sectorData) {
-         text += buildCoordsText(sectorData);
+         text += "Sector " + buildCoordsText(sectorData);
          let objectsText = ""
          objectsText += buildWorldText(sectorData);
          objectsText += buildPortalText(sectorData);
@@ -43,6 +59,61 @@ const buildCoordsText = (sectorData: any): string =>
         return text;
   }
 
+ const buildStormHoverText = (sectorData: any): string =>
+  {
+        let text = "";
+        if (sectorData.storms) {
+            if (sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
+                const numStorms = sectorData.storms.length;
+                if (numStorms > 1) {
+                    let intensity = 0;
+                    sectorData.storms.forEach((storm: any) => {
+                        intensity += storm.rating;
+                    });
+                    text += "\n" + numStorms + " storms (total intensity " + intensity + ")";
+                }
+                else {
+                    const storm = sectorData.storms[0];
+                    text += "\n" + storm.name + " (" + (storm.rating > 0 ? ("intensity " + storm.rating + " ion storm") : "nebula") + ")";
+                }
+            }
+        }
+        return text;
+  }
+
+  const buildPortalHoverText = (sectorData: any): string =>
+  {
+      let text = "";
+      const portals = sectorData.portals;
+      if (portals) {
+          portals.forEach((portal:any) => {
+              text = "\n" + portal.name;
+              switch (sectorData.status) {
+                  case Constants.SCAN_STATUS_TYPE.Scanned:
+                  case Constants.SCAN_STATUS_TYPE.Visible:
+                       text += portal.collapsed ? " (collapsed)" : "";
+                       break;
+                  default:
+                       break;
+              }
+              if (portal.navDataKnown) {
+                  let connectionText = "";
+                  if (portal.entrances?.length > 0) {
+                      connectionText += plural(portal.entrances.length, "entrance");
+                  }
+                  if (connectionText.length > 0) {
+                      connectionText += ", ";
+                  }
+                  if (portal.exits?.length > 0) {
+                      connectionText += plural(portal.exits.length, "exit");
+                  }
+                  text += ": " + connectionText;
+              }
+          });
+      }
+      return text;
+  }
+
   const buildPortalText = (sectorData: any): string =>
   {
       let text = "";
@@ -58,8 +129,13 @@ const buildCoordsText = (sectorData: any): string =>
                   default:
                        break;
               }
-              if (portal.navDataKnown && portal.exits) {
-                  text += ", exits: " + portal.exits.sort().join(", ");
+              if (portal.navDataKnown) {
+                  if (portal.entrances?.length > 0) {
+                      text += "\n entrances: " + portal.entrances.sort().join(", ");
+                  }
+                  if (portal.exits?.length > 0) {
+                      text += "\n exits: " + portal.exits.sort().join(", ");
+                  }
               }
           });
       }
@@ -96,20 +172,27 @@ const buildCoordsText = (sectorData: any): string =>
       }
       return text;
   }
+
+  const plural = (count: number, noun: string): string => {
+      return count + " " + noun + (count > 1 ? "s" : "");
+  }
+
 const formatShipStats = (ship: any, turnData: any): string => {
    let text = "";
-   if (ship.owner === turnData.name || turnData.shipClasses[ship.shipClass]) {
+   const foundShip = turnData.shipClasses.find(shipClass => shipClass.name === ship.shipClass);
+   if (foundShip) {
        text += "  " + ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
                             (ship.opGuns ? ship.opGuns : 0) + "/" +
                             (ship.opEngines ? ship.opEngines: 0) + "/" +
                             (ship.opScan ? ship.opScan : 0) +
-                            ", dp " + ship.dpRemaining + ")\n";
+                            ", dp " + ship.dpRemaining + "/" + ship.dp +
+                            ", OR " + Math.round(ship.opRating * 100) + "%)\n";
    }
    else {
        text += "  " + ship.name + " (" + ship.shipClass +
                             "/" + ship.hull + " " +
-                            ship.tonnage + " tonne" + (ship.tonnage > 1 ? "s": "") + ")\n";
+                            plural(ship.tonnage, "tonne") + ")\n";
    }
    return text;
 }
@@ -119,12 +202,10 @@ const buildShipsText = (sectorData: any, turnData: any): string => {
       if (sectorData.ships) {
           let empiresPresent = Object.keys(sectorData.ships);
           empiresPresent.sort();
-          empiresPresent.filter(item => item !== turnData.name).unshift(turnData.name);
           text += "\n";
           empiresPresent.forEach((e) => {
-                text += e + ":\n";
+               text += e + " ships:\n";
                let empireShips = sectorData.ships[e].ships;
-//               console.log( "empireShips = " + JSON.stringify(empireShips));
                for (const shipName in empireShips) {
                     let ship = empireShips[shipName];
                     text += formatShipStats(ship, turnData);
@@ -133,8 +214,28 @@ const buildShipsText = (sectorData: any, turnData: any): string => {
       }
       if (sectorData.unidentifiedShipCount > 0) {
           text += "\n";
-          text += sectorData.unidentifiedShipCount + " unidentified ship" + (sectorData.unidentifiedShipCount > 1 ? "s": "") +
-                  " (" + sectorData.unidentifiedShipTonnage + " tonne" + (sectorData.unidentifiedShipTonnage > 1 ? "s": "") + ")\n";
+          text += plural(sectorData.unidentifiedShipCount, "unidentified ship") +
+                  " (" + plural(sectorData.unidentifiedShipTonnage, " tonne") + ")\n";
+      }
+      return text;
+  }
+
+const buildShipsHoverText = (sectorData: any): string => {
+      let text = "";
+      if (sectorData.ships) {
+          let empiresPresent = Object.keys(sectorData.ships);
+          empiresPresent.sort();
+          text += "\n";
+          empiresPresent.forEach((e) => {
+                text += e + ": ";
+                text += plural(sectorData.ships[e].count, "ship") + ", " +
+                        plural(sectorData.ships[e].tonnage, " tonne") + "\n";
+          });
+      }
+      if (sectorData.unidentifiedShipCount > 0) {
+          text += "\n";
+          text += plural(sectorData.unidentifiedShipCount, "unidentified ship") +
+                  ", " + plural(sectorData.unidentifiedShipTonnage, " tonne") + "\n";
       }
       return text;
   }

@@ -8,13 +8,13 @@ import Hex from './Hex';
 import ShipDots from './ShipDots';
 import * as Constants from '../../Constants';
 import { BorderType } from '../../Constants';
-import {buildSectorText} from '../common/SectorTextBuilder';
+import {buildHoverText, buildSectorText} from '../common/SectorTextBuilder';
 
 interface SectorProps {
   turnData: any;
   oblique: number;
   y: number;
-  onClick: (e: any, sector: any) => void;
+  onClick: (e: any, sector: any, sectorText: string) => void;
   onContextMenu: (e: any, sector: any) => void;
   onMouseEnter: (x: number, y: number, text: string) => void;
   onMouseLeave: () => void;
@@ -45,6 +45,7 @@ export default function Sector(props: SectorProps) {
       ypos,
       sectorData,
       hoverText,
+      sectorText,
       unidentifiedShips,
       worldColor,
       prohibition,
@@ -88,7 +89,8 @@ export default function Sector(props: SectorProps) {
          shipDotColors = empiresPresent.map((e) => turnData.colors[e]);
      }
 
-     const hoverText = buildSectorText(turnData, sectorData);
+     const hoverText = buildHoverText(sectorData);
+     const sectorText = buildSectorText(turnData, sectorData);
      const unidentifiedShips = sectorData.unidentifiedShipCount || 0;
      const collapsed = portals && (portals.length > 1 || portals[0]?.collapsed);
 
@@ -104,6 +106,7 @@ export default function Sector(props: SectorProps) {
       ypos,
       sectorData,
       hoverText,
+      sectorText,
       unidentifiedShips,
       worldColor,
       prohibition,
@@ -113,7 +116,7 @@ export default function Sector(props: SectorProps) {
 
     return (
       <Group
-        onClick={(e: any) => onClick(e, sectorData)}
+        onClick={(e: any) => onClick(e, sectorData, sectorText)}
         onContextMenu={(e: any) => onContextMenu(e, sectorData)}
         onMouseEnter={(e: any) => {
           const mousePosition = e.target.getStage().getPointerPosition();
