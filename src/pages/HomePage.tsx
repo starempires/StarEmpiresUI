@@ -10,7 +10,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Button from '@mui/material/Button';
 import '../index.css';
 
 const client = generateClient<Schema>({ authMode: 'userPool' });
@@ -30,13 +29,10 @@ interface SessionWithEmpires {
   empires: Empire[];
 }
 interface HomePageProps {
-  signOut: () => void;
   user: any;
-  userGroups: any;
-  userAttributes: any;
 }
 
-export default function HomePage({ signOut, user, userGroups, userAttributes }: HomePageProps) {
+export default function HomePage({ user }: HomePageProps) {
   const [sessions, setSessions] = useState<SessionWithEmpires[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -139,9 +135,6 @@ export default function HomePage({ signOut, user, userGroups, userAttributes }: 
 
  return (
      <div className="p-6">
-       <Typography variant="h4" gutterBottom>
-         Welcome, {userAttributes?.preferred_username}
-       </Typography>
        <Typography variant="h6" gutterBottom>
          Your Sessions
        </Typography>
@@ -181,14 +174,6 @@ export default function HomePage({ signOut, user, userGroups, userAttributes }: 
            </TableBody>
          </Table>
        </TableContainer>
-       <Button onClick={signOut} variant="contained" color="error" sx={{ mt: 2 }}>
-         Sign out
-       </Button>
-       {userGroups && userGroups.includes("GAMEMASTERS") && (
-             <Button onClick={() => console.log("Create Session clicked")} variant="contained" color="primary" sx={{ mt: 2, ml: 2 }}>
-                Create Session
-               </Button>
-             )}
      </div>
    );
 }

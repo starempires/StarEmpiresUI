@@ -8,49 +8,39 @@ import * as Constants from '../Constants';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { SplitPane } from "react-collapse-pane";
+import { SplitPane } from 'react-collapse-pane';
+import { fetchSessionObject } from '../components/common/SessionAPI';
 
 type CustomKonvaEventObject<T extends Event> = {
   evt: T;
-  // Add any additional properties if needed
 };
 
-export default function MapPage({ signOut, userAttributes }: { signOut: () => void; userAttributes: any }) {
+export default function MapPage() {
 
   const { sessionName, empireName, turnNumber } = useParams();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [entryText, setEntryText] = useState<string>("");
   const [selectedSectorText, setSelectedSectorText] = useState<string>("");
 
     useEffect(() => {
-      // Define an async function to call the API
-      const fetchSessionObject = async () => {
-        try {
-          const response = await fetch("https://api.starempires.com/getSessionObject", {
-            method: "POST",
-            headers: {
-              "Authorization": "Bearer REAL_JWT_TOKEN",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              sessionName: sessionName,
-              empireName: empireName,
-              turnNumber: turnNumber,
-              sessionObject: "SNAPSHOT"
-            })
-          });
-          const apiData = await response.json();
-          setData(apiData);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchSessionObject();
-    }, []);
+      async function loadSnapshot() {
+         try {
+            const apiData = await fetchSessionObject(
+                  sessionName ?? "",
+                  empireName ?? "",
+                  Number(turnNumber),
+                  "SNAPSHOT"
+            );
+            const json = JSON.parse(apiData);
+            setData(json.data);
+         } catch (error) {
+            console.error("Error loading snapshot:", error);
+         } finally {
+            setLoading(false);
+         }
+      }
+      loadSnapshot();
+    }, [sessionName, empireName, turnNumber]);
 
   const handleDoubleClick = (event: CustomKonvaEventObject<MouseEvent>) => {
     event.evt.preventDefault();
@@ -80,41 +70,42 @@ export default function MapPage({ signOut, userAttributes }: { signOut: () => vo
 
     return (
     <div>
-          <Typography variant="h6" gutterBottom sx={{ ml: 5, color: data.colors["visible"] }}>
-            Welcome, {userAttributes?.preferred_username}
-            <button onClick={signOut}>Sign out</button>
-          </Typography>
-          <Typography variant="h6" gutterBottom sx={{ ml: 5, color: data.colors["visible"] }}>
+          <Typography variant="h6" gutterBottom sx={{ ml: 3, color: data.colors["visible"] }}>
             {data.name} galactic map for session {data.session}, turn {data.turnNumber}
           </Typography>
       <Grid container spacing={2}>
         {/* Left Pane: Galaxy Map */}
         <SplitPane split="vertical" collapse={true} initialSizes={[1.5,1]} minSizes={[300, 300]} >
         <Grid item xs={true}>
-          <Box sx={{ ml: 5 }}>
+          <Box sx={{ ml: 2 }}>
             <Stage width={width} height={height}>
               <Galaxy turnData={data} onDblClick={handleDoubleClick} onClick={handleClick} />
             </Stage>
           </Box>
         </Grid>
-        {/* Right Pane: Two stacked panes */}
-        <Grid item xs={4}>
-          <Grid container direction="column" spacing={2}>
-            {/* Top Right Pane: Display Selected Sector Data */}
-            <SplitPane split="horizontal" collapse={true}  minSizes={[150, 250]}>
-            <Grid item xs={true}>
-              <InfoPane infoText={selectedSectorText}/>
-            </Grid>
-            {/* Bottom Right Pane: Text Entry for Orders */}
-            <Grid item xs={true}>
-              <OrdersPane entryText={entryText}
-                          onEntryChange={setEntryText}
-                          onSubmit ={() => { console.log("Submitting orders");
-               }}/>
-            </Grid>
-            </SplitPane>
-          </Grid>
-        </Grid>
+                {/* Right Pane: Always show InfoPane; if not GM, show OrdersPane in a vertical split */}
+                <Grid item xs={4}>
+                  {empireName === "GM" ? (
+                    <Box sx={{ ml: 5, width: "100%" }}>
+                      <InfoPane infoText={selectedSectorText} />
+                    </Box>
+                  ) : (
+                    <Grid container direction="column" spacing={2}>
+                      <SplitPane split="horizontal" collapse={true} minSizes={[150, 250]}>
+                        <Grid item xs={true}>
+                          <InfoPane infoText={selectedSectorText} />
+                        </Grid>
+                        <Grid item xs={true}>
+                          <OrdersPane
+                            sessionName={sessionName!}
+                            empireName={empireName!}
+                            turnNumber={Number(turnNumber)}
+                          />
+                        </Grid>
+                      </SplitPane>
+                    </Grid>
+                  )}
+                </Grid>
       </SplitPane>
       </Grid>
     </div>
