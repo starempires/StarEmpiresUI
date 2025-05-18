@@ -4,6 +4,7 @@ import { Stage } from 'react-konva';
 import Galaxy from '../components/galaxy/Galaxy';
 import InfoPane from '../components/panels/InfoPane';
 import OrdersPane from '../components/panels/OrdersPane';
+import MapPageSubHeader from '../components/panels/MapPageSubHeader';
 import * as Constants from '../Constants';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -70,9 +71,7 @@ export default function MapPage() {
 
     return (
     <div>
-          <Typography variant="h6" gutterBottom sx={{ ml: 3, color: data.colors["visible"] }}>
-            {data.name} galactic map for session {data.session}, turn {data.turnNumber}
-          </Typography>
+      <MapPageSubHeader sessionName={sessionName!} empireName={empireName!} turnNumber={Number(turnNumber)} />
       <Grid container spacing={2}>
         {/* Left Pane: Galaxy Map */}
         <SplitPane split="vertical" collapse={true} initialSizes={[1.5,1]} minSizes={[300, 300]} >

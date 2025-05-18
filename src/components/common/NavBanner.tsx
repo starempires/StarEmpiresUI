@@ -12,7 +12,6 @@ import { Link } from 'react-router-dom';
 
 const pages: Record<string, string> = {
   Sessions: '/',
-  Messages: '/messages',
   'Ship Design': '/ship-design',
   'GM Controls': '/gm-controls'
 };

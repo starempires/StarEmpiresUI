@@ -7,30 +7,17 @@ specifies that any unauthenticated user can "create", "read", "update",
 and "delete" any "Todo" records.
 =========================================================================*/
 const schema = a.schema({
-  SessionEmpire: a
+
+  Player: a
     .model({
-       userId: a.string().required(),
-       sessionId: a.id(),
-       session: a.belongsTo('Session', 'sessionId'),
-       empireName: a.string().required(),
-       ordersLocked: a.boolean().required(),
-       empireType: a.enum([
-                'ABANDONED',
-                'ACTIVE',
-                'GM',
-                'HOMELESS',
-                'INACTIVE',
-                'NPC',
-                'OBSERVER',
-       ]),
+       name: a.string().required(),
+       dedicationRating: a.integer(),
     })
-    .secondaryIndexes((index) => [index("sessionId")])
+    .secondaryIndexes((index) => [index("name")])
     .authorization((allow) => [ allow.authenticated()]),
   Session: a
     .model({
-      id: a.id().required(),
       name: a.string().required(),
-      created: a.datetime().required(),
       started: a.datetime(), // optional
       status: a.enum([
         'ABANDONED',
@@ -47,11 +34,52 @@ const schema = a.schema({
       numPlayers: a.integer().required(),
       updateHours: a.integer().required(),
       currentTurnNumber: a.integer().required().default(0),
-      nextDeadline: a.datetime(), // optional
+      deadline: a.datetime(), // optional
       maxTurns: a.integer(), // optional
-      sessionEmpire: a.hasMany('SessionEmpire', 'sessionId'),
     })
+    .secondaryIndexes((index) => [index("name")])
     .authorization((allow) => [allow.authenticated()]),
+  Empire: a
+    .model({
+      name: a.string().required(),
+      playerName: a.string().required(),
+      sessionName: a.string().required(),
+      ordersLocked: a.boolean().required(),
+      empireType: a.enum([
+                  'ABANDONED',
+                  'ACTIVE',
+                  'GM',
+                  'HOMELESS',
+                  'INACTIVE',
+                  'NPC',
+                  'OBSERVER',
+      ]),
+    })
+    .secondaryIndexes((index) => [index("sessionName"), index("playerName"), index("name")])
+    .authorization((allow) => [ allow.authenticated()]),
+  Message: a
+    .model({
+      id: a.id().required(),
+      sessionName: a.string().required(),
+      sender: a.string().required(),
+      broadcast: a.boolean().required(),
+      anonymous: a.boolean().required(),
+      content: a.string().required(),
+      sent: a.datetime().required(),
+      recipients: a.hasMany('MessageRecipient', 'messageId'),
+    })
+    .secondaryIndexes((index) => [index("sessionName"), index("sender")])
+    .authorization((allow) => [ allow.authenticated()]),
+  MessageRecipient: a
+    .model({
+      sessionName: a.string().required(),
+      recipient: a.string().required(),
+      read: a.datetime(),
+      messageId: a.id().required(),
+      message: a.belongsTo('Message', 'messageId'),
+    })
+    .secondaryIndexes((index) => [index("sessionName"), index("recipient")])
+    .authorization((allow) => [ allow.authenticated()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;

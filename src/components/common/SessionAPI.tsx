@@ -6,6 +6,7 @@ export async function fetchSessionObject(
   turnNumber: number,
   sessionObject: string
 ): Promise<any> {
+    try {
        const response = await fetch("https://api.starempires.com/getSessionObject", {
          method: "POST",
          headers: {
@@ -19,8 +20,23 @@ export async function fetchSessionObject(
            sessionObject,
          }),
        });
-       if (response.ok) {
+      if (response.status===404) {
+          return "";
+      }
+//    console.log("ok = " + JSON.stringify(response.ok));
+//    console.log("response statu = " + response.status);
+//    console.log("response text = " + response.statusText);
+//         if (response.status === 404) {
+//            console.error(`Error: Resource not found. Received status 404 for URL`);
+//          } else {
+//            console.error(`Error fetching session object: ${response.status} ${response.statusText}`);
+//          }
+       if (response.ok && response.status===200) {
            return await response.text();
        }
        return "";
+    } catch (error) {
+      console.error("Error in fetchSessionObject:", error);
+      throw error;
+    }
 }

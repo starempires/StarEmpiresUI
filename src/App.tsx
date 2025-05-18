@@ -4,6 +4,7 @@ import { fetchUserAttributes } from '@aws-amplify/auth';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
+import MessagesPage from './pages/MessagesPage';
 import NavBanner from './components/common/NavBanner';
 
 export default function App({user, signOut}: {user: any; signOut: () => void;}) {
@@ -30,8 +31,9 @@ export default function App({user, signOut}: {user: any; signOut: () => void;}) 
        <BrowserRouter>
           <NavBanner signOut={signOut} userAttributes={userAttributes} userGroups={userGroups} />
           <Routes>
-            <Route path="/" element={<HomePage user={user} />} />
-            <Route path="/session/:sessionName/:empireName/:turnNumber" element={<MapPage />} />
+            <Route path="/" element={<HomePage user={user} userAttributes={userAttributes} />} />
+            <Route path="/session/:sessionName/:empireName/:turnNumber" element={<MapPage/>} />
+            <Route path="/messages/:sessionName/:empireName" element={<MessagesPage />} />
           </Routes>
         </BrowserRouter>
       );

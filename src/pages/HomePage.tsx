@@ -15,108 +15,120 @@ import '../index.css';
 const client = generateClient<Schema>({ authMode: 'userPool' });
 
 interface Empire {
-  empireName: string;
+  name: string;
   empireType: string;
-  sessionId: string;
+  sessionName: string;
   ordersLocked: boolean;
 }
 
-interface SessionWithEmpires {
+interface SessionEmpires {
   sessionName: string;
-  sessionId: string;
   currentTurnNumber: number;
   deadline: string;
   empires: Empire[];
 }
 interface HomePageProps {
   user: any;
+  userAttributes: any;
 }
 
-export default function HomePage({ user }: HomePageProps) {
-  const [sessions, setSessions] = useState<SessionWithEmpires[]>([]);
+export default function HomePage({ user, userAttributes }: HomePageProps) {
+  const [sessionEmpires, setSessionEmpires] = useState<SessionEmpires[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  async function fetchSession(sessionId: string): Promise<any> {
+  async function fetchSession(name: string): Promise<any> {
     const result = await client.models.Session.list({
-      filter: { id: { eq: sessionId } },
+      filter: { name: { eq: name } },
     });
     return result.data || [];
   }
 
-  async function fetchEmpiresForSession(sessionId: string): Promise<any> {
-    const result = await client.models.SessionEmpire.list({
-      filter: { sessionId: { eq: sessionId } },
+  async function fetchEmpiresForSession(sessionName: string): Promise<any> {
+    const result = await client.models.Empire.list({
+      filter: { sessionName: { eq: sessionName } },
     });
     return result.data || []; // for now
   }
 
-  async function fetchEmpiresForUser(userId: string): Promise<any> {
-    const result = await client.models.SessionEmpire.list({
-      filter: { userId: { eq: userId } }
+  async function fetchEmpiresForPlayer(playerName: string): Promise<any> {
+    const result = await client.models.Empire.list({
+      filter: { playerName: { eq: playerName } }
     });
+// console.log("result = " + JSON.stringify(result));
     return result.data || [];
   }
 
   useEffect(() => {
-    const loadSessions = async () => {
+    const loadSessionEmpires = async () => {
       try {
-          // get all empires for user
+          // get all empires for player
           // separate them into GM and non-GM empires
           // for GM empires, fetch all empires in that session
           // fetch all unique sessions
           // join session w/empire data
-        const empires = await fetchEmpiresForUser(user.userId);
+        const playerEmpires = await fetchEmpiresForPlayer(userAttributes?.preferred_username);
+//         console.log("playerEmpires = " + JSON.stringify(playerEmpires));
+        if (playerEmpires.length == 0) {
+            return {};
+        }
 
-        const gmEmpires = empires.filter((empire: Empire) => empire.empireType === "GM");
-        const nonGMEmpires = empires.filter((empire: Empire) => empire.empireType !== "GM");
+        const gmEmpires = playerEmpires.filter((empire: Empire) => empire.empireType === "GM");
+//         console.log("gmEmpries = " + JSON.stringify(gmEmpires));
+        const nonGMEmpires = playerEmpires.filter((empire: Empire) => empire.empireType !== "GM");
+//         console.log("nongmEmpries = " + JSON.stringify(nonGMEmpires));
 
-        const gmSessionIds: string[] = Array.from(new Set(gmEmpires.map((empire: Empire) => empire.sessionId)));
-        const gmEmpiresPromises = gmSessionIds.map((sessionId: string) => fetchEmpiresForSession(sessionId));
+        const gmSessionNames: string[] = Array.from(new Set(gmEmpires.map((empire: Empire) => empire.sessionName)));
+        const gmEmpiresPromises = gmSessionNames.map((sessionName: string) => fetchEmpiresForSession(sessionName));
         const results = await Promise.all(gmEmpiresPromises);
         const gmOtherEmpires = results.flat();
+//         console.log("gmotherEmpries = " + JSON.stringify(gmOtherEmpires));
 
-        const combinedEmpires = Array.from(
-          new Map(
-            [...nonGMEmpires, ...gmOtherEmpires].map(empire => [empire.empireName, empire])
-          ).values()
-        );
+        // get unique empires
+        const allPlayerEmpires = [...gmEmpires, ...nonGMEmpires, ...gmOtherEmpires];
+//         console.log("allPlayerEmpires = " + JSON.stringify(allPlayerEmpires));
+        const map = new Map(
+            allPlayerEmpires.map(empire => [`${empire.sessionName}:${empire.name}`, empire])
+          );
+        const combinedEmpires = Array.from(map.values());
+//         console.log("combined = " + JSON.stringify(combinedEmpires));
 
-        // all sessionIds, whether GM or not
-        const allSessionIds: string[] = Array.from(new Set(empires.map((empire: Empire) => empire.sessionId)));
-        const allSessionPromises = allSessionIds.map((sessionId: string) => fetchSession(sessionId));
+        // all sessions, whether GM or not
+        const allSessionNames: string[] = Array.from(new Set(combinedEmpires.map((empire: Empire) => empire.sessionName)));
+//         console.log("all session Names = " + JSON.stringify(allSessionNames));
+        const allSessionPromises = allSessionNames.map((sessionName: string) => fetchSession(sessionName));
         const allSessionResults = await Promise.all(allSessionPromises);
         const allSessions = allSessionResults.flat();
+//         console.log("all sessions = " + JSON.stringify(allSessions));
 
-        const sessionsWithEmpires: SessionWithEmpires[] = allSessions.map(session => {
-          const sessionEmpires = combinedEmpires.filter((empire: Empire) => empire.sessionId === session.id);
+        const sessionEmpires: SessionEmpires[] = allSessions.map(session => {
+          const empiresForThisSession = combinedEmpires.filter((empire: Empire) => empire.sessionName === session.name);
           return {
             sessionName: session.name,
-            sessionId: session.id,
             currentTurnNumber: session.currentTurnNumber,
             deadline: session.nextDeadline,
-            empires: sessionEmpires.map((empire: Empire) => ({
-              empireName: empire.empireName,
+            empires: empiresForThisSession.map((empire: Empire) => ({
+              name: empire.name,
               empireType: empire.empireType,
+              sessionName: session.name,
               ordersLocked: empire.ordersLocked,
-              sessionId:  empire.sessionId,
             }))
           };
         });
 
         // Sort sessions alphabetically by sessionName.
-        sessionsWithEmpires.sort((a, b) => a.sessionName.localeCompare(b.sessionName));
+        sessionEmpires.sort((a:SessionEmpires, b:SessionEmpires) => a.sessionName.localeCompare(b.sessionName));
 
         // For each session, sort the empires so that the GM empire is first,
         // and the rest are sorted alphabetically by empireName.
-        sessionsWithEmpires.forEach(session => {
-          session.empires.sort((a, b) => {
+        sessionEmpires.forEach(session => {
+          session.empires.sort((a:Empire, b:Empire) => {
             if (a.empireType === "GM" && b.empireType !== "GM") return -1;
             if (b.empireType === "GM" && a.empireType !== "GM") return 1;
-            return a.empireName.localeCompare(b.empireName);
+            return a.name.localeCompare(b.name);
           });
         });
 
-        setSessions(sessionsWithEmpires);
+        setSessionEmpires(sessionEmpires);
       } catch (error) {
           console.error("Error loading session data " + error);
       } finally {
@@ -125,9 +137,9 @@ export default function HomePage({ user }: HomePageProps) {
     };
 
     if (user?.userId) {
-      loadSessions();
+       loadSessionEmpires();
     }
-  }, [user]);
+  }, [user, userAttributes]);
 
   if (loading) {
       return <Typography variant="h6" sx={{ ml: 5 }}>Loading...</Typography>;
@@ -136,7 +148,7 @@ export default function HomePage({ user }: HomePageProps) {
  return (
      <div className="p-6">
        <Typography variant="h6" gutterBottom>
-         Your Sessions
+         Sessions for {userAttributes?.preferred_username}
        </Typography>
        <TableContainer component={Paper}>
          <Table>
@@ -151,9 +163,9 @@ export default function HomePage({ user }: HomePageProps) {
              </TableRow>
            </TableHead>
            <TableBody>
-             {sessions.map((session) =>
+             {sessionEmpires.map((session) =>
                session.empires.map((empire: Empire, index: number) => (
-                 <TableRow key={`${session.sessionId}-${index}`}>
+                 <TableRow key={`${session.sessionName}-${index}`}>
                    {index === 0 && (
                      <>
                        <TableCell rowSpan={session.empires.length}>{session.sessionName}</TableCell>
@@ -162,8 +174,8 @@ export default function HomePage({ user }: HomePageProps) {
                      </>
                    )}
                    <TableCell>
-                     <Link to={`/session/${session.sessionName}/${empire.empireName}/${session.currentTurnNumber}`} className="text-blue-500 hover:underline">
-                       {empire.empireName}
+                     <Link to={`/session/${session.sessionName}/${empire.name}/${session.currentTurnNumber}`} className="text-blue-500 hover:underline">
+                       {empire.name}
                      </Link>
                    </TableCell>
                    <TableCell>{empire.empireType}</TableCell>
