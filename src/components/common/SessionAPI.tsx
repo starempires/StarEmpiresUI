@@ -40,3 +40,21 @@ export async function fetchSessionObject(
       throw error;
     }
 }
+export async function loadOrdersStatus(sessionName: string, empireName: string, turnNumber: number): Promise<string> {
+    try {
+      const apiData = await fetchSessionObject(
+                       sessionName ?? "",
+                       empireName ?? "",
+                       Number(turnNumber),
+                       "ORDERS_STATUS"
+      );
+      if (apiData) {
+          const processedText = apiData.replace(/(\r\n|\n|\r)/g, "\\n");
+          const json = JSON.parse(processedText);
+          return json.data;
+      }
+    } catch (error) {
+      console.error("Error loading orders:", error);
+    }
+    return "UNKNOWN";
+}

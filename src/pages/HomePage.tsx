@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { loadOrdersStatus } from '../components/common/SessionAPI';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import { Link } from 'react-router-dom';
@@ -18,7 +19,7 @@ interface Empire {
   name: string;
   empireType: string;
   sessionName: string;
-  ordersLocked: boolean;
+  orderStatus: string;
 }
 
 interface SessionEmpires {
@@ -94,26 +95,30 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
 
         // all sessions, whether GM or not
         const allSessionNames: string[] = Array.from(new Set(combinedEmpires.map((empire: Empire) => empire.sessionName)));
-//         console.log("all session Names = " + JSON.stringify(allSessionNames));
+        console.log("all session Names = " + JSON.stringify(allSessionNames));
         const allSessionPromises = allSessionNames.map((sessionName: string) => fetchSession(sessionName));
         const allSessionResults = await Promise.all(allSessionPromises);
         const allSessions = allSessionResults.flat();
-//         console.log("all sessions = " + JSON.stringify(allSessions));
+        console.log("all sessions = " + JSON.stringify(allSessions));
 
-        const sessionEmpires: SessionEmpires[] = allSessions.map(session => {
-          const empiresForThisSession = combinedEmpires.filter((empire: Empire) => empire.sessionName === session.name);
-          return {
-            sessionName: session.name,
-            currentTurnNumber: session.currentTurnNumber,
-            deadline: session.nextDeadline,
-            empires: empiresForThisSession.map((empire: Empire) => ({
-              name: empire.name,
-              empireType: empire.empireType,
+        const sessionEmpires: SessionEmpires[] = await Promise.all(
+          allSessions.map(async session => {
+            const empiresForThisSession = combinedEmpires.filter((empire: Empire) => empire.sessionName === session.name);
+            return {
               sessionName: session.name,
-              ordersLocked: empire.ordersLocked,
-            }))
-          };
-        });
+              currentTurnNumber: session.currentTurnNumber,
+              deadline: session.nextDeadline,
+              empires: await Promise.all(
+                empiresForThisSession.map(async (empire: Empire) => ({
+                  name: empire.name,
+                  empireType: empire.empireType,
+                  sessionName: session.name,
+                  orderStatus: empire.empireType === "GM" ? "" : await loadOrdersStatus(session.name, empire.name, session.currentTurnNumber),
+                }))
+              )
+            };
+          })
+        );
 
         // Sort sessions alphabetically by sessionName.
         sessionEmpires.sort((a:SessionEmpires, b:SessionEmpires) => a.sessionName.localeCompare(b.sessionName));
@@ -159,7 +164,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
                <TableCell sx={{ fontWeight: 'bold' }}>Deadline</TableCell>
                <TableCell sx={{ fontWeight: 'bold' }}>Empire Name</TableCell>
                <TableCell sx={{ fontWeight: 'bold' }}>Empire Type</TableCell>
-               <TableCell sx={{ fontWeight: 'bold' }}>Orders Locked</TableCell>
+               <TableCell sx={{ fontWeight: 'bold' }}>Orders Status</TableCell>
              </TableRow>
            </TableHead>
            <TableBody>
@@ -179,7 +184,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
                      </Link>
                    </TableCell>
                    <TableCell>{empire.empireType}</TableCell>
-                   <TableCell>{empire.empireType === "ACTIVE" ? (empire.ordersLocked ? "locked" : "not locked") : ""}</TableCell>
+                   <TableCell>{empire.empireType === "ACTIVE" ? empire.orderStatus : ""}</TableCell>
                  </TableRow>
                ))
              )}

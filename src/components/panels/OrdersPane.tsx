@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { fetchSessionObject } from '../common/SessionAPI';
+import { fetchSessionObject, loadOrdersStatus } from '../common/SessionAPI';
 
 interface OrderSubmissionPaneProps {
   sessionName: string;
@@ -44,32 +44,17 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
           }
         }
 
-         async function loadOrderStatus() {
-              try {
-                 const apiData = await fetchSessionObject(
-                       sessionName ?? "",
-                       empireName ?? "",
-                       Number(turnNumber),
-                       "ORDERS_STATUS"
-                 );
-                 if (apiData) {
-                     const processedText = apiData.replace(/(\r\n|\n|\r)/g, "\\n");
-                     const json = JSON.parse(processedText);
-                     if (json.data === "LOCKED") {
-                         setLocked(true);
-                         setLockedTrigger(true);
-                     }
-                 }
-              } catch (error) {
-                 console.error("Error loading orders:", error);
-              }
-              finally {
-                 lockedTriggerInitialized.current = true
-              }
-            }
+        async function initializeStatus() {
+           const orderStatus = await loadOrdersStatus(sessionName, empireName, turnNumber);
+           if (orderStatus === 'LOCKED') {
+             setLocked(true);
+             setLockedTrigger(true);
+           }
+           lockedTriggerInitialized.current = true;
+         }
 
       loadOrders();
-      loadOrderStatus();
+      initializeStatus();
     }, [sessionName, empireName, turnNumber]);
 
     useEffect(() => {
