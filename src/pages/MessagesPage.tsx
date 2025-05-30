@@ -24,7 +24,7 @@ interface MessagePageParams extends Record<string | "", string | ""> {
 
 // interface MessagePageProps {
 //   userAttributes: any;
-// }
+//
 
 export default function MessagePage() {
   const { sessionName, empireName } = useParams<MessagePageParams>();

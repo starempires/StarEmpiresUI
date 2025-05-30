@@ -5,6 +5,7 @@ import { fetchAuthSession } from 'aws-amplify/auth';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import MessagesPage from './pages/MessagesPage';
+import ShipDesignPage from './pages/ShipDesignPage';
 import NavBanner from './components/common/NavBanner';
 
 export default function App({user, signOut}: {user: any; signOut: () => void;}) {
@@ -34,6 +35,7 @@ export default function App({user, signOut}: {user: any; signOut: () => void;}) 
             <Route path="/" element={<HomePage user={user} userAttributes={userAttributes} />} />
             <Route path="/session/:sessionName/:empireName/:turnNumber" element={<MapPage/>} />
             <Route path="/messages/:sessionName/:empireName" element={<MessagesPage />} />
+            <Route path="/ship-design/" element={<ShipDesignPage />} />
           </Routes>
         </BrowserRouter>
       );

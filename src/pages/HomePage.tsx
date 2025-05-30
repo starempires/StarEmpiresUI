@@ -95,11 +95,11 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
 
         // all sessions, whether GM or not
         const allSessionNames: string[] = Array.from(new Set(combinedEmpires.map((empire: Empire) => empire.sessionName)));
-        console.log("all session Names = " + JSON.stringify(allSessionNames));
+//         console.log("all session Names = " + JSON.stringify(allSessionNames));
         const allSessionPromises = allSessionNames.map((sessionName: string) => fetchSession(sessionName));
         const allSessionResults = await Promise.all(allSessionPromises);
         const allSessions = allSessionResults.flat();
-        console.log("all sessions = " + JSON.stringify(allSessions));
+//         console.log("all sessions = " + JSON.stringify(allSessions));
 
         const sessionEmpires: SessionEmpires[] = await Promise.all(
           allSessions.map(async session => {
