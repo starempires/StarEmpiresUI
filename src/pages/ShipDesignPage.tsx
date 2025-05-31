@@ -10,27 +10,50 @@ import {
 } from '@mui/material';
 import { HullParameters, Hulls } from '../components/common/HullParameters';
 
-const ZERO_COMPONENTS = {
+interface ShipComponents {
+  guns: number;
+  engines: number;
+  scan: number;
+  dp: number;
+  racks: number;
+}
+
+interface MissileComponents {
+  guns: number;
+  tonnage: number;
+}
+
+const INIT_SHIP_COMPONENTS = {
       guns: 0,
-        engines: 0,
-        scan: 0,
-        dp: 0,
-        racks: 0,
+      engines: 0,
+      scan: 0,
+      dp: 0,
+      racks: 0,
+    };
+
+const INIT_MISSILE_COMPONENTS = {
+      guns: 1,
+      tonnage: 1,
     };
 
 const MAX_LENGTH = 25;
 
 export default function ShipDesignPage() {
   const [hullParameters, setHullParameters] = useState<HullParameters | null>(null);
-  const [className, setClassName] = useState('');
-  const [cost, setCost] = useState(0);
-  const [tonnage, setTonnage] = useState(0);
-  const [components, setComponents] = useState(ZERO_COMPONENTS);
+  const [className, setClassName] = useState('MyShipClass');
+  const [shipCost, setShipCost] = useState(1);
+  const [shipTonnage, setShipTonnage] = useState(1);
+  const [missileCost, setMissileCost] = useState(1);
+  const [shipComponents, setShipComponents] = useState<ShipComponents>(INIT_SHIP_COMPONENTS);
+  const [missileComponents, setMissileComponents] = useState<MissileComponents>(INIT_MISSILE_COMPONENTS);
   const [designText, setDesignText] = useState('');
 
-  const handleComponentChange = (key: keyof typeof components, value: number) => {
-    setComponents(prev => ({ ...prev, [key]: value }));
-// console.log("Key " + key + ", value = " + value);
+  const handleShipComponentChange = (key: keyof ShipComponents, value: number) => {
+    setShipComponents(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleMissileComponentChange = (key: keyof MissileComponents, value: number) => {
+    setMissileComponents(prev => ({ ...prev, [key]: value }));
   };
 
  useEffect(() => {
@@ -40,11 +63,18 @@ export default function ShipDesignPage() {
       if (!className) {
           return;
       }
-      setDesignText(["DESIGN", hullParameters.hullType.replaceAll(' ', '_'), className, components.guns, components.engines, components.scan, components.dp, components.racks].join(' '));
-  }, [className, hullParameters, components]);
+      if (hullParameters.hullType === 'missile') {
+          setDesignText(["DESIGN", hullParameters.hullType.replaceAll(' ', '_'), className, missileComponents.guns, missileComponents.tonnage].join(' '));
+      }
+      else {
+          setDesignText(["DESIGN", hullParameters.hullType.replaceAll(' ', '_'), className, shipComponents.guns, shipComponents.engines, shipComponents.scan, shipComponents.dp, shipComponents.racks].join(' '));
+      }
+  }, [className, hullParameters, shipComponents, missileComponents]);
 
   const computeComponent = (delta: number, denominator: number) => {
-      if (delta === 0) return 0;
+      if (delta === 0 || denominator === 0) {
+          return 0;
+      }
 
      // Compute exponential impact
      const impact = Math.exp(Math.abs(delta) / denominator);
@@ -55,11 +85,11 @@ export default function ShipDesignPage() {
 
   useEffect(() => {
     if (hullParameters) {
-        const addGuns = components.guns - hullParameters.baseGuns;
-        const addEngines = components.engines - hullParameters.baseEngines;
-        const addScan = components.scan - hullParameters.baseScan;
-        const addDp = components.dp - hullParameters.baseDp;
-        const addRacks = components.racks - hullParameters.baseRacks;
+        const addGuns = shipComponents.guns - hullParameters.baseGuns;
+        const addEngines = shipComponents.engines - hullParameters.baseEngines;
+        const addScan = shipComponents.scan - hullParameters.baseScan;
+        const addDp = shipComponents.dp - hullParameters.baseDp;
+        const addRacks = shipComponents.racks - hullParameters.baseRacks;
 //         console.log("addGuns = " + addGuns + ", addEngines = " + addEngines + ", addScan = " + addScan + ", addDp = " + addDp + ", addRacks = " + addRacks);
       const additionalCost =
                    computeComponent(addGuns, hullParameters.costGuns) +
@@ -75,44 +105,59 @@ export default function ShipDesignPage() {
                    computeComponent(addRacks, hullParameters.tonnageRacks);
       const cost = Math.max(1, hullParameters.baseCost + additionalCost);
       const tonnage = Math.max(1, hullParameters.baseTonnage + additionalTonnage);
-      setCost(cost);
-      setTonnage(tonnage);
+      setShipCost(cost);
+      setShipTonnage(tonnage);
     }
     else {
-      setCost(0);
-      setTonnage(0);
+      setShipCost(0);
+      setShipTonnage(0);
     }
-  }, [components, hullParameters]);
+  }, [shipComponents, hullParameters]);
+
+  useEffect(() => {
+    if (hullParameters === Hulls["missile"]) {
+        const A = 10;
+        const cost = Math.max(1, Math.round(Math.exp(missileComponents.guns / (A * missileComponents.tonnage))));
+       setMissileCost(cost);
+    }
+    else {
+       setMissileCost(0);
+    }
+  }, [missileComponents]);
 
   const handeHullChange = (hullType: string) => {
 
       if (!hullType) {
           setHullParameters(null);
-          setComponents(ZERO_COMPONENTS);
+          setShipComponents(INIT_SHIP_COMPONENTS);
+          setMissileComponents(INIT_MISSILE_COMPONENTS);
           return;
         }
       const hullParameters = Hulls[hullType];
-      if (!hullParameters) {
-          setHullParameters(null);
-          setComponents(ZERO_COMPONENTS);
-          return;
-      }
 //       console.log("key = " + hullType + ", value = " + JSON.stringify(hullParameters));
       setHullParameters(hullParameters);
-      setComponents({
-          guns: hullParameters.baseGuns,
-          engines: hullParameters.baseEngines,
-          scan: hullParameters.baseScan,
-          dp: hullParameters.baseDp,
-          racks: hullParameters.baseRacks,
+      if (hullType === "missile") {
+          setMissileComponents({
+              guns: hullParameters.baseGuns,
+              tonnage: hullParameters.baseTonnage,
+              });
+      }
+      else {
+          setShipComponents({
+              guns: hullParameters.baseGuns,
+              engines: hullParameters.baseEngines,
+              scan: hullParameters.baseScan,
+              dp: hullParameters.baseDp,
+              racks: hullParameters.baseRacks,
         });
+      }
   };
 
    const handleClassNameChange = (value: string) => {
     setClassName(value)
   }
   const selectableHullTypes = Object.keys(Hulls).filter(
-    (hullType) => hullType !== 'missile' && hullType !== 'device'
+    (hullType) => hullType !== 'device'
   );
 
   return (
@@ -152,43 +197,87 @@ export default function ShipDesignPage() {
             ))}
           </TextField>
 
-          <Grid container spacing={2} mt={1}>
-            {(['guns', 'engines', 'scan', 'dp', 'racks'] as const).map(comp => {
-               let maxValue = Infinity;
-               let name = comp.charAt(0).toUpperCase() + comp.slice(1);
-               let disabled = true;
-               if (hullParameters) {
-                   const maxKey = `max${name}` as keyof typeof hullParameters;
-                   maxValue = Number(hullParameters[maxKey]);
-                   disabled = maxValue === 0;
-               }
-              const value = components[comp];
-             return ( <Grid item xs={6} key={comp}>
+          {hullParameters?.hullType === 'missile' ? (
+            <Grid container spacing={2} mt={1}>
+              <Grid item xs={6}>
                 <TextField
                   fullWidth
                   type="number"
-                  label={name}
-                  value={components[comp]}
-                  helperText={ maxValue === 0 ? `No ${name} allowed` : (maxValue === Infinity ? '' : `Max value ${maxValue}`)}
-                  onChange={(e) => handleComponentChange(comp, Number(e.target.value))}
-                  error={value < 0 || value > maxValue}
-                  disabled={disabled}
-                  color={value == maxValue ? 'info' : 'success'}
-                  focused
-                  inputProps={{
-                    min: 0,
-                    max: maxValue,
-                  }}
+                  label="Guns"
+                  value={missileComponents.guns}
+                  onChange={(e) => handleMissileComponentChange('guns', Number(e.target.value))}
+                  error={missileComponents.guns < 1}
+                  inputProps={{ min: 1 }}
                 />
-              </Grid>);
-            })}
-          </Grid>
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label="Tonnage"
+                  value={missileComponents.tonnage}
+                  onChange={(e) => handleMissileComponentChange('tonnage', Number(e.target.value))}
+                  error={missileComponents.tonnage < 1}
+                  inputProps={{ min: 1 }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Box mt={3}>
+                  <Typography>Cost: {missileCost}</Typography>
+                  <Typography>{designText}</Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          ) : (
+            <Grid container spacing={2} mt={1}>
+              {(['guns', 'engines', 'scan', 'dp', 'racks'] as const).map((comp) => {
+                let maxValue = Infinity;
+                let name = comp.charAt(0).toUpperCase() + comp.slice(1);
+                let disabled = true;
+                if (hullParameters) {
+                  const maxKey = `max${name}` as keyof typeof hullParameters;
+                  maxValue = Number(hullParameters[maxKey]);
+                  disabled = maxValue === 0;
+                }
+                const value = shipComponents[comp];
+                return (
+                  <Grid item xs={6} key={comp}>
+                    <TextField
+                      fullWidth
+                      type="number"
+                      label={name}
+                      value={shipComponents[comp]}
+                      helperText={
+                        maxValue === 0
+                          ? `No ${name} allowed`
+                          : maxValue === Infinity
+                          ? ''
+                          : `Max value ${maxValue}`
+                      }
+                      onChange={(e) => handleShipComponentChange(comp, Number(e.target.value))}
+                      error={value < 0 || value > maxValue}
+                      disabled={disabled}
+                      color={value === maxValue ? 'info' : 'success'}
+                      focused
+                      inputProps={{
+                        min: 0,
+                        max: maxValue,
+                      }}
+                    />
+                  </Grid>
+                );
+              })}
+              <Grid item xs={12}>
+                <Box mt={3}>
+                  <Typography>Cost: {shipCost}</Typography>
+                  <Typography>Tonnage: {shipTonnage}</Typography>
+                  <Typography>{designText}</Typography>
+                </Box>
+              </Grid>
+            </Grid>
+          )}
 
-          <Box mt={3}>
-            <Typography>Cost: {cost}</Typography>
-            <Typography>Tonnage: {tonnage}</Typography>
-            <Typography>{designText}</Typography>
-          </Box>
+
         </Paper>
       </Box>
     </Container>
