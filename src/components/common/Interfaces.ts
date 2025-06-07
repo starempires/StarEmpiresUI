@@ -10,5 +10,6 @@ export interface SessionEmpires {
   sessionId: string;
   currentTurnNumber: number;
   deadline: string;
+  status: string;
   empires: Empire[];
 }

@@ -37,7 +37,7 @@ const INIT_MISSILE_COMPONENTS = {
     };
 
 const MAX_LENGTH = 25;
-const MISSILE_DESIGN_FACTOR = 10;
+const MISSILE_DESIGN_FACTOR = 5;
 
 export default function ShipDesignPage() {
   const [hullParameters, setHullParameters] = useState<HullParameters | null>(null);

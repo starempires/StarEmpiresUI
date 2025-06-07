@@ -7,6 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Link } from 'react-router-dom';
 import type { Schema } from '../../amplify/data/resource';
 import type { Empire, SessionEmpires } from '../components/common/Interfaces';
+import { updateTurn } from '../components/common/SessionAPI';
 
 const sessionStatuses = [
   'ABANDONED',
@@ -31,26 +32,25 @@ export default function SessionControlCell({
 }: SessionControlCellProps) {
 
    type SessionStatus = NonNullable<Schema["Session"]["type"]["status"]>;
-
-   const [selectedStatus, setSelectedStatus] = useState<SessionStatus>('TEMPORARILY_CLOSED');
+   const [selectedStatus, setSelectedStatus] = useState<SessionStatus>(session.status);
+   const [turnNumber, setTurnNumber] = useState<SessionStatus>(session.currentTurnNumber);
    const [processing, setProcessing] = useState<boolean>(false);
 
   async function handleStatusChange(sessionId: string, status: SessionStatus) {
-      console.log("Status Changed for session:", sessionId);
+//       console.log("Status Changed for session:", sessionId);
       setProcessing(true);
 
       try {
          await updateSessionStatus(sessionId, status);
-         console.log("Status successfully updated.");
+//          console.log("Status successfully updated.");
          setSelectedStatus(status);
      } catch (error) {
-         console.error("Failed to update statys:", error);
+//          console.error("Failed to update status:", error);
      } finally {
          setProcessing(false);
      }
  }
 
- // Update session status and turn number by session name
   async function updateSessionStatus(
     sessionId: string,
     newStatus: NonNullable<Schema["Session"]["type"]["status"]>
@@ -76,7 +76,7 @@ export default function SessionControlCell({
         currentTurnNumber: turnNumber,
       });
 
-      console.log("Turn number updated:", updated.data);
+//       console.log("Turn number updated:", updated.data);
       return updated.data;
     } catch (error) {
       console.error("Error updating session turn number:", error);
@@ -84,16 +84,21 @@ export default function SessionControlCell({
     }
   }
   async function handleUpdateTurn(sessionId: string) {
-      console.log("Update Turn clicked for session:", sessionId);
+//       console.log("Update Turn clicked for session:", sessionId);
       setProcessing(true);
 
       try {
-        // Step 2: Fetch current session to get the current turn number
+        // fetch current turn
         const result = await client.models.Session.get({ id: sessionId });
         const currentTurn = result.data?.currentTurnNumber || 0;
-        // Step 3: Increment the turn number
+        // update turn info
+        const apiData = await updateTurn(session.sessionName, currentTurn);
+        const json = JSON.parse(apiData);
+        console.log(JSON.stringify(json));
+        // update turn number
         await updateSessionTurnNumber(sessionId, currentTurn + 1);
-        console.log("Turn successfully updated.");
+        setTurnNumber(currentTurn + 1);
+//         console.log("Turn successfully updated to turn number " + (currentTurn + 1));
       } catch (error) {
         console.error("Failed to update turn:", error);
       } finally {
@@ -102,7 +107,7 @@ export default function SessionControlCell({
     }
 
     async function handleRollbackTurn(sessionId: string) {
-      console.log("Rollback Turn clicked for session:", sessionId);
+//       console.log("Rollback Turn clicked for session:", sessionId);
       setProcessing(true);
 
       try {
@@ -110,7 +115,8 @@ export default function SessionControlCell({
         const currentTurn = result.data?.currentTurnNumber || 0;
         if (currentTurn > 0) {
             await updateSessionTurnNumber(sessionId, currentTurn - 1);
-            console.log("Turn successfully rolled back.");
+//             console.log("Turn successfully rolled back.");
+            setTurnNumber(currentTurn - 1);
         }
       } catch (error) {
         console.error("Failed to update turn:", error);
@@ -149,6 +155,7 @@ export default function SessionControlCell({
                    {session.empires[0].empireType === 'GM' && (
                       <React.Fragment>
                         <br />
+                        <br />
                         <FormControl size="small" style={{ minWidth: '200px', marginBottom: '8px' }}>
                            <InputLabel>Status</InputLabel>
                            <Select value={selectedStatus || ''}
@@ -180,7 +187,7 @@ export default function SessionControlCell({
                       </React.Fragment>
                    )}
                 </TableCell>
-                <TableCell rowSpan={session.empires.length}>{session.currentTurnNumber}</TableCell>
+                <TableCell rowSpan={session.empires.length}>{turnNumber}</TableCell>
                 <TableCell rowSpan={session.empires.length}>{session.deadline}</TableCell>
              </React.Fragment>
             )}

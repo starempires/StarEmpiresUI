@@ -97,6 +97,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
               sessionId: session.id,
               currentTurnNumber: session.currentTurnNumber,
               deadline: session.deadline,
+              status: session.status,
               empires: await Promise.all(
                 empiresForThisSession.map(async (empire: Empire) => ({
                   name: empire.name,
