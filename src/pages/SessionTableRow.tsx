@@ -32,8 +32,8 @@ export default function SessionControlCell({
 }: SessionControlCellProps) {
 
    type SessionStatus = NonNullable<Schema["Session"]["type"]["status"]>;
-   const [selectedStatus, setSelectedStatus] = useState<SessionStatus>(session.status);
-   const [turnNumber, setTurnNumber] = useState<SessionStatus>(session.currentTurnNumber);
+   const [selectedStatus, setSelectedStatus] = useState<SessionStatus>(session.status as SessionStatus);
+   const [turnNumber, setTurnNumber] = useState<number>(session.currentTurnNumber);
    const [processing, setProcessing] = useState<boolean>(false);
 
   async function handleStatusChange(sessionId: string, status: SessionStatus) {
