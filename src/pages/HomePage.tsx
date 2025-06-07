@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { loadOrdersStatus } from '../components/common/SessionAPI';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
-import { Link } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,22 +11,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import '../index.css';
+import SessionTableRow from './SessionTableRow';
+import type { Empire, SessionEmpires } from '../components/common/Interfaces';
 
 const client = generateClient<Schema>({ authMode: 'userPool' });
 
-interface Empire {
-  name: string;
-  empireType: string;
-  sessionName: string;
-  orderStatus: string;
-}
-
-interface SessionEmpires {
-  sessionName: string;
-  currentTurnNumber: number;
-  deadline: string;
-  empires: Empire[];
-}
 interface HomePageProps {
   user: any;
   userAttributes: any;
@@ -106,8 +94,9 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
             const empiresForThisSession = combinedEmpires.filter((empire: Empire) => empire.sessionName === session.name);
             return {
               sessionName: session.name,
+              sessionId: session.id,
               currentTurnNumber: session.currentTurnNumber,
-              deadline: session.nextDeadline,
+              deadline: session.deadline,
               empires: await Promise.all(
                 empiresForThisSession.map(async (empire: Empire) => ({
                   name: empire.name,
@@ -146,6 +135,9 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
     }
   }, [user, userAttributes]);
 
+
+
+
   if (loading) {
       return <Typography variant="h6" sx={{ ml: 5 }}>Loading...</Typography>;
   }
@@ -158,7 +150,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
        <TableContainer component={Paper}>
          <Table>
            <TableHead>
-             <TableRow>
+             <TableRow key="header">
                <TableCell sx={{ fontWeight: 'bold' }}>Session Name</TableCell>
                <TableCell sx={{ fontWeight: 'bold' }}>Current Turn</TableCell>
                <TableCell sx={{ fontWeight: 'bold' }}>Deadline</TableCell>
@@ -168,26 +160,9 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
              </TableRow>
            </TableHead>
            <TableBody>
-             {sessionEmpires.map((session) =>
-               session.empires.map((empire: Empire, index: number) => (
-                 <TableRow key={`${session.sessionName}-${index}`}>
-                   {index === 0 && (
-                     <>
-                       <TableCell rowSpan={session.empires.length}>{session.sessionName}</TableCell>
-                       <TableCell rowSpan={session.empires.length}>{session.currentTurnNumber}</TableCell>
-                       <TableCell rowSpan={session.empires.length}>{session.deadline}</TableCell>
-                     </>
-                   )}
-                   <TableCell>
-                     <Link to={`/session/${session.sessionName}/${empire.name}/${session.currentTurnNumber}`} className="text-blue-500 hover:underline">
-                       {empire.name}
-                     </Link>
-                   </TableCell>
-                   <TableCell>{empire.empireType}</TableCell>
-                   <TableCell>{empire.empireType === "ACTIVE" ? empire.orderStatus : ""}</TableCell>
-                 </TableRow>
-               ))
-             )}
+             {sessionEmpires.map((session) => {
+                return <SessionTableRow key={session.sessionId} session={session} />
+             })}
            </TableBody>
          </Table>
        </TableContainer>

@@ -37,6 +37,7 @@ const INIT_MISSILE_COMPONENTS = {
     };
 
 const MAX_LENGTH = 25;
+const MISSILE_DESIGN_FACTOR = 10;
 
 export default function ShipDesignPage() {
   const [hullParameters, setHullParameters] = useState<HullParameters | null>(null);
@@ -116,8 +117,7 @@ export default function ShipDesignPage() {
 
   useEffect(() => {
     if (hullParameters === Hulls["missile"]) {
-        const A = 10;
-        const cost = Math.max(1, Math.round(Math.exp(missileComponents.guns / (A * missileComponents.tonnage))));
+        const cost = Math.max(1, Math.round(Math.exp(missileComponents.guns / (MISSILE_DESIGN_FACTOR * missileComponents.tonnage))));
        setMissileCost(cost);
     }
     else {
@@ -156,9 +156,9 @@ export default function ShipDesignPage() {
    const handleClassNameChange = (value: string) => {
     setClassName(value)
   }
-  const selectableHullTypes = Object.keys(Hulls).filter(
-    (hullType) => hullType !== 'device'
-  );
+  const selectableHullTypes = Object.keys(Hulls)
+    .filter((hullType) => hullType !== 'device')
+    .sort((a, b) => a.localeCompare(b));
 
   return (
     <Container maxWidth="sm">
@@ -171,11 +171,11 @@ export default function ShipDesignPage() {
             fullWidth
             label="Ship Class Name"
             value={className}
-            onChange={(e) => handleClassNameChange(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
+            onChange={(e) => handleClassNameChange(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
             margin="normal"
             helperText={`Only letters and numbers are allowed, max length ${MAX_LENGTH} characters`}
             inputProps={{
-              pattern: '^[a-zA-Z0-9]+$',
+              pattern: '^[a-zA-Z0-9_]+$',
               maxLength: MAX_LENGTH,
             }}
           />
@@ -271,6 +271,8 @@ export default function ShipDesignPage() {
                 <Box mt={3}>
                   <Typography>Cost: {shipCost}</Typography>
                   <Typography>Tonnage: {shipTonnage}</Typography>
+                  <br/>
+                  <Typography>Use the text below to submit a design order for this ship class.</Typography>
                   <Typography>{designText}</Typography>
                 </Box>
               </Grid>

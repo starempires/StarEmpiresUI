@@ -58,3 +58,55 @@ export async function loadOrdersStatus(sessionName: string, empireName: string, 
     }
     return "UNKNOWN";
 }
+
+export async function updateTurn(sessionName: string, turnNumber: number): Promise<string> {
+    try {
+       const response = await fetch("https://api.starempires.com/updateTurn", {
+         method: "POST",
+         headers: {
+           "Authorization": "Bearer REAL_JWT_TOKEN", // Replace with your token logic
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify({
+           sessionName,
+           turnNumber,
+         }),
+       });
+       if (response.status===404) {
+          return "";
+       }
+       if (response.ok && response.status===200) {
+           return await response.text();
+       }
+       return "";
+    } catch (error) {
+      console.error("Error in updateTurn:", error);
+      throw error;
+    }
+}
+
+export async function rollbackTurn(sessionName: string, turnNumber: number): Promise<string> {
+    try {
+       const response = await fetch("https://api.starempires.com/rollbackTurn", {
+         method: "POST",
+         headers: {
+           "Authorization": "Bearer REAL_JWT_TOKEN", // Replace with your token logic
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify({
+           sessionName,
+           turnNumber,
+         }),
+       });
+       if (response.status===404) {
+          return "";
+       }
+       if (response.ok && response.status===200) {
+           return await response.text();
+       }
+       return "";
+    } catch (error) {
+      console.error("Error in rollbackTurn:", error);
+      throw error;
+    }
+}
