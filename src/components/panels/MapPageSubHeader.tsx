@@ -21,7 +21,14 @@ export default function MapPageSubHeader({ empireName, sessionName, turnNumber }
                  size="small"
                  component={RouterLink}
                  to={`/messages/${sessionName}/${empireName}`}
-                 sx={{ mr: 1 }}
+                 disabled={true}
+                 sx={{
+                   mr: 1,
+                   '&.Mui-disabled': {
+                     color: '#aaaaaa',
+                     borderColor: '#aaaaaa',
+                   },
+                 }}
                >
                  Messages
                </Button>
@@ -29,6 +36,14 @@ export default function MapPageSubHeader({ empireName, sessionName, turnNumber }
                  variant="outlined"
                  size="small"
                  component={RouterLink}
+                 disabled={turnNumber==0}
+                 sx={{
+                    mr: 1,
+                    '&.Mui-disabled': {
+                        color: '#aaaaaa',
+                        borderColor: '#aaaaaa',
+                    },
+                 }}
                  to={`/news/${sessionName}/${empireName}/${turnNumber}`}
                >
                  News

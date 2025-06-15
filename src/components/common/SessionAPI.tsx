@@ -24,7 +24,6 @@ export async function fetchSessionObject(
           return "";
       }
 //    console.log("ok = " + JSON.stringify(response.ok));
-//    console.log("response statu = " + response.status);
 //    console.log("response text = " + response.statusText);
 //         if (response.status === 404) {
 //            console.error(`Error: Resource not found. Received status 404 for URL`);

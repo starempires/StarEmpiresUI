@@ -192,7 +192,7 @@ export default function SessionControlCell({
              </React.Fragment>
             )}
            <TableCell>
-              <Link to={`/session/${session.sessionName}/${empire.name}/${session.currentTurnNumber}`} className="text-blue-500 hover:underline">
+              <Link to={`/session/${session.sessionName}/${empire.name}/${turnNumber}`} className="text-blue-500 hover:underline">
                  {empire.name}
               </Link>
            </TableCell>

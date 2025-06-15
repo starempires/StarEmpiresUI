@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import MessagesPage from './pages/MessagesPage';
 import ShipDesignPage from './pages/ShipDesignPage';
+import NewsPage from './pages/NewsPage';
 import NavBanner from './components/common/NavBanner';
 
 export default function App({user, signOut}: {user: any; signOut: () => void;}) {
@@ -34,6 +35,7 @@ export default function App({user, signOut}: {user: any; signOut: () => void;}) 
           <Routes>
             <Route path="/" element={<HomePage user={user} userAttributes={userAttributes} />} />
             <Route path="/session/:sessionName/:empireName/:turnNumber" element={<MapPage/>} />
+            <Route path="/news/:sessionName/:empireName/:turnNumber" element={<NewsPage />} />
             <Route path="/messages/:sessionName/:empireName" element={<MessagesPage />} />
             <Route path="/ship-design/" element={<ShipDesignPage />} />
           </Routes>
