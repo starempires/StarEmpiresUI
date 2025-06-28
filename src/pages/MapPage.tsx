@@ -10,37 +10,39 @@ import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { SplitPane } from 'react-collapse-pane';
-import { fetchSessionObject } from '../components/common/SessionAPI';
+import { loadSnapshot } from '../components/common/SessionAPI';
 
 type CustomKonvaEventObject<T extends Event> = {
   evt: T;
 };
 
+interface MapPageParams {
+  sessionName: string;
+  empireName: string;
+  turnNumber: string;
+  [key: string]: string | undefined;
+}
+
 export default function MapPage() {
 
-  const { sessionName, empireName, turnNumber } = useParams();
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { sessionName, empireName, turnNumber } = useParams<MapPageParams>();
+  const [snapshot, setSnapshot] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [selectedSectorText, setSelectedSectorText] = useState<string>("");
 
     useEffect(() => {
-      async function loadSnapshot() {
+      async function loadTurnShapshot() {
          try {
-            const apiData = await fetchSessionObject(
-                  sessionName ?? "",
-                  empireName ?? "",
-                  Number(turnNumber),
-                  "SNAPSHOT"
-            );
-            const json = JSON.parse(apiData);
-            setData(json.data);
+            const snapshot = await loadSnapshot(sessionName!, empireName!, Number(turnNumber!));
+            setSnapshot(snapshot);
+//             console.log("set snapshot to " + JSON.stringify(snapshot));
          } catch (error) {
             console.error("Error loading snapshot:", error);
          } finally {
             setLoading(false);
          }
       }
-      loadSnapshot();
+      loadTurnShapshot();
     }, [sessionName, empireName, turnNumber]);
 
   const handleDoubleClick = (event: CustomKonvaEventObject<MouseEvent>) => {
@@ -59,26 +61,26 @@ export default function MapPage() {
         return <Typography variant="h6" sx={{ ml: 5 }}>Loading...</Typography>;
     }
 
-    // Ensure data is available before rendering
-    if (!data) {
-        return <Typography variant="h6" sx={{ ml: 5, color: "red" }}>Error loading data.</Typography>;
+    // Ensure snapshot is available before rendering
+    if (!snapshot) {
+        return <Typography variant="h6" sx={{ ml: 5, color: "red" }}>Error loading snapshot.</Typography>;
     }
 
    // width, height enough room for hover text
    // TODO: revisit this for a better computation
-   const width = (data.radius * 8) * Constants.RADIUS;
-   const height = (data.radius * 6) * Constants.RADIUS;
+   const width = (snapshot.radius * 8) * Constants.RADIUS;
+   const height = (snapshot.radius * 6) * Constants.RADIUS;
 
     return (
     <div>
-      <MapPageSubHeader sessionName={sessionName!} empireName={empireName!} turnNumber={Number(turnNumber)} />
+      <MapPageSubHeader sessionName={sessionName!} empireName={empireName!} turnNumber={Number(turnNumber!)} />
       <Grid container spacing={2}>
         {/* Left Pane: Galaxy Map */}
         <SplitPane split="vertical" collapse={true} initialSizes={[1.5,1]} minSizes={[300, 300]} >
         <Grid item xs={true}>
           <Box sx={{ ml: 2 }}>
             <Stage width={width} height={height}>
-              <Galaxy turnData={data} onDblClick={handleDoubleClick} onClick={handleClick} />
+              <Galaxy turnData={snapshot} onDblClick={handleDoubleClick} onClick={handleClick} />
             </Stage>
           </Box>
         </Grid>

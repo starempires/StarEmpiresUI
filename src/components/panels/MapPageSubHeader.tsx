@@ -7,7 +7,7 @@ interface MapPageSubHeaderProps {
     turnNumber: number;
 }
 
-export default function MapPageSubHeader({ empireName, sessionName, turnNumber }: MapPageSubHeaderProps) {
+export default function MapPageSubHeader({ empireName, sessionName, turnNumber}: MapPageSubHeaderProps) {
   return (
    <Grid container spacing={2}>
          <Grid item xs={12}>
@@ -20,6 +20,8 @@ export default function MapPageSubHeader({ empireName, sessionName, turnNumber }
                  variant="outlined"
                  size="small"
                  component={RouterLink}
+                 target="_blank"
+                 rel="noopener noreferrer"
                  to={`/messages/${sessionName}/${empireName}`}
                  disabled={true}
                  sx={{
@@ -36,6 +38,8 @@ export default function MapPageSubHeader({ empireName, sessionName, turnNumber }
                  variant="outlined"
                  size="small"
                  component={RouterLink}
+                 target="_blank"
+                 rel="noopener noreferrer"
                  disabled={turnNumber==0}
                  sx={{
                     mr: 1,
@@ -47,6 +51,24 @@ export default function MapPageSubHeader({ empireName, sessionName, turnNumber }
                  to={`/news/${sessionName}/${empireName}/${turnNumber}`}
                >
                  News
+               </Button>
+               <Button
+                 variant="outlined"
+                 size="small"
+                 component={RouterLink}
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 disabled={turnNumber==0}
+                 sx={{
+                    mr: 1,
+                    '&.Mui-disabled': {
+                        color: '#aaaaaa',
+                        borderColor: '#aaaaaa',
+                    },
+                 }}
+                 to={`/ship-classes/${sessionName}/${empireName}/${turnNumber}`}
+               >
+                 Ship Classes
                </Button>
              </Box>
            </Box>

@@ -109,3 +109,21 @@ export async function rollbackTurn(sessionName: string, turnNumber: number): Pro
       throw error;
     }
 }
+
+export async function loadSnapshot(sessionName: string, empireName: string, turnNumber: number): Promise<string> {
+    try {
+       const apiData = await fetchSessionObject(
+                  sessionName ?? "",
+                  empireName ?? "",
+                  turnNumber,
+                  "SNAPSHOT"
+       );
+       if (apiData) {
+           const json = JSON.parse(apiData);
+           return json.data;
+       }
+   } catch (error) {
+            console.error("Error loading snapshot:", error);
+   }
+   return "";
+}

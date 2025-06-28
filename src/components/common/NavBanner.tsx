@@ -34,7 +34,7 @@ export default function NavBanner({ signOut, userGroups, userAttributes }: NavBa
 
   return (
     <AppBar position="static">
-      <Container maxWidth="xl">
+      <Container maxWidth={false} disableGutters sx={{ pl: 2 }}>
         <Toolbar disableGutters>
          {/* logo and title */}
           <Typography
@@ -43,7 +43,7 @@ export default function NavBanner({ signOut, userGroups, userAttributes }: NavBa
             component="a"
             href="#app-bar-with-responsive-menu"
             sx={{
-              mr: 2,
+              mr: 1,
               display: { xs: 'none', md: 'flex' },
               fontFamily: 'Futura',
               fontWeight: 700,
@@ -51,8 +51,7 @@ export default function NavBanner({ signOut, userGroups, userAttributes }: NavBa
               color: 'inherit',
               textDecoration: 'none',
             }}
-          >
-            Star Empires
+          >Star Empires
           </Typography>
 
           {/* nav menu items */}
