@@ -60,33 +60,31 @@ export default function NewsPage() {
         sections.push({ header: newsText, body: [] });
         return sections;
     }
-    const lines = newsText.split('\n');
+    const lines = newsText
+      .split('\n')
+      .filter(line => !line.startsWith('==='));
     let i = 0;
+    let header: string = "";
+    let body: string[] = [];
 
     while (i < lines.length) {
+        if (header) {
+            sections.push({ header, body });
+            body = [];
+            header = "";
+        }
       // Skip top separator lines
-      if (lines[i].startsWith('=')) {
-          i++;
+      if (lines[i].startsWith('Phase')) {
+         header = lines[i++]?.trim();
       }
-
-      // Get phase header
-      const header = lines[i++]?.trim();
-
-      if (lines[i].startsWith('=')) {
-          i++;
-      }
-
-      // Collect body lines until next phase or EOF
-      const body: string[] = [];
-      while (i < lines.length && !lines[i].startsWith('=')) {
-          const line = lines[i++].trim();
-          body.push(line);
-      }
-
-      if (header) {
-          sections.push({ header, body });
+      else {
+          while (i < lines.length && !lines[i].startsWith('Phase')) {
+               const line = lines[i++].trim();
+               body.push(line);
+          }
       }
     }
+    sections.push({ header, body });
 
     return sections;
   }
