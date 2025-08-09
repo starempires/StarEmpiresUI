@@ -9,13 +9,13 @@ export default function InfoPane({infoText}: {infoText: string}) {
       </Typography>
       <Box
         sx={{
-          ml: 2,
+          ml: 1,
           backgroundColor: "#f5f5f5",
           padding: 1,
           height: "100%",
           width: "100%",
           overflow: "auto",
-          border: "1px solid #ccc",
+          border: "0px solid #ccc",
           color: "black"
         }}
       >

@@ -101,18 +101,23 @@ export default function MapPage() {
 
           {/* Right Pane: Sector details and orders – fills full height */}
           <Panel defaultSize={50}>
-            {empireName === 'GM' ? (
-              <Box sx={{ ml: 5, width: '100%', height: '90%', overflow: 'auto' }}>
-                <InfoPane infoText={selectedSectorText} />
-              </Box>
-            ) : (
               <PanelGroup direction="vertical" style={{ height: '95%' }}>
                 <Panel defaultSize={50}>
                   <Box sx={{ height: '100%', overflow: 'auto' }}>
                     <InfoPane infoText={selectedSectorText} />
                   </Box>
                 </Panel>
-                <PanelResizeHandle className="h-3 bg-blue-800 hover:bg-blue-600" style={{ cursor: 'row-resize', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <PanelResizeHandle
+                  className="h-3 bg-blue-800 hover:bg-blue-600"
+                  style={{
+                    cursor: 'row-resize',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: '4px',
+                    marginBottom: '4px'
+                  }}
+                >
                   <Box sx={{
                     width: '30px',
                     height: '4px',
@@ -130,7 +135,6 @@ export default function MapPage() {
                   </Box>
                 </Panel>
               </PanelGroup>
-            )}
           </Panel>
         </PanelGroup>
       </Box>

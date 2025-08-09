@@ -135,7 +135,7 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
   };
 
   return (
-    <Box sx={{ ml: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ ml: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h6" gutterBottom>
         Enter Turn {turnNumber} Orders
       </Typography>
@@ -204,7 +204,7 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
                     color="success"
                     onChange={(e) => handleLocked(e.target.checked)}
                     sx={{
-                      ml: 2,
+                      ml: 1,
                       color: 'white',
                       '&.Mui-checked': {
                         color: 'success',
