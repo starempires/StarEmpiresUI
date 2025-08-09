@@ -199,7 +199,7 @@ export default function ShipDesignPage() {
 
           {hullParameters?.hullType === 'missile' ? (
             <Grid container spacing={2} mt={1}>
-              <Grid item xs={6}>
+              <Grid>
                 <TextField
                   fullWidth
                   type="number"
@@ -210,7 +210,7 @@ export default function ShipDesignPage() {
                   inputProps={{ min: 1 }}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid>
                 <TextField
                   fullWidth
                   type="number"
@@ -221,7 +221,7 @@ export default function ShipDesignPage() {
                   inputProps={{ min: 1 }}
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid>
                 <Box mt={3}>
                   <Typography>Cost: {missileCost}</Typography>
                   <Typography>{designText}</Typography>
@@ -241,7 +241,7 @@ export default function ShipDesignPage() {
                 }
                 const value = shipComponents[comp];
                 return (
-                  <Grid item xs={6} key={comp}>
+                  <Grid key={comp}>
                     <TextField
                       fullWidth
                       type="number"
@@ -267,7 +267,7 @@ export default function ShipDesignPage() {
                   </Grid>
                 );
               })}
-              <Grid item xs={12}>
+              <Grid>
                 <Box mt={3}>
                   <Typography>Cost: {shipCost}</Typography>
                   <Typography>Tonnage: {shipTonnage}</Typography>

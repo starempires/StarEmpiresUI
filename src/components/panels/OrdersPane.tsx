@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
 import { fetchSessionObject, loadOrdersStatus } from '../common/SessionAPI';
 
 interface OrderSubmissionPaneProps {
@@ -15,7 +16,7 @@ interface OrderSubmissionPaneProps {
 
 export default function OrderPane({ sessionName, empireName, turnNumber }: OrderSubmissionPaneProps) {
 
-  const [ordersText, setOrdersText] = useState<string>();
+  const [ordersText, setOrdersText] = useState<string>('');
   const [submitTrigger, setSubmitTrigger] = useState<number>(0);
   const [lockedTrigger, setLockedTrigger] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -134,57 +135,88 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
   };
 
   return (
-    <Box sx={{ ml: 5, width: "100%", height: "100%" }}>
+    <Box sx={{ ml: 2, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Typography variant="h6" gutterBottom>
         Enter Turn {turnNumber} Orders
       </Typography>
-      <TextField
-        fullWidth
-        multiline={true}
-        variant="outlined"
-        value={ordersText}
-        minRows={8}
-        maxRows={8}
-        onChange={(e) => setOrdersText(e.target.value)}
-        sx={{
-          backgroundColor: 'white',
-          '& .MuiInputBase-input': {
-            color: 'black'
-          }
-        }}
-        placeholder={`Enter your turn ${turnNumber} orders here`}
-      />
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', mt: 1 }}>
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: isSubmitting ? '#265100' : '#1976d2',
-            '&:hover': {
-              backgroundColor: isSubmitting ? '#265100' : '#115293'
-            },
-          }}
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Saving Orders..." : "Save Orders"}
-        </Button>
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={locked}
-              color="success"
-              onChange={(e) => handleLocked(e.target.checked)}
-              sx={{
-                ml: 2,
-                color: 'white',
-                '&.Mui-checked': {
-                  color: 'success',
-                },
-              }}
-            />
-          }
-          label="Lock Orders"
-        />
+
+      {/* Resizable split between orders text and controls */}
+      <Box sx={{ flex: 1, minHeight: 0 }}>
+        <PanelGroup direction="vertical" style={{ height: '100%' }}>
+          {/* Top panel: Text field fills available space */}
+          <Panel defaultSize={75} minSize={30}>
+            <Box sx={{ height: '100%', overflow: 'auto', ml: 0 }}>
+              <TextField
+                fullWidth
+                multiline
+                variant="outlined"
+                value={ordersText}
+                onChange={(e) => setOrdersText(e.target.value)}
+                placeholder={`Enter your turn ${turnNumber} orders here`}
+                sx={{
+                  height: '100%',
+                  backgroundColor: 'white',
+                  '& .MuiInputBase-root': {
+                    height: '100%',
+                    alignItems: 'start',
+                  },
+                  '& .MuiInputBase-input': {
+                    color: 'black',
+                  },
+                  '& textarea': {
+                    height: '100% !important',
+                    boxSizing: 'border-box',
+                  },
+                }}
+              />
+            </Box>
+          </Panel>
+
+          <PanelResizeHandle className="h-3 bg-blue-800 hover:bg-blue-600" style={{ cursor: 'row-resize', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{
+              width: '30px',
+              height: '4px',
+              backgroundColor: 'white',
+              borderRadius: '2px',
+            }} />
+          </PanelResizeHandle>
+
+          {/* Bottom panel: Buttons/checkbox row */}
+          <Panel defaultSize={25} minSize={10}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', mt: 1 }}>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: isSubmitting ? '#265100' : '#1976d2',
+                  '&:hover': {
+                    backgroundColor: isSubmitting ? '#265100' : '#115293'
+                  },
+                }}
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Saving Orders...' : 'Save Orders'}
+              </Button>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={locked}
+                    color="success"
+                    onChange={(e) => handleLocked(e.target.checked)}
+                    sx={{
+                      ml: 2,
+                      color: 'white',
+                      '&.Mui-checked': {
+                        color: 'success',
+                      },
+                    }}
+                  />
+                }
+                label="Lock Orders"
+              />
+            </Box>
+          </Panel>
+        </PanelGroup>
       </Box>
     </Box>
   );

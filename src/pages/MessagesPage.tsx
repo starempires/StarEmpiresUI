@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
-import { List, ListItem, ListItemText, Divider, Typography } from '@mui/material';
+import { List, ListItemButton, ListItemText, Divider, Typography } from '@mui/material';
 
 const client = generateClient<Schema>({ authMode: 'userPool' });
 
@@ -145,14 +145,14 @@ export default function MessagePage() {
         <List>
           {messages.map((msg) => (
             <React.Fragment key={msg.id}>
-              <ListItem button onClick={() => handleClickMessage(msg)}>
+              <ListItemButton onClick={() => handleClickMessage(msg)}>
                 <ListItemText
                   primary={`From: ${msg.sender} (Sent: ${new Date(msg.sent).toLocaleString()})`}
                   secondary={msg.content.substring(0, 100) + (msg.content.length > 100 ? '...' : '')}
                   primaryTypographyProps={{ style: { color: 'lightgray' } }}
                   secondaryTypographyProps={{ style: { color: 'lightgray' } }}
                 />
-              </ListItem>
+              </ListItemButton>
               <Divider />
             </React.Fragment>
           ))}

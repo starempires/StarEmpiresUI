@@ -6,10 +6,13 @@ import InfoPane from '../components/panels/InfoPane';
 import OrdersPane from '../components/panels/OrdersPane';
 import MapPageSubHeader from '../components/panels/MapPageSubHeader';
 import * as Constants from '../Constants';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { SplitPane } from 'react-collapse-pane';
+import {
+  PanelGroup,
+  Panel,
+  PanelResizeHandle
+} from 'react-resizable-panels';
 import { loadSnapshot } from '../components/common/SessionAPI';
 
 type CustomKonvaEventObject<T extends Event> = {
@@ -71,44 +74,66 @@ export default function MapPage() {
    const width = (snapshot.radius * 8) * Constants.RADIUS;
    const height = (snapshot.radius * 6) * Constants.RADIUS;
 
-    return (
-    <div>
+  return (
+    <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <MapPageSubHeader sessionName={sessionName!} empireName={empireName!} turnNumber={Number(turnNumber!)} />
-      <Grid container spacing={2}>
-        {/* Left Pane: Galaxy Map */}
-        <SplitPane split="vertical" collapse={true} initialSizes={[1.5,1]} minSizes={[300, 300]} >
-        <Grid item xs={true}>
-          <Box sx={{ ml: 2 }}>
-            <Stage width={width} height={height}>
-              <Galaxy turnData={snapshot} onDblClick={handleDoubleClick} onClick={handleClick} />
-            </Stage>
-          </Box>
-        </Grid>
-                {/* Right Pane: Always show InfoPane; if not GM, show OrdersPane in a vertical split */}
-                <Grid item xs={4}>
-                  {empireName === "GM" ? (
-                    <Box sx={{ ml: 5, width: "100%" }}>
-                      <InfoPane infoText={selectedSectorText} />
-                    </Box>
-                  ) : (
-                    <Grid container direction="column" spacing={2}>
-                      <SplitPane split="horizontal" collapse={true} minSizes={[150, 250]}>
-                        <Grid item xs={true}>
-                          <InfoPane infoText={selectedSectorText} />
-                        </Grid>
-                        <Grid item xs={true}>
-                          <OrdersPane
-                            sessionName={sessionName!}
-                            empireName={empireName!}
-                            turnNumber={Number(turnNumber)}
-                          />
-                        </Grid>
-                      </SplitPane>
-                    </Grid>
-                  )}
-                </Grid>
-      </SplitPane>
-      </Grid>
-    </div>
-    );
+
+      {/* Main split panes fill the remaining viewport height */}
+      <Box sx={{ flex: 1, minHeight: 0 }}>
+        <PanelGroup direction="horizontal" style={{ height: '95%' }}>
+          {/* Left Pane: Galaxy Map (scrollable if Stage is taller than the container) */}
+          <Panel defaultSize={50} minSize={25} maxSize={95}>
+            <Box sx={{ ml: 2, height: '100%', overflow: 'auto' }}>
+              <Stage width={width} height={height}>
+                <Galaxy turnData={snapshot} onDblClick={handleDoubleClick} onClick={handleClick} />
+              </Stage>
+            </Box>
+          </Panel>
+
+          <PanelResizeHandle className="w-3 bg-blue-800 hover:bg-blue-600" style={{ cursor: 'col-resize', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{
+              width: '4px',
+              height: '30px',
+              backgroundColor: 'white',
+              borderRadius: '2px',
+            }} />
+          </PanelResizeHandle>
+
+          {/* Right Pane: Sector details and orders – fills full height */}
+          <Panel defaultSize={50}>
+            {empireName === 'GM' ? (
+              <Box sx={{ ml: 5, width: '100%', height: '90%', overflow: 'auto' }}>
+                <InfoPane infoText={selectedSectorText} />
+              </Box>
+            ) : (
+              <PanelGroup direction="vertical" style={{ height: '95%' }}>
+                <Panel defaultSize={50}>
+                  <Box sx={{ height: '100%', overflow: 'auto' }}>
+                    <InfoPane infoText={selectedSectorText} />
+                  </Box>
+                </Panel>
+                <PanelResizeHandle className="h-3 bg-blue-800 hover:bg-blue-600" style={{ cursor: 'row-resize', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Box sx={{
+                    width: '30px',
+                    height: '4px',
+                    backgroundColor: 'white',
+                    borderRadius: '2px',
+                  }} />
+                </PanelResizeHandle>
+                <Panel defaultSize={50}>
+                  <Box sx={{ height: '100%', overflow: 'auto' }}>
+                    <OrdersPane
+                      sessionName={sessionName!}
+                      empireName={empireName!}
+                      turnNumber={Number(turnNumber)}
+                    />
+                  </Box>
+                </Panel>
+              </PanelGroup>
+            )}
+          </Panel>
+        </PanelGroup>
+      </Box>
+    </Box>
+  );
 }

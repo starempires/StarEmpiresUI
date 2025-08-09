@@ -1,4 +1,4 @@
-import { Grid, Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 interface MapPageSubHeaderProps {
@@ -9,9 +9,7 @@ interface MapPageSubHeaderProps {
 
 export default function MapPageSubHeader({ empireName, sessionName, turnNumber}: MapPageSubHeaderProps) {
   return (
-   <Grid container spacing={2}>
-         <Grid item xs={12}>
-           <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+         <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
              <Typography variant="h6" sx={{ color: "white" }}>
                {empireName} galactic map for session {sessionName}, turn {turnNumber}
              </Typography>
@@ -71,8 +69,6 @@ export default function MapPageSubHeader({ empireName, sessionName, turnNumber}:
                  Ship Classes
                </Button>
              </Box>
-           </Box>
-         </Grid>
-       </Grid>
+         </Box>
   );
 }
