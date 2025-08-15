@@ -38,7 +38,6 @@ export default function MapPageSubHeader({ empireName, sessionName, turnNumber}:
                  component={RouterLink}
                  target="_blank"
                  rel="noopener noreferrer"
-                 disabled={turnNumber==0}
                  sx={{
                     mr: 1,
                     '&.Mui-disabled': {
@@ -56,7 +55,6 @@ export default function MapPageSubHeader({ empireName, sessionName, turnNumber}:
                  component={RouterLink}
                  target="_blank"
                  rel="noopener noreferrer"
-                 disabled={turnNumber==0}
                  sx={{
                     mr: 1,
                     '&.Mui-disabled': {

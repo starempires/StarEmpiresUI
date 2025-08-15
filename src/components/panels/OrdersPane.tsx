@@ -145,7 +145,7 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
         <PanelGroup direction="vertical" style={{ height: '100%' }}>
           {/* Top panel: Text field fills available space */}
           <Panel defaultSize={75} minSize={30}>
-            <Box sx={{ height: '100%', overflow: 'auto', ml: 0 }}>
+            <Box sx={{ height: '100%', overflow: 'hidden', ml: 0 }}>
               <TextField
                 fullWidth
                 multiline
@@ -153,19 +153,39 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
                 value={ordersText}
                 onChange={(e) => setOrdersText(e.target.value)}
                 placeholder={`Enter your turn ${turnNumber} orders here`}
+                inputProps={{
+                  style: { height: '100%', overflowY: 'auto' }
+                }}
                 sx={{
                   height: '100%',
                   backgroundColor: 'white',
                   '& .MuiInputBase-root': {
                     height: '100%',
-                    alignItems: 'start',
+                    alignItems: 'stretch',
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    height: '100%',
+                    alignItems: 'stretch',
                   },
                   '& .MuiInputBase-input': {
                     color: 'black',
+                    overflowY: 'auto',
+                  },
+                  '& .MuiOutlinedInput-input': {
+                    overflowY: 'auto',
+                  },
+                  '& .MuiInputBase-inputMultiline': {
+                    height: '100% !important',
+                    overflowY: 'auto',
+                  },
+                  '& .MuiOutlinedInput-inputMultiline': {
+                    height: '100% !important',
+                    overflowY: 'auto',
                   },
                   '& textarea': {
                     height: '100% !important',
                     boxSizing: 'border-box',
+                    overflowY: 'auto',
                   },
                 }}
               />
@@ -183,7 +203,7 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
 
           {/* Bottom panel: Buttons/checkbox row */}
           <Panel defaultSize={25} minSize={10}>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', mt: 1 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', mt: 1, mr: 1 }}>
               <Button
                 variant="contained"
                 sx={{

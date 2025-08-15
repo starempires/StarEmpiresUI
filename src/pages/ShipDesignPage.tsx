@@ -7,14 +7,15 @@ import {
   Grid,
   Paper,
   Box,
+  Button,
 } from '@mui/material';
 import { HullParameters, Hulls } from '../components/common/HullParameters';
 
 interface ShipComponents {
   guns: number;
+  dp: number;
   engines: number;
   scan: number;
-  dp: number;
   racks: number;
 }
 
@@ -25,9 +26,9 @@ interface MissileComponents {
 
 const INIT_SHIP_COMPONENTS = {
       guns: 0,
+      dp: 0,
       engines: 0,
       scan: 0,
-      dp: 0,
       racks: 0,
     };
 
@@ -57,6 +58,12 @@ export default function ShipDesignPage() {
     setMissileComponents(prev => ({ ...prev, [key]: value }));
   };
 
+  const handleReset = () => {
+      if (hullParameters) {
+          setComponentBaseValues(hullParameters);
+      }
+  };
+
  useEffect(() => {
       if (!hullParameters) {
           return;
@@ -65,10 +72,23 @@ export default function ShipDesignPage() {
           return;
       }
       if (hullParameters.hullType === 'missile') {
-          setDesignText(["DESIGN", hullParameters.hullType.replaceAll(' ', '_'), className, missileComponents.guns, missileComponents.tonnage].join(' '));
+          setDesignText(["DESIGN",
+              "<world>",
+              hullParameters.hullType.replaceAll(' ', '_'),
+              className,
+              missileComponents.guns,
+              missileComponents.tonnage].join(' '));
       }
       else {
-          setDesignText(["DESIGN", hullParameters.hullType.replaceAll(' ', '_'), className, shipComponents.guns, shipComponents.engines, shipComponents.scan, shipComponents.dp, shipComponents.racks].join(' '));
+          setDesignText(["DESIGN",
+              "<world>",
+              hullParameters.hullType.replaceAll(' ', '_'),
+              className,
+              shipComponents.guns,
+              shipComponents.dp,
+              shipComponents.engines,
+              shipComponents.scan,
+              shipComponents.racks].join(' '));
       }
   }, [className, hullParameters, shipComponents, missileComponents]);
 
@@ -79,6 +99,7 @@ export default function ShipDesignPage() {
 
      // Compute exponential impact
      const impact = Math.exp(Math.abs(delta) / denominator);
+     console.log("delta = " + delta + ", denominator = " + denominator + ", impact = " + impact);
 
      // Positive delta increases cost, negative delta decreases cost
      return delta > 0 ? Math.round(impact) : -Math.round(impact);
@@ -87,22 +108,22 @@ export default function ShipDesignPage() {
   useEffect(() => {
     if (hullParameters) {
         const addGuns = shipComponents.guns - hullParameters.baseGuns;
+        const addDp = shipComponents.dp - hullParameters.baseDp;
         const addEngines = shipComponents.engines - hullParameters.baseEngines;
         const addScan = shipComponents.scan - hullParameters.baseScan;
-        const addDp = shipComponents.dp - hullParameters.baseDp;
         const addRacks = shipComponents.racks - hullParameters.baseRacks;
-//         console.log("addGuns = " + addGuns + ", addEngines = " + addEngines + ", addScan = " + addScan + ", addDp = " + addDp + ", addRacks = " + addRacks);
+        console.log("addGuns = " + addGuns + ", addEngines = " + addEngines + ", addScan = " + addScan + ", addDp = " + addDp + ", addRacks = " + addRacks);
       const additionalCost =
                    computeComponent(addGuns, hullParameters.costGuns) +
+                   computeComponent(addDp, hullParameters.costDp) +
                    computeComponent(addEngines, hullParameters.costEngines) +
                    computeComponent(addScan, hullParameters.costScan) +
-                   computeComponent(addDp, hullParameters.costDp) +
                    computeComponent(addRacks, hullParameters.costRacks);
       const additionalTonnage =
                    computeComponent(addGuns, hullParameters.tonnageGuns) +
+                   computeComponent(addDp, hullParameters.tonnageDp) +
                    computeComponent(addEngines, hullParameters.tonnageEngines) +
                    computeComponent(addScan, hullParameters.tonnageScan) +
-                   computeComponent(addDp, hullParameters.tonnageDp) +
                    computeComponent(addRacks, hullParameters.tonnageRacks);
       const cost = Math.max(1, hullParameters.baseCost + additionalCost);
       const tonnage = Math.max(1, hullParameters.baseTonnage + additionalTonnage);
@@ -125,6 +146,24 @@ export default function ShipDesignPage() {
     }
   }, [missileComponents]);
 
+const setComponentBaseValues = (parameters: HullParameters) => {
+     if (parameters.hullType === "missile") {
+         setMissileComponents({
+             guns: parameters.baseGuns,
+             tonnage: parameters.baseTonnage,
+         });
+     }
+     else {
+         setShipComponents({
+             guns: parameters.baseGuns,
+             dp: parameters.baseDp,
+             engines: parameters.baseEngines,
+             scan: parameters.baseScan,
+             racks: parameters.baseRacks,
+         });
+     }
+  };
+
   const handeHullChange = (hullType: string) => {
 
       if (!hullType) {
@@ -136,21 +175,22 @@ export default function ShipDesignPage() {
       const hullParameters = Hulls[hullType];
 //       console.log("key = " + hullType + ", value = " + JSON.stringify(hullParameters));
       setHullParameters(hullParameters);
-      if (hullType === "missile") {
-          setMissileComponents({
-              guns: hullParameters.baseGuns,
-              tonnage: hullParameters.baseTonnage,
-              });
-      }
-      else {
-          setShipComponents({
-              guns: hullParameters.baseGuns,
-              engines: hullParameters.baseEngines,
-              scan: hullParameters.baseScan,
-              dp: hullParameters.baseDp,
-              racks: hullParameters.baseRacks,
-        });
-      }
+      setComponentBaseValues(hullParameters);
+//       if (hullType === "missile") {
+//           setMissileComponents({
+//               guns: hullParameters.baseGuns,
+//               tonnage: hullParameters.baseTonnage,
+//               });
+//       }
+//       else {
+//           setShipComponents({
+//               guns: hullParameters.baseGuns,
+//               dp: hullParameters.baseDp,
+//               engines: hullParameters.baseEngines,
+//               scan: hullParameters.baseScan,
+//               racks: hullParameters.baseRacks,
+//         });
+//       }
   };
 
    const handleClassNameChange = (value: string) => {
@@ -196,7 +236,6 @@ export default function ShipDesignPage() {
               </MenuItem>
             ))}
           </TextField>
-
           {hullParameters?.hullType === 'missile' ? (
             <Grid container spacing={2} mt={1}>
               <Grid>
@@ -230,7 +269,7 @@ export default function ShipDesignPage() {
             </Grid>
           ) : (
             <Grid container spacing={2} mt={1}>
-              {(['guns', 'engines', 'scan', 'dp', 'racks'] as const).map((comp) => {
+              {(['guns', 'dp', 'engines', 'scan', 'racks'] as const).map((comp) => {
                 let maxValue = Infinity;
                 let name = comp.charAt(0).toUpperCase() + comp.slice(1);
                 let disabled = true;
@@ -252,7 +291,9 @@ export default function ShipDesignPage() {
                           ? `No ${name} allowed`
                           : maxValue === Infinity
                           ? ''
-                          : `Max value ${maxValue}`
+                          : value === maxValue
+                            ? <span style={{ color: 'red' }}>{`Max value ${maxValue}`}</span>
+                            : `Max value ${maxValue}`
                       }
                       onChange={(e) => handleShipComponentChange(comp, Number(e.target.value))}
                       error={value < 0 || value > maxValue}
@@ -267,6 +308,17 @@ export default function ShipDesignPage() {
                   </Grid>
                 );
               })}
+              <Box sx={{ my: 2 }}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleReset}
+                  disabled={!hullParameters}
+                >
+                  Reset Values
+                </Button>
+              </Box>
+
               <Grid>
                 <Box mt={3}>
                   <Typography>Cost: {shipCost}</Typography>
@@ -278,7 +330,6 @@ export default function ShipDesignPage() {
               </Grid>
             </Grid>
           )}
-
 
         </Paper>
       </Box>

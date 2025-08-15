@@ -100,7 +100,7 @@ export default function MapPage() {
           </PanelResizeHandle>
 
           {/* Right Pane: Sector details and orders – fills full height */}
-          <Panel defaultSize={50}>
+          <Panel defaultSize={50} style={{ marginRight: '12px', overflow: 'hidden' }}>
               <PanelGroup direction="vertical" style={{ height: '95%' }}>
                 <Panel defaultSize={50}>
                   <Box sx={{ height: '100%', overflow: 'auto' }}>

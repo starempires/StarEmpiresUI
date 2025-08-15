@@ -68,13 +68,12 @@ export default function NewsPage() {
     let body: string[] = [];
 
     while (i < lines.length) {
-        if (header) {
+      if (lines[i].startsWith('Phase')) {
+         if (header) {
             sections.push({ header, body });
             body = [];
             header = "";
-        }
-      // Skip top separator lines
-      if (lines[i].startsWith('Phase')) {
+         }
          header = lines[i++]?.trim();
       }
       else {

@@ -70,7 +70,7 @@ export const Hulls: Record<string, HullParameters> = {
     costDp: 5,
     costEngines: 3,
     costScan: 3,
-    costRacks: 1.5,
+    costRacks: 1,
     tonnageGuns: 5,
     tonnageDp: 5,
     tonnageEngines: 5,

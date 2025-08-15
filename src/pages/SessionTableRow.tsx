@@ -136,7 +136,7 @@ export default function SessionControlCell({
 
 
     return (
-      <>
+     <React.Fragment>
        <Dialog open={processing}>
           <DialogTitle>
             Processing...
@@ -200,6 +200,6 @@ export default function SessionControlCell({
            <TableCell>{empire.empireType === "ACTIVE" ? empire.orderStatus : ""}</TableCell>
          </TableRow>
        ))}
-      </>
+      </React.Fragment>
   );
 }
