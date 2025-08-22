@@ -181,7 +181,11 @@ const formatShipStats = (ship: any, turnData: any): string => {
    let text = "";
    const foundShip = turnData.shipClasses.find((shipClass:any) => shipClass.name === ship.shipClass);
    if (foundShip) {
-       text += "  " + ship.name + " (" + ship.shipClass + "/" + ship.hull +
+       text += "  ";
+       if (ship.carrier != null) {
+           text += " +";
+       }
+       text += ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
                             (ship.opGuns ? ship.opGuns : 0) + "/" +
                             (ship.opEngines ? ship.opEngines: 0) + "/" +
@@ -197,6 +201,41 @@ const formatShipStats = (ship: any, turnData: any): string => {
    return text;
 }
 
+const sortShips = (ships: any[]): any[] => {
+    const carrierMap: { [carrierName: string]: any[] } = {};
+
+    const independentShips: any[] = [];
+
+    // Group ships by whether they're loaded into a carrier
+    Object.values(ships).forEach((ship) => {
+        if (ship.carrier) {
+            if (!carrierMap[ship.carrier]) {
+                carrierMap[ship.carrier] = [];
+            }
+            carrierMap[ship.carrier].push(ship);
+        } else {
+            independentShips.push(ship);
+        }
+    });
+
+    // Sort independent ships alphabetically
+    independentShips.sort((a, b) => a.name.localeCompare(b.name));
+    // Sort loaded ships alphabetically within each carrier group
+    Object.values(carrierMap).forEach(group =>
+        group.sort((a, b) => a.name.localeCompare(b.name))
+    );
+
+    // Build final list: each carrier followed by its loaded ships
+    const result: any[] = [];
+    independentShips.forEach((ship) => {
+        result.push(ship);
+        if (carrierMap[ship.name]) {
+            result.push(...carrierMap[ship.name]);
+        }
+    });
+
+    return result;
+};
 const buildShipsText = (sectorData: any, turnData: any): string => {
       let text = "";
       if (sectorData.ships) {
@@ -206,8 +245,8 @@ const buildShipsText = (sectorData: any, turnData: any): string => {
           empiresPresent.forEach((e) => {
                text += e + " ships:\n";
                let empireShips = sectorData.ships[e].ships;
-               for (const shipName in empireShips) {
-                    let ship = empireShips[shipName];
+               let sortedShips = sortShips(empireShips);
+               for (const ship of sortedShips) {
                     text += formatShipStats(ship, turnData);
                };
           });
