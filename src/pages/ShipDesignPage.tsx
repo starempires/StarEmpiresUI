@@ -74,16 +74,16 @@ export default function ShipDesignPage() {
       if (hullParameters.hullType === 'missile') {
           setDesignText(["DESIGN",
               "<world>",
-              hullParameters.hullType.replaceAll(' ', '_'),
               className,
+              hullParameters.hullType.replaceAll(' ', '_'),
               missileComponents.guns,
               missileComponents.tonnage].join(' '));
       }
       else {
           setDesignText(["DESIGN",
               "<world>",
-              hullParameters.hullType.replaceAll(' ', '_'),
               className,
+              hullParameters.hullType.replaceAll(' ', '_'),
               shipComponents.guns,
               shipComponents.dp,
               shipComponents.engines,
@@ -112,7 +112,7 @@ export default function ShipDesignPage() {
         const addEngines = shipComponents.engines - hullParameters.baseEngines;
         const addScan = shipComponents.scan - hullParameters.baseScan;
         const addRacks = shipComponents.racks - hullParameters.baseRacks;
-        console.log("addGuns = " + addGuns + ", addEngines = " + addEngines + ", addScan = " + addScan + ", addDp = " + addDp + ", addRacks = " + addRacks);
+//         console.log("addGuns = " + addGuns + ", addEngines = " + addEngines + ", addScan = " + addScan + ", addDp = " + addDp + ", addRacks = " + addRacks);
       const additionalCost =
                    computeComponent(addGuns, hullParameters.costGuns) +
                    computeComponent(addDp, hullParameters.costDp) +

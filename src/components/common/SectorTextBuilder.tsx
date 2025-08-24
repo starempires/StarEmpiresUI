@@ -185,13 +185,16 @@ const formatShipStats = (ship: any, turnData: any): string => {
        if (ship.carrier != null) {
            text += " +";
        }
-       text += ship.name + " (" + ship.shipClass + "/" + ship.hull +
+      text += ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
                             (ship.opGuns ? ship.opGuns : 0) + "/" +
                             (ship.opEngines ? ship.opEngines: 0) + "/" +
                             (ship.opScan ? ship.opScan : 0) +
+                            (ship.opScan ? ship.opScan : 0) +
                             ", dp " + ship.dpRemaining + "/" + ship.dp +
-                            ", OR " + Math.round(ship.opRating * 100) + "%)\n";
+                            ", OR " + Math.round(ship.opRating * 100) + "%" +
+                            ", r " + (ship.racks ? ship.emptyRacks + "/" + ship.racks : "0/0") +
+                            ")\n";
    }
    else {
        text += "  " + ship.name + " (" + ship.shipClass +
