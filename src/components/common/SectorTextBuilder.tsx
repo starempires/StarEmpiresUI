@@ -185,15 +185,15 @@ const formatShipStats = (ship: any, turnData: any): string => {
        if (ship.carrier != null) {
            text += " +";
        }
-      text += ship.name + " (" + ship.shipClass + "/" + ship.hull +
+       text += ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
                             (ship.opGuns ? ship.opGuns : 0) + "/" +
                             (ship.opEngines ? ship.opEngines: 0) + "/" +
                             (ship.opScan ? ship.opScan : 0) +
-                            (ship.opScan ? ship.opScan : 0) +
                             ", dp " + ship.dpRemaining + "/" + ship.dp +
                             ", OR " + Math.round(ship.opRating * 100) + "%" +
                             ", r " + (ship.racks ? ship.emptyRacks + "/" + ship.racks : "0/0") +
+                            ", t " + ship.tonnage +
                             ")\n";
    }
    else {
@@ -222,10 +222,14 @@ const sortShips = (ships: any[]): any[] => {
     });
 
     // Sort independent ships alphabetically
-    independentShips.sort((a, b) => a.name.localeCompare(b.name));
+    independentShips.sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    );
     // Sort loaded ships alphabetically within each carrier group
     Object.values(carrierMap).forEach(group =>
-        group.sort((a, b) => a.name.localeCompare(b.name))
+        group.sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+        )
     );
 
     // Build final list: each carrier followed by its loaded ships
@@ -257,7 +261,7 @@ const buildShipsText = (sectorData: any, turnData: any): string => {
       if (sectorData.unidentifiedShipCount > 0) {
           text += "\n";
           text += plural(sectorData.unidentifiedShipCount, "unidentified ship") +
-                  " (" + plural(sectorData.unidentifiedShipTonnage, " tonne") + ")\n";
+                  " (" + plural(sectorData.unidentifiedShipTonnage, "tonne") + ")\n";
       }
       return text;
   }
