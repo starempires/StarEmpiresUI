@@ -185,6 +185,9 @@ const formatShipStats = (ship: any, turnData: any): string => {
        if (ship.carrier != null) {
            text += " +";
        }
+       const racks = ship.racks || 0;
+       const usedRacks = racks - (ship.emptyRacks ||0);
+
        text += ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
                             (ship.opGuns ? ship.opGuns : 0) + "/" +
@@ -192,7 +195,7 @@ const formatShipStats = (ship: any, turnData: any): string => {
                             (ship.opScan ? ship.opScan : 0) +
                             ", dp " + ship.dpRemaining + "/" + ship.dp +
                             ", OR " + Math.round(ship.opRating * 100) + "%" +
-                            ", r " + (ship.racks ? ship.emptyRacks + "/" + ship.racks : "0/0") +
+                            ", r " + usedRacks + "/" + racks +
                             ", t " + ship.tonnage +
                             ")\n";
    }
