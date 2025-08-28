@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 export default function InfoPane({infoText}: {infoText: string}) {
   return (
     <>
-      <Typography sx={{ml:2}} variant="h6" gutterBottom>
+      <Typography sx={{ml:1}} variant="h6" gutterBottom>
         Sector Details
       </Typography>
       <Box
