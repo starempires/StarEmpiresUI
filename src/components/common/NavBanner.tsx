@@ -13,7 +13,10 @@ import { Link } from 'react-router-dom';
 const pages: Record<string, string> = {
   Sessions: '/',
   'Ship Design': '/ship-design',
-  'GM Controls': '/gm-controls'
+};
+
+const gmpages: Record<string, string> = {
+  'Create Session': '/create-session'
 };
 
 interface NavBannerProps {
@@ -32,6 +35,9 @@ export default function NavBanner({ signOut, userGroups, userAttributes }: NavBa
     setAnchorElUser(null);
   };
 
+  const allPages: Record<string, string> = userGroups?.includes("GAMEMASTERS")
+    ? { ...pages, ...gmpages }
+    : pages;
   return (
     <AppBar position="static">
       <Container maxWidth={false} disableGutters sx={{ pl: 2 }}>
@@ -56,9 +62,7 @@ export default function NavBanner({ signOut, userGroups, userAttributes }: NavBa
 
           {/* nav menu items */}
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {Object.entries(pages)
-                .filter(([page]) => page !== "GM Controls" || (userGroups?.includes("GAMEMASTERS")))
-                .map(([page, url]) => (
+            {Object.entries(allPages).map(([page, url]) => (
               <Button
                 key={page}
                 component={Link} to={url}

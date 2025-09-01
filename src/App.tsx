@@ -8,6 +8,7 @@ import MessagesPage from './pages/MessagesPage';
 import ShipDesignPage from './pages/ShipDesignPage';
 import NewsPage from './pages/NewsPage';
 import ShipClassesPage from './pages/ShipClassesPage';
+import CreateSessionPage from './pages/CreateSessionPage';
 import NavBanner from './components/common/NavBanner';
 import { SnapshotContext } from './components/common/SnapshotContext';
 
@@ -44,6 +45,7 @@ export default function App({user, signOut}: {user: any; signOut: () => void;}) 
             <Route path="/messages/:sessionName/:empireName" element={<MessagesPage />} />
             <Route path="/ship-design/" element={<ShipDesignPage />} />
             <Route path="/ship-classes/:sessionName/:empireName/:turnNumber" element={<ShipClassesPage />} />
+            <Route path="/create-session/" element={<CreateSessionPage  user={user} userAttributes={userAttributes}/>} userGroups={userGroups} />
           </Routes>
         </BrowserRouter>
        </SnapshotContext.Provider>
