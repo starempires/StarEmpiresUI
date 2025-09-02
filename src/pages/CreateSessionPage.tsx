@@ -18,7 +18,6 @@ import '../index.css';
 const client = generateClient<Schema>({ authMode: 'userPool' });
 
 interface GMControlsPageProps {
-  user: any;
   userAttributes: any;
   userGroups: any;
 }
@@ -32,12 +31,12 @@ interface EmpireRow {
 
 const toUnderscore = (s: string) => (s ?? '').replace(/\s+/g, '_');
 
-const isValidEmail = (s: string) => /[^\s@]+@[^\s@]+\.[^\s@]+/.test(s);
-
-export default function CreateSessionPage({ user, userAttributes, userGroups }: GMControlsPageProps) {
+export default function CreateSessionPage({ userAttributes, userGroups }: GMControlsPageProps) {
   const [sessionName, setSessionName] = useState('');
   const [numPlayers, setNumPlayers] = useState<number>(6);
   const [rows, setRows] = useState<EmpireRow[]>(() => Array.from({ length: 2 }, () => ({ empireName: '', homeworldName: '', starbaseName: '', playerName: '' })));
+
+  // console.log("user groups = ", userGroups);
 
   // keep rows array length in sync with selected number of players
   useEffect(() => {
@@ -180,6 +179,21 @@ const handleSubmit = async () => {
   }
 };
 
+  if (!userGroups?.includes("GAMEMASTERS")) {
+    return (
+      <Box className="p-6">
+        <Paper sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Unauthorized
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            You must be a member of the <strong>GAMEMASTERS</strong> group to access this page.
+          </Typography>
+        </Paper>
+      </Box>
+    );
+  }
+
   return (
     <Box className="p-6">
       <Typography variant="h6" gutterBottom>
@@ -188,19 +202,19 @@ const handleSubmit = async () => {
 
       <Paper sx={{ p: 3 }}>
         <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={8}>
+          <Grid size={{xs:'auto'}}>
             <TextField
-              fullWidth
               required
               label="Session Name"
               value={sessionName}
               onChange={(e) => setSessionName(toUnderscore(e.target.value))}
               size="small"
               margin="dense"
+              sx={{ width: 280 }}
             />
           </Grid>
-          <Grid item xs={12} md={4}>
-            <FormControl fullWidth required sx={{ minWidth: 240 }} size="small">
+          <Grid size={{xs:'auto'}}>
+            <FormControl required sx={{ width: 160, ml: 2 }} size="small">
               <InputLabel id="num-players-label">Number of Players</InputLabel>
               <Select
                 labelId="num-players-label"
@@ -219,15 +233,16 @@ const handleSubmit = async () => {
 
         <Divider sx={{ my: 3 }} />
 
-        <Grid container spacing={2}>
+        <Grid container spacing={1}>
           {rows.map((row, idx) => (
-            <Grid key={idx} item xs={12}>
-              <Paper variant="outlined" sx={{ p: 2 }}>
-                <Grid container spacing={2} alignItems="flex-start">
-                  <Grid item xs={12} md={2}>
-                    <Typography variant="subtitle2">Player {idx + 1}</Typography>
+            <Grid key={idx} size={{xs:12}}>
+              <Paper variant="outlined" sx={{ p: 1 }}>
+                <Grid container spacing={1} alignItems="flex-start">
+                  <Grid size={{xs:12, md:2}}>
+                    <Typography variant="subtitle2" sx={{ lineHeight: 1, mb: 0 }}>Empire {idx + 1}</Typography>
                   </Grid>
-                  <Grid item xs={12} md={3}>
+                  <Grid size={{ xs: 12 }} />
+                  <Grid size={{xs:12, md:2}}>
                     <TextField
                       fullWidth
                       required
@@ -236,14 +251,15 @@ const handleSubmit = async () => {
                       onChange={(e) => handleRowChange(idx, 'empireName', e.target.value)}
                       size="small"
                       margin="dense"
+                      sx={{ maxWidth: 200 }}
                     />
-                    <Box sx={{ mt: 0.5 }}>
+                    <Box sx={{ mt: 0 }}>
                       <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                         Abbreviation: {abbrevs[idx]}
                       </Typography>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={3}>
+                  <Grid size={{xs:12, md:2}}>
                     <TextField
                       fullWidth
                       required
@@ -252,9 +268,10 @@ const handleSubmit = async () => {
                       onChange={(e) => handleRowChange(idx, 'homeworldName', e.target.value)}
                       size="small"
                       margin="dense"
+                      sx={{ maxWidth: 200 }}
                     />
                   </Grid>
-                  <Grid item xs={12} md={3}>
+                  <Grid size={{xs:12, md:2}}>
                     <TextField
                       fullWidth
                       required
@@ -263,9 +280,10 @@ const handleSubmit = async () => {
                       onChange={(e) => handleRowChange(idx, 'starbaseName', e.target.value)}
                       size="small"
                       margin="dense"
+                      sx={{ maxWidth: 200 }}
                     />
                   </Grid>
-                  <Grid item xs={12} md={3}>
+                  <Grid size={{ xs: 12, md: 2 }}>
                     <TextField
                       fullWidth
                       required
@@ -277,6 +295,7 @@ const handleSubmit = async () => {
                       inputProps={{ pattern: "\\S*" }}
                       size="small"
                       margin="dense"
+                      sx={{ maxWidth: 200 }}
                     />
                   </Grid>
                 </Grid>

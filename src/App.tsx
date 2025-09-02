@@ -45,7 +45,7 @@ export default function App({user, signOut}: {user: any; signOut: () => void;}) 
             <Route path="/messages/:sessionName/:empireName" element={<MessagesPage />} />
             <Route path="/ship-design/" element={<ShipDesignPage />} />
             <Route path="/ship-classes/:sessionName/:empireName/:turnNumber" element={<ShipClassesPage />} />
-            <Route path="/create-session/" element={<CreateSessionPage  user={user} userAttributes={userAttributes}/>} userGroups={userGroups} />
+            <Route path="/create-session/" element={<CreateSessionPage userAttributes={userAttributes} userGroups={userGroups} />} />
           </Routes>
         </BrowserRouter>
        </SnapshotContext.Provider>
