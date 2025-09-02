@@ -36,7 +36,7 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
   const [numPlayers, setNumPlayers] = useState<number>(6);
   const [rows, setRows] = useState<EmpireRow[]>(() => Array.from({ length: 2 }, () => ({ empireName: '', homeworldName: '', starbaseName: '', playerName: '' })));
 
-  // console.log("user groups = ", userGroups);
+//   console.log("user attributes = ", userAttributes);
 
   // keep rows array length in sync with selected number of players
   useEffect(() => {
@@ -114,17 +114,23 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
     });
   };
 
-async function createEmpire(name: string, playerName: string, sessionName: string): Promise<any> {
+async function createEmpire(
+    name: string,
+    playerName: string,
+    sessionName: string,
+    empireType: 'ABANDONED' | 'ACTIVE' | 'GM' | 'HOMELESS' | 'INACTIVE' | 'NPC' | 'OBSERVER'
+  ): Promise<any> {
     const result = await client.models.Empire.create({
               name: name,
               playerName: playerName,
               sessionName: sessionName,
               ordersLocked: false,
-              empireType: 'ACTIVE',  // choose the enum that fits a new player empire
+              empireType: empireType
     });
     return result.data;
 }
-  async function createSession(name: string, numPlayers: number): Promise<any> {
+
+async function createSession(name: string, numPlayers: number): Promise<any> {
      const result = await client.models.Session.create({
           name: name,
           currentTurnNumber: 0,
@@ -134,7 +140,7 @@ async function createEmpire(name: string, playerName: string, sessionName: strin
           updateHours: 168,
         });
      return result.data;
-  }
+}
 
 const handleSubmit = async () => {
   try {
@@ -155,19 +161,20 @@ const handleSubmit = async () => {
     // 2) Create one Empire per player row
     await Promise.all(
       rows.map(async (row) => {
-        const empireResult = await createEmpire(row.empireName, row.playerName, sessionName);
+        const empireResult = await createEmpire(row.empireName, row.playerName, sessionName, 'ACTIVE');
 
         if (empireResult && Array.isArray((empireResult as any).errors) && (empireResult as any).errors.length > 0) {
-          console.error('Empire create errors:', (empireResult as any).errors);
-          const message = (empireResult as any).errors
-            .map((e: any) => e?.message || JSON.stringify(e))
-            .join('; ');
-          throw new Error(message || 'Unknown error creating empire');
+            console.error('Empire create errors:', (empireResult as any).errors);
+            const message = (empireResult as any).errors
+              .map((e: any) => e?.message || JSON.stringify(e))
+              .join('; ');
+            throw new Error(message || 'Unknown error creating empire');
         }
 
         console.log('Empire created:', empireResult);
       })
     );
+    await createEmpire("GM", userAttributes.preferred_username, sessionName, 'GM');
 
     // (Optional) Reset the form
     // setSessionName('');

@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import { loadOrdersStatus } from '../components/common/SessionAPI';
 import { generateClient } from 'aws-amplify/data';
@@ -136,9 +137,6 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
     }
   }, [user, userAttributes]);
 
-
-
-
   if (loading) {
       return <Typography variant="h6" sx={{ ml: 5 }}>Loading...</Typography>;
   }
@@ -161,9 +159,14 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
              </TableRow>
            </TableHead>
            <TableBody>
-             {sessionEmpires.map((session) => {
-                return <SessionTableRow key={session.sessionId} session={session} />
-             })}
+             {sessionEmpires.map((session) => (
+               <React.Fragment key={session.sessionId}>
+                 <SessionTableRow session={session} />
+                 <TableRow>
+                   <TableCell colSpan={6} sx={{ borderBottom: 3, borderColor: 'divider', p: 0 }} />
+                 </TableRow>
+               </React.Fragment>
+             ))}
            </TableBody>
          </Table>
        </TableContainer>

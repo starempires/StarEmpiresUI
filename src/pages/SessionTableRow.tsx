@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TableRow, TableCell, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { TableRow, TableCell } from '@mui/material';
 import { generateClient } from 'aws-amplify/data';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -61,7 +61,7 @@ export default function SessionControlCell({
          status: newStatus,
        });
 
-      console.log("Session updated:", updated.data);
+//       console.log("Session updated:", updated.data);
       return updated.data;
     } catch (error) {
       console.error("Error updating session:", error);
@@ -151,27 +151,34 @@ export default function SessionControlCell({
            {index === 0 && (
              <React.Fragment>
                 <TableCell rowSpan={session.empires.length}>
-                   {session.sessionName}
+                   <strong>{session.sessionName}</strong>
                    {session.empires[0].empireType === 'GM' && (
                       <React.Fragment>
                         <br />
                         <br />
-                        <FormControl size="small" style={{ minWidth: '200px', marginBottom: '8px' }}>
-                           <InputLabel>Status</InputLabel>
-                           <Select value={selectedStatus || ''}
-                                   label="Status"
-                                   onChange={(e) => handleStatusChange(session.sessionId, e.target.value as SessionStatus)}
-                           >
-                             {sessionStatuses.map((status) => (
-                                <MenuItem key={status} value={status}>
-                                   {status.toLowerCase()
-                                          .split('_')
-                                          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                          .join(' ')}
-                                </MenuItem>
-                             ))}
-                           </Select>
-                         </FormControl>
+                        <div
+                          style={{ marginBottom: '8px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <label htmlFor={`status-${session.sessionId}`} style={{ fontSize: 12 }}>Status</label>
+                          <select
+                            id={`status-${session.sessionId}`}
+                            value={selectedStatus || ''}
+                            onChange={(e) => handleStatusChange(session.sessionId, e.target.value as SessionStatus)}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            style={{ minWidth: 200, padding: '6px 8px', borderRadius: 4 }}
+                          >
+                            {sessionStatuses.map((status) => (
+                              <option key={status} value={status}>
+                                {status.toLowerCase()
+                                  .split('_')
+                                  .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                                  .join(' ')}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                          <br />
                            <div style={{ marginTop: '8px', display: 'inline-flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
                              <button onClick={() => handleUpdateTurn(session.sessionId)} disabled={processing} style={{ backgroundColor: 'lightblue' }} >
