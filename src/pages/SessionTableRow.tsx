@@ -4,7 +4,6 @@ import { generateClient } from 'aws-amplify/data';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import CircularProgress from '@mui/material/CircularProgress';
-import { Link } from 'react-router-dom';
 import type { Schema } from '../../amplify/data/resource';
 import type { Empire, SessionEmpires } from '../components/common/Interfaces';
 import { updateTurn } from '../components/common/SessionAPI';
@@ -199,9 +198,14 @@ export default function SessionControlCell({
              </React.Fragment>
             )}
            <TableCell>
-              <Link to={`/session/${session.sessionName}/${empire.name}/${turnNumber}`} className="text-blue-500 hover:underline">
-                 {empire.name}
-              </Link>
+              <a
+                href={`/session/${session.sessionName}/${empire.name}/${turnNumber}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
+              >
+                {empire.name}
+              </a>
            </TableCell>
            <TableCell>{empire.empireType}</TableCell>
            <TableCell>{empire.empireType === "ACTIVE" ? empire.orderStatus : ""}</TableCell>
