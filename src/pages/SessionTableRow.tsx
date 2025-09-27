@@ -199,7 +199,7 @@ export default function SessionControlCell({
             )}
            <TableCell>
               <a
-                href={`/session/${session.sessionName}/${empire.name}/${turnNumber}`}
+                href={`https://${window.location.host}/session/${session.sessionName}/${empire.name}/${turnNumber}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-500 hover:underline"

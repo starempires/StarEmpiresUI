@@ -12,6 +12,7 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
+import { useNavigate } from 'react-router-dom';
 
 import '../index.css';
 
@@ -35,6 +36,7 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
   const [sessionName, setSessionName] = useState('');
   const [numPlayers, setNumPlayers] = useState<number>(6);
   const [rows, setRows] = useState<EmpireRow[]>(() => Array.from({ length: 2 }, () => ({ empireName: '', homeworldName: '', starbaseName: '', playerName: '' })));
+  const navigate = useNavigate();
 
 //   console.log("user attributes = ", userAttributes);
 
@@ -141,9 +143,29 @@ async function createSession(name: string, numPlayers: number): Promise<any> {
         });
      return result.data;
 }
+async function checkSessionExists(sessionName: string): Promise<boolean> {
+  try {
+    const existing = await client.models.Session.list({
+      filter: { name: { eq: sessionName } }
+    });
+console.log("session " + sessionName + ", existing = ", existing);
+
+    return !!(existing.data && existing.data.length > 0);
+  } catch (error) {
+    console.error("Error checking session existence:", error);
+    // being cautious — assume it exists if we hit an error
+    return true;
+  }
+}
 
 const handleSubmit = async () => {
   try {
+    const exists = await checkSessionExists(sessionName);
+    if (exists) {
+        console.log(`Session "${sessionName}" already exists.`);
+        return;
+    }
+
     // 1) Create the Session
     const sessionResult = await createSession(sessionName, numPlayers);
 
@@ -175,6 +197,7 @@ const handleSubmit = async () => {
       })
     );
     await createEmpire("GM", userAttributes.preferred_username, sessionName, 'GM');
+    navigate('/');
 
     // (Optional) Reset the form
     // setSessionName('');
