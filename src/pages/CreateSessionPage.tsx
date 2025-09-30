@@ -13,6 +13,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import { useNavigate } from 'react-router-dom';
+import { createSession } from '../components/common/SessionAPI';
 
 import '../index.css';
 
@@ -116,7 +117,7 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
     });
   };
 
-async function createEmpire(
+async function registerEmpire(
     name: string,
     playerName: string,
     sessionName: string,
@@ -132,7 +133,7 @@ async function createEmpire(
     return result.data;
 }
 
-async function createSession(name: string, numPlayers: number): Promise<any> {
+async function registerSession(name: string, numPlayers: number): Promise<any> {
      const result = await client.models.Session.create({
           name: name,
           currentTurnNumber: 0,
@@ -143,12 +144,13 @@ async function createSession(name: string, numPlayers: number): Promise<any> {
         });
      return result.data;
 }
+
 async function checkSessionExists(sessionName: string): Promise<boolean> {
   try {
     const existing = await client.models.Session.list({
       filter: { name: { eq: sessionName } }
     });
-console.log("session " + sessionName + ", existing = ", existing);
+//     console.log("session " + sessionName + ", existing = ", existing);
 
     return !!(existing.data && existing.data.length > 0);
   } catch (error) {
@@ -156,6 +158,14 @@ console.log("session " + sessionName + ", existing = ", existing);
     // being cautious — assume it exists if we hit an error
     return true;
   }
+}
+
+function assembleEmpireData(): string[] {
+  return rows.map((row, idx) => {
+    const empireType = 'ACTIVE';
+    const abbrev = abbrevs[idx];
+    return [row.empireName, abbrev, empireType, row.homeworldName, row.starbaseName].join(',');
+  });
 }
 
 const handleSubmit = async () => {
@@ -167,7 +177,10 @@ const handleSubmit = async () => {
     }
 
     // 1) Create the Session
-    const sessionResult = await createSession(sessionName, numPlayers);
+    const empireData = assembleEmpireData();
+    await createSession(sessionName, empireData);
+
+    const sessionResult = await registerSession(sessionName, numPlayers);
 
     // Optional: surface backend-reported errors (Amplify Gen2 returns { data, errors })
     if (sessionResult && Array.isArray((sessionResult as any).errors) && (sessionResult as any).errors.length > 0) {
@@ -183,7 +196,7 @@ const handleSubmit = async () => {
     // 2) Create one Empire per player row
     await Promise.all(
       rows.map(async (row) => {
-        const empireResult = await createEmpire(row.empireName, row.playerName, sessionName, 'ACTIVE');
+        const empireResult = await registerEmpire(row.empireName, row.playerName, sessionName, 'ACTIVE');
 
         if (empireResult && Array.isArray((empireResult as any).errors) && (empireResult as any).errors.length > 0) {
             console.error('Empire create errors:', (empireResult as any).errors);
@@ -196,7 +209,7 @@ const handleSubmit = async () => {
         console.log('Empire created:', empireResult);
       })
     );
-    await createEmpire("GM", userAttributes.preferred_username, sessionName, 'GM');
+    await registerEmpire("GM", userAttributes.preferred_username, sessionName, 'GM');
     navigate('/');
 
     // (Optional) Reset the form

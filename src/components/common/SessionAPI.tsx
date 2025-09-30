@@ -84,9 +84,9 @@ export async function updateTurn(sessionName: string, turnNumber: number): Promi
     }
 }
 
-export async function rollbackTurn(sessionName: string, turnNumber: number): Promise<string> {
+export async function createSession(sessionName: string, empireData: string[]): Promise<string> {
     try {
-       const response = await fetch("https://api.starempires.com/rollbackTurn", {
+       const response = await fetch("https://api.starempires.com/createSession", {
          method: "POST",
          headers: {
            "Authorization": "Bearer REAL_JWT_TOKEN", // Replace with your token logic
@@ -94,7 +94,7 @@ export async function rollbackTurn(sessionName: string, turnNumber: number): Pro
          },
          body: JSON.stringify({
            sessionName,
-           turnNumber,
+           empireData,
          }),
        });
        if (response.status===404) {
@@ -105,7 +105,7 @@ export async function rollbackTurn(sessionName: string, turnNumber: number): Pro
        }
        return "";
     } catch (error) {
-      console.error("Error in rollbackTurn:", error);
+      console.error("Error in createSession:", error);
       throw error;
     }
 }
