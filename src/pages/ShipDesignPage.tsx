@@ -10,6 +10,7 @@ import {
   Button,
 } from '@mui/material';
 import { HullParameters, Hulls } from '../components/common/HullParameters';
+import * as Constants from '../Constants';
 
 interface ShipComponents {
   guns: number;
@@ -44,8 +45,10 @@ export default function ShipDesignPage() {
   const [hullParameters, setHullParameters] = useState<HullParameters | null>(null);
   const [className, setClassName] = useState('MyShipClass');
   const [shipCost, setShipCost] = useState(1);
+  const [designFee, setDesignFee] = useState(1);
   const [shipTonnage, setShipTonnage] = useState(1);
   const [missileCost, setMissileCost] = useState(1);
+  const [ar, setAr] = useState(1);
   const [shipComponents, setShipComponents] = useState<ShipComponents>(INIT_SHIP_COMPONENTS);
   const [missileComponents, setMissileComponents] = useState<MissileComponents>(INIT_MISSILE_COMPONENTS);
   const [designText, setDesignText] = useState('');
@@ -98,11 +101,12 @@ export default function ShipDesignPage() {
       }
 
      // Compute exponential impact
-     const impact = Math.exp(Math.abs(delta) / denominator);
-     console.log("delta = " + delta + ", denominator = " + denominator + ", impact = " + impact);
+     const impact = Math.ceil(Math.exp(Math.abs(delta) / denominator));
 
      // Positive delta increases cost, negative delta decreases cost
-     return delta > 0 ? Math.round(impact) : -Math.round(impact);
+     const rv = delta > 0 ? Math.round(impact) : -Math.round(impact);
+     console.log("delta = " + delta + ", denominator = " + denominator + ", impact = " + impact + ", rv = " + rv);
+     return rv;
    };
 
   useEffect(() => {
@@ -112,34 +116,41 @@ export default function ShipDesignPage() {
         const addEngines = shipComponents.engines - hullParameters.baseEngines;
         const addScan = shipComponents.scan - hullParameters.baseScan;
         const addRacks = shipComponents.racks - hullParameters.baseRacks;
-//         console.log("addGuns = " + addGuns + ", addEngines = " + addEngines + ", addScan = " + addScan + ", addDp = " + addDp + ", addRacks = " + addRacks);
-      const additionalCost =
+//         console.log("addGuns = " + addGuns + ", addDp = " + addDp + ", addEngines = " + addEngines + ", addScan = " + addScan + ", addRacks = " + addRacks);
+        const additionalCost =
                    computeComponent(addGuns, hullParameters.costGuns) +
                    computeComponent(addDp, hullParameters.costDp) +
                    computeComponent(addEngines, hullParameters.costEngines) +
                    computeComponent(addScan, hullParameters.costScan) +
                    computeComponent(addRacks, hullParameters.costRacks);
-      const additionalTonnage =
+        const additionalTonnage =
                    computeComponent(addGuns, hullParameters.tonnageGuns) +
                    computeComponent(addDp, hullParameters.tonnageDp) +
                    computeComponent(addEngines, hullParameters.tonnageEngines) +
                    computeComponent(addScan, hullParameters.tonnageScan) +
                    computeComponent(addRacks, hullParameters.tonnageRacks);
-      const cost = Math.max(1, hullParameters.baseCost + additionalCost);
-      const tonnage = Math.max(1, hullParameters.baseTonnage + additionalTonnage);
-      setShipCost(cost);
-      setShipTonnage(tonnage);
-    }
-    else {
-      setShipCost(0);
-      setShipTonnage(0);
-    }
+        const cost = Math.max(1, hullParameters.baseCost + additionalCost);
+        const tonnage = Math.max(1, hullParameters.baseTonnage + additionalTonnage);
+        const fee = Math.max(1, Math.round(cost * Constants.DEFAULT_DESIGN_MULTIPLIER));
+        const ar = Math.max(1, Math.round(shipComponents.dp * Constants.DEFAULT_AUTO_REPAIR_MULTIPLIER));
+
+        setShipCost(cost);
+        setShipTonnage(tonnage);
+        setDesignFee(fee);
+        setAr(ar);
+      }
+      else {
+        setShipCost(0);
+        setShipTonnage(0);
+        setDesignFee(0);
+        setAr(0);
+      }
   }, [shipComponents, hullParameters]);
 
   useEffect(() => {
     if (hullParameters === Hulls["missile"]) {
         const cost = Math.max(1, Math.round(Math.exp(missileComponents.guns / (MISSILE_DESIGN_FACTOR * missileComponents.tonnage))));
-       setMissileCost(cost);
+        setMissileCost(cost);
     }
     else {
        setMissileCost(0);
@@ -176,21 +187,6 @@ const setComponentBaseValues = (parameters: HullParameters) => {
 //       console.log("key = " + hullType + ", value = " + JSON.stringify(hullParameters));
       setHullParameters(hullParameters);
       setComponentBaseValues(hullParameters);
-//       if (hullType === "missile") {
-//           setMissileComponents({
-//               guns: hullParameters.baseGuns,
-//               tonnage: hullParameters.baseTonnage,
-//               });
-//       }
-//       else {
-//           setShipComponents({
-//               guns: hullParameters.baseGuns,
-//               dp: hullParameters.baseDp,
-//               engines: hullParameters.baseEngines,
-//               scan: hullParameters.baseScan,
-//               racks: hullParameters.baseRacks,
-//         });
-//       }
   };
 
    const handleClassNameChange = (value: string) => {
@@ -271,12 +267,13 @@ const setComponentBaseValues = (parameters: HullParameters) => {
             <Grid container spacing={2} mt={1}>
               {(['guns', 'dp', 'engines', 'scan', 'racks'] as const).map((comp) => {
                 let maxValue = Infinity;
+                const minValue = (comp === 'dp') ? 1 : 0;
                 let name = comp.charAt(0).toUpperCase() + comp.slice(1);
                 let disabled = true;
                 if (hullParameters) {
-                  const maxKey = `max${name}` as keyof typeof hullParameters;
-                  maxValue = Number(hullParameters[maxKey]);
-                  disabled = maxValue === 0;
+                    const maxKey = `max${name}` as keyof typeof hullParameters;
+                    maxValue = Number(hullParameters[maxKey]);
+                    disabled = maxValue === 0;
                 }
                 const value = shipComponents[comp];
                 return (
@@ -301,7 +298,7 @@ const setComponentBaseValues = (parameters: HullParameters) => {
                       color={value === maxValue ? 'info' : 'success'}
                       focused
                       inputProps={{
-                        min: 0,
+                        min: minValue,
                         max: maxValue,
                       }}
                     />
@@ -323,6 +320,8 @@ const setComponentBaseValues = (parameters: HullParameters) => {
                 <Box mt={3}>
                   <Typography>Cost: {shipCost}</Typography>
                   <Typography>Tonnage: {shipTonnage}</Typography>
+                  <Typography>Auto Repair: {ar}</Typography>
+                  <Typography>Design Fee: {designFee}</Typography>
                   <br/>
                   <Typography>Use the text below to submit a design order for this ship class.</Typography>
                   <Typography>{designText}</Typography>

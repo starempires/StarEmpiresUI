@@ -25,6 +25,8 @@ export const INFO_HOVER_TEXT_COLOR: string = "black";
 export const INFO_HOVER_FONT_SIZE: number = 10;
 export const INFO_HOVER_FONT_FAMILY: string = "Calibri";
 export const SHIP_DOT_SIZE: number = 5;
+export const DEFAULT_DESIGN_MULTIPLIER = 0.5;
+export const DEFAULT_AUTO_REPAIR_MULTIPLIER = 0.1;
 
 // Enums defined as constant objects with literal types
 export const SCAN_STATUS_TYPE = {
