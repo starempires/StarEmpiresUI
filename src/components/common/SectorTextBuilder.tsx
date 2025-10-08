@@ -179,8 +179,8 @@ const buildCoordsText = (sectorData: any): string =>
 
 const formatShipStats = (ship: any, turnData: any): string => {
    let text = "";
-   const foundShip = turnData.shipClasses.find((shipClass:any) => shipClass.name === ship.shipClass);
-   if (foundShip) {
+   const foundShipClass = turnData.shipClasses.find((shipClass:any) => shipClass.name === ship.shipClass);
+   if (foundShipClass) {
        text += "  ";
        if (ship.carrier != null) {
            text += " +";
@@ -193,17 +193,21 @@ const formatShipStats = (ship: any, turnData: any): string => {
                             (ship.opGuns ? ship.opGuns : 0) + "/" +
                             (ship.opEngines ? ship.opEngines: 0) + "/" +
                             (ship.opScan ? ship.opScan : 0) +
-                            ", dp " + ship.dpRemaining + "/" + ship.dp +
+                            ", dp " + ship.dpRemaining + "/" + foundShipClass.dp +
                             ", OR " + Math.round(ship.opRating * 100) + "%" +
                             ", r " + usedRacks + "/" + racks +
                             ", t " + ship.tonnage +
-                            ")\n";
+                            ")";
    }
    else {
        text += "  " + ship.name + " (" + ship.shipClass +
                             "/" + ship.hull + " " +
-                            plural(ship.tonnage, "tonne") + ")\n";
+                            plural(ship.tonnage, "tonne") + ")";
    }
+   if (ship.conditions) {
+       text += " #" + ship.conditions.join(",");
+   }
+   text += "\n";
    return text;
 }
 
