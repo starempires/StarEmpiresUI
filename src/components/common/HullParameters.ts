@@ -22,7 +22,6 @@ export type HullParameters = {
   tonnageEngines: number;
   tonnageScan: number;
   tonnageRacks: number;
-  arMultiplier: number;
 };
 
 export const Hulls: Record<string, HullParameters> = {
@@ -49,8 +48,7 @@ export const Hulls: Record<string, HullParameters> = {
     tonnageDp: 20,
     tonnageEngines: 5,
     tonnageScan: 5,
-    tonnageRacks: 2,
-    arMultiplier: 4
+    tonnageRacks: 2
   },
   "scout": {
     hullType: "scout",
@@ -75,8 +73,7 @@ export const Hulls: Record<string, HullParameters> = {
     tonnageDp: 5,
     tonnageEngines: 5,
     tonnageScan: 5,
-    tonnageRacks: 2,
-    arMultiplier: 1
+    tonnageRacks: 2
   },
   "transport": {
     hullType: "transport",
@@ -101,8 +98,7 @@ export const Hulls: Record<string, HullParameters> = {
     tonnageDp: 10,
     tonnageEngines: 5,
     tonnageScan: 5,
-    tonnageRacks: 2,
-    arMultiplier: 1
+    tonnageRacks: 2
   },
   "orbital": {
     hullType: "orbital",
@@ -127,8 +123,7 @@ export const Hulls: Record<string, HullParameters> = {
     tonnageDp: 20,
     tonnageEngines: 1,
     tonnageScan: 5,
-    tonnageRacks: 2,
-    arMultiplier: 4
+    tonnageRacks: 2
   },
   "gunship": {
     hullType: "gunship",
@@ -153,8 +148,7 @@ export const Hulls: Record<string, HullParameters> = {
     tonnageDp: 10,
     tonnageEngines: 5,
     tonnageScan: 5,
-    tonnageRacks: 2,
-    arMultiplier: 2
+    tonnageRacks: 2
   },
   "wing": {
     hullType: "wing",
@@ -179,8 +173,7 @@ export const Hulls: Record<string, HullParameters> = {
     tonnageDp: 20,
     tonnageEngines: 1,
     tonnageScan: 1,
-    tonnageRacks: 1,
-    arMultiplier: 1
+    tonnageRacks: 1
   },
   "device": {
     hullType: "device",
@@ -205,8 +198,7 @@ export const Hulls: Record<string, HullParameters> = {
     tonnageDp: 1,
     tonnageEngines: 1,
     tonnageScan: 1,
-    tonnageRacks: 1,
-    arMultiplier: 1
+    tonnageRacks: 1
   },
   "missile": {
     hullType: "missile",
@@ -231,7 +223,6 @@ export const Hulls: Record<string, HullParameters> = {
     tonnageDp: 1,
     tonnageEngines: 1,
     tonnageScan: 1,
-    tonnageRacks: 1,
-    arMultiplier: 1
+    tonnageRacks: 1
   }
 };
