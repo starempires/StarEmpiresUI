@@ -186,7 +186,13 @@ const formatShipStats = (ship: any, turnData: any): string => {
            text += " +";
        }
        const racks = ship.racks || 0;
-       const usedRacks = racks - (ship.emptyRacks ||0);
+       var usedRacks;
+       if (ship.owner === turnData.name) {
+           usedRacks = racks - (ship.emptyRacks ||0);
+       }
+       else {
+           usedRacks = racks == 0 ? "0" : "?";
+       }
 
        text += ship.name + " (" + ship.shipClass + "/" + ship.hull +
                             ", g/e/s " +
