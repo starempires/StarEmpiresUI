@@ -187,7 +187,7 @@ const formatShipStats = (ship: any, turnData: any): string => {
        }
        const racks = ship.racks || 0;
        var usedRacks;
-       if (ship.owner === turnData.name) {
+       if (ship.owner === turnData.name || turnData.name === "GM") {
            usedRacks = racks - (ship.emptyRacks ||0);
        }
        else {
@@ -207,8 +207,7 @@ const formatShipStats = (ship: any, turnData: any): string => {
    }
    else {
        text += "  " + ship.name + " (" + ship.shipClass +
-                            "/" + ship.hull + " " +
-                            plural(ship.tonnage, "tonne") + ")";
+                            "/" + ship.hull + ", t " + ship.tonnage + ")";
    }
    if (ship.conditions) {
        text += " #" + ship.conditions.join(",");

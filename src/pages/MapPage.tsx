@@ -87,6 +87,9 @@ export default function MapPage() {
               <Stage width={width} height={height}>
                 <Galaxy turnData={snapshot} onDblClick={handleDoubleClick} onClick={handleClick} />
               </Stage>
+              <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'darkgrey' }}>
+                Snapshot timestamp {snapshot?.timestamp}
+              </Typography>
             </Box>
           </Panel>
 

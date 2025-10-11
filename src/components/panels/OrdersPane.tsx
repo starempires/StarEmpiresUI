@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { PanelGroup, Panel, PanelResizeHandle } from 'react-resizable-panels';
+import { PanelGroup, Panel } from 'react-resizable-panels';
 import { fetchSessionObject, loadOrdersStatus } from '../common/SessionAPI';
 
 interface OrderSubmissionPaneProps {
@@ -305,15 +305,6 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
               />
             </Box>
           </Panel>
-
-          <PanelResizeHandle className="h-3 bg-blue-800 hover:bg-blue-600" style={{ cursor: 'row-resize', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Box sx={{
-              width: '30px',
-              height: '4px',
-              backgroundColor: 'white',
-              borderRadius: '2px',
-            }} />
-          </PanelResizeHandle>
 
           {/* Bottom panel: Buttons/checkbox row */}
           <Panel defaultSize={25} minSize={10}>

@@ -158,7 +158,7 @@ export const Hulls: Record<string, HullParameters> = {
     baseScan: 0,
     baseRacks: 0,
     baseTonnage: 1,
-    baseCost: 1,
+    baseCost: 2,
     maxGuns: Infinity,
     maxDp: Infinity,
     maxEngines: 0,

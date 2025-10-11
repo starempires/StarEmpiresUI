@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import Typography from '@mui/material/Typography';
@@ -12,6 +12,9 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from 'react-router-dom';
 import { createSession } from '../components/common/SessionAPI';
 
@@ -37,6 +40,7 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
   const [sessionName, setSessionName] = useState('');
   const [numPlayers, setNumPlayers] = useState<number>(6);
   const [rows, setRows] = useState<EmpireRow[]>(() => Array.from({ length: 2 }, () => ({ empireName: '', homeworldName: '', starbaseName: '', playerName: '' })));
+  const [processing, setProcessing] = useState<boolean>(false);
   const navigate = useNavigate();
 
 //   console.log("user attributes = ", userAttributes);
@@ -169,6 +173,8 @@ function assembleEmpireData(): string[] {
 }
 
 const handleSubmit = async () => {
+  setProcessing(true);
+
   try {
     const exists = await checkSessionExists(sessionName);
     if (exists) {
@@ -219,6 +225,8 @@ const handleSubmit = async () => {
 
   } catch (err) {
     console.error('Failed to create session/empires', err);
+  } finally {
+    setProcessing(false);
   }
 };
 
@@ -238,7 +246,16 @@ const handleSubmit = async () => {
   }
 
   return (
-    <Box className="p-6">
+    <React.Fragment>
+          <Dialog open={processing}>
+              <DialogTitle>
+                Creating Session...
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
+                   <CircularProgress />
+                </div>
+              </DialogTitle>
+           </Dialog>
+     <Box className="p-6">
       <Typography variant="h6" gutterBottom>
         Welcome, {userAttributes?.preferred_username}.
       </Typography>
@@ -347,11 +364,12 @@ const handleSubmit = async () => {
           ))}
         </Grid>
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 2 }}>
-          <Button variant="contained" disabled={!canSubmit} onClick={handleSubmit}>
+          <Button variant="contained" disabled={!canSubmit || processing} onClick={handleSubmit}>
             Create Session
           </Button>
         </Box>
       </Paper>
-    </Box>
+     </Box>
+    </React.Fragment>
   );
 }

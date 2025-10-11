@@ -6,7 +6,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import CircularProgress from '@mui/material/CircularProgress';
 import type { Schema } from '../../amplify/data/resource';
 import type { Empire, SessionEmpires } from '../components/common/Interfaces';
-import { updateTurn } from '../components/common/SessionAPI';
+import { updateTurn, generateSnapshots } from '../components/common/SessionAPI';
 
 const sessionStatuses = [
   'ABANDONED',
@@ -125,14 +125,23 @@ export default function SessionControlCell({
     }
 
     async function handleGenerateSnapshots(sessionId: string) {
-      console.log("Generate Snapshots clicked for session:", sessionId);
+      console.log("Generate Snapshots for session:", sessionId);
       setProcessing(true);
-      // Simulate async operation or add your snapshot logic here
-      setTimeout(() => {
-         setProcessing(false);
-      }, 1000);
-    }
 
+      try {
+        // fetch current turn
+        const result = await client.models.Session.get({ id: sessionId });
+        const currentTurn = result.data?.currentTurnNumber || 0;
+        // update turn info
+        const apiData = await generateSnapshots(session.sessionName, currentTurn);
+        const json = JSON.parse(apiData);
+        console.log(JSON.stringify(json));
+      } catch (error) {
+        console.error("Failed to generate snapshots:", error);
+      } finally {
+        setProcessing(false);
+      }
+    }
 
     return (
      <React.Fragment>
