@@ -27,9 +27,11 @@
     "react-dom": "^19.1.1",
     "react-konva": "^19.0.7",
     "react-konva-utils": "^1.1.1",
+    "react-markdown": "^10.1.0",
     "react-resizable-panels": "^3.0.4",
     "react-router-dom": "^7.7.1",
     "react-sliding-pane": "^7.3.0",
+    "remark-gfm": "^4.0.1",
     "styled-components": "^6.1.19",
     "web-vitals": "^5.1.0"
   },

@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Divider, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { fetchSessionObject } from '../components/common/SessionAPI';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Define the expected URL parameters.
 interface NewsPageParams extends Record<string | "", string | ""> {
@@ -50,64 +52,14 @@ export default function NewsPage() {
     return <Typography variant="h6">Loading news...</Typography>;
   }
 
-  function parseNewsSections(newsText: string): { header: string; body: string[] }[] {
-    const sections: { header: string; body: string[] }[] = [];
-    if (!newsText) {
-        return sections;
-    }
-
-    if (!newsText.includes("=")) {
-        sections.push({ header: newsText, body: [] });
-        return sections;
-    }
-    const lines = newsText
-      .split('\n')
-      .filter(line => !line.startsWith('==='));
-    let i = 0;
-    let header: string = "";
-    let body: string[] = [];
-
-    while (i < lines.length) {
-      if (lines[i].startsWith('Phase')) {
-         if (header) {
-            sections.push({ header, body });
-            body = [];
-            header = "";
-         }
-         header = lines[i++]?.trim();
-      }
-      else {
-          while (i < lines.length && !lines[i].startsWith('Phase')) {
-               const line = lines[i++].trim();
-               body.push(line);
-          }
-      }
-    }
-    sections.push({ header, body });
-
-    return sections;
-  }
-
   return (
     <div style={{ padding: 16 }}>
       <Typography variant="h5" gutterBottom>
         Session {sessionName} news for {empireName}, turn {turnNumber}
       </Typography>
-      <div style={{ marginTop: 16 }}>
-        {parseNewsSections(news).map((section, idx) => (
-          <div key={idx} style={{ marginBottom: 24 }}>
-            <Divider sx={{ marginBottom: 2, borderColor: 'white' }} />
-            <Typography style={{color: 'lightblue'}} variant="h6" gutterBottom>
-              {section.header}
-            </Typography>
-            {section.body.map((line, j) => (
-              <Typography variant="h5" key={j} style={{ marginLeft: 16 }}>
-                {line}
-              </Typography>
-            ))}
-          </div>
-        ))}
-      </div>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        {news}
+      </ReactMarkdown>
     </div>
   );
 }
