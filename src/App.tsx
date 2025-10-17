@@ -11,28 +11,31 @@ import ShipClassesPage from './pages/ShipClassesPage';
 import CreateSessionPage from './pages/CreateSessionPage';
 import NavBanner from './components/common/NavBanner';
 import { SnapshotContext } from './components/common/SnapshotContext';
+import { ensurePlayerExists } from '../amplify/players';
 
 export default function App({user, signOut}: {user: any; signOut: () => void;}) {
    const [userAttributes, setUserAttributes] = useState<any>(null);
    const [userGroups, setUserGroups] = useState<string[]>([]);
    const [snapshot, setSnapshot] = useState<any>(null);
 
-
   useEffect(() => {
-  }, []);
-
-  useEffect(() => {
+     async function loadUser() {
        fetchUserAttributes()
           .then(attributes => { setUserAttributes(attributes); })
           .catch(error => console.error("Error fetching user attributes:", error));
 
-      fetchAuthSession()
+       fetchAuthSession()
           .then(session => {
                  const groups = session?.tokens?.accessToken?.payload['cognito:groups'];
                  setUserGroups(Array.isArray(groups) ? groups.map(g => String(g)) : []);
+                 ensurePlayerExists(session);
           })
           .catch(error => console.error("Error fetching user groups:", error));
-      }, [user]);
+     }
+     if (user) {
+         loadUser();
+     }
+  }, [user]);
 
     return (
       <SnapshotContext.Provider value={{ snapshot, setSnapshot }}>

@@ -56,8 +56,11 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
           // for GM empires, fetch all empires in that session
           // fetch all unique sessions
           // join session w/empire data
+        if (!userAttributes) {
+            return {};
+        }
+
         const playerEmpires = await fetchEmpiresForPlayer(userAttributes?.preferred_username);
-//         console.log("playerEmpires = " + JSON.stringify(playerEmpires));
         if (playerEmpires.length == 0) {
             return {};
         }
@@ -139,6 +142,10 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
 
   if (loading) {
       return <Typography variant="h6" sx={{ ml: 5 }}>Loading...</Typography>;
+  }
+
+  if (sessionEmpires.length === 0) {
+      return <Typography variant="h6" sx={{ ml: 5 }}>No sessions found</Typography>;
   }
 
  return (
