@@ -144,9 +144,9 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
       return <Typography variant="h6" sx={{ ml: 5 }}>Loading...</Typography>;
   }
 
-  if (sessionEmpires.length === 0) {
-      return <Typography variant="h6" sx={{ ml: 5 }}>No sessions found</Typography>;
-  }
+//   if (sessionEmpires.length === 0) {
+//       return <Typography variant="h6" sx={{ ml: 5 }}>No sessions found</Typography>;
+//   }
 
  return (
      <div className="p-6">

@@ -34,13 +34,42 @@ interface EmpireRow {
   playerName: string;
 }
 
+
 const toUnderscore = (s: string) => (s ?? '').replace(/\s+/g, '_');
+
+// Centralized session property definitions
+interface SessionPropertyDef {
+  key: string;
+  name: string;
+  min: number;
+  max: number;
+  defaultValue: number;
+}
+
+const SESSION_PROPERTIES: Record<string, SessionPropertyDef> = {
+  radius: { key: 'radius', name: 'Galaxy Radius', min: 2, max: 10, defaultValue: 5 },
+  maxStormRating: { key: 'maxStormRating', name: 'Max Storm Rating', min: 0, max: 5, defaultValue: 3 },
+  numWormnets: { key: 'numWormnets', name: 'Number of Wormnets', min: 0, max: 3, defaultValue: 1 },
+  maxWormnetPortals: { key: 'maxWormnetPortals', name: 'Max Wormnet Portals', min: 2, max: 5, defaultValue: 3 },
+  worldDensity: { key: 'worldDensity', name: 'World Density', min: 1, max: 10, defaultValue: 5 },
+  stormDensity: { key: 'stormDensity', name: 'Storm Density', min: 1, max: 10, defaultValue: 5 },
+  nebulaDensity: { key: 'nebulaDensity', name: 'Nebula Density', min: 1, max: 10, defaultValue: 5 },
+};
+
+const SESSION_PROPERTIES_LIST: SessionPropertyDef[] = Object.values(SESSION_PROPERTIES);
+const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+
+// const makeRange = (min: number, max: number) =>
+//   Array.from({ length: Math.max(0, max - min + 1) }, (_, i) => min + i);
 
 export default function CreateSessionPage({ userAttributes, userGroups }: GMControlsPageProps) {
   const [sessionName, setSessionName] = useState('');
   const [numPlayers, setNumPlayers] = useState<number>(6);
   const [rows, setRows] = useState<EmpireRow[]>(() => Array.from({ length: 2 }, () => ({ empireName: '', homeworldName: '', starbaseName: '', playerName: '' })));
   const [processing, setProcessing] = useState<boolean>(false);
+  const [configValues, setConfigValues] = useState<Record<string, number>>(
+    () => Object.fromEntries(SESSION_PROPERTIES_LIST.map(def => [def.key, def.defaultValue]))
+  );
   const navigate = useNavigate();
 
 //   console.log("user attributes = ", userAttributes);
@@ -184,7 +213,21 @@ const handleSubmit = async () => {
 
     // 1) Create the Session
     const empireData = assembleEmpireData();
-    await createSession(sessionName, empireData);
+    const overrideProperties: Record<string, string> =
+      Object.fromEntries(Object.entries(configValues).map(([k, v]) => [k, String(v)]));
+//     console.log('createSession payload (UI):', JSON.stringify({ sessionName, empireData, overrideProperties }));
+    const createResult = await createSession(sessionName, empireData, overrideProperties);
+//     console.log("createSession result " + JSON.stringify(createResult));
+
+    try {
+       const parsedResult = JSON.parse(createResult);
+       if (!parsedResult || parsedResult.data !== "OK") {
+         const msg = parsedResult?.message || "(no message)";
+         throw new Error("Error creating session: " + msg);
+       }
+    } catch {
+      throw new Error("createSession returned non-JSON response: " + createResult);
+    }
 
     const sessionResult = await registerSession(sessionName, numPlayers);
 
@@ -212,7 +255,7 @@ const handleSubmit = async () => {
             throw new Error(message || 'Unknown error creating empire');
         }
 
-        console.log('Empire created:', empireResult);
+//         console.log('Empire created:', empireResult);
       })
     );
     await registerEmpire("GM", userAttributes.preferred_username, sessionName, 'GM');
@@ -292,16 +335,16 @@ const handleSubmit = async () => {
         </Grid>
 
         <Divider sx={{ my: 3 }} />
+        <Typography variant="h6" sx={{ mb: 1 }}>Empire Configuration</Typography>
 
         <Grid container spacing={1}>
           {rows.map((row, idx) => (
             <Grid key={idx} size={{xs:12}}>
               <Paper variant="outlined" sx={{ p: 1 }}>
                 <Grid container spacing={1} alignItems="flex-start">
-                  <Grid size={{xs:12, md:2}}>
+                  <Grid size={{xs:12}}>
                     <Typography variant="subtitle2" sx={{ lineHeight: 1, mb: 0 }}>Empire {idx + 1}</Typography>
                   </Grid>
-                  <Grid size={{ xs: 12 }} />
                   <Grid size={{xs:12, md:2}}>
                     <TextField
                       fullWidth
@@ -363,10 +406,42 @@ const handleSubmit = async () => {
             </Grid>
           ))}
         </Grid>
+
+
+        {/* Session Configuration */}
+        <Divider sx={{ my: 3 }} />
+        <Typography variant="h6" sx={{ mb: 1 }}>Session Parameters</Typography>
+
+        <Grid container spacing={2}>
+          {SESSION_PROPERTIES_LIST.map((def) => (
+            <Grid key={def.key} size={{ xs: 12, sm: 6, md: 2 }}>
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  type="number"
+                  label={def.name}
+                  value={configValues[def.key]}
+                  onChange={(e) => {
+                    const next = Number(e.target.value);
+                    if (Number.isNaN(next)) {
+                      setConfigValues(prev => ({ ...prev, [def.key]: def.min }));
+                    } else {
+                      setConfigValues(prev => ({ ...prev, [def.key]: clamp(next, def.min, def.max) }));
+                    }
+                  }}
+                  inputProps={{ min: def.min, max: def.max, step: 1 }}
+                  helperText={`Min ${def.min}, Max ${def.max}`}
+                />
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 2 }}>
-          <Button variant="contained" disabled={!canSubmit || processing} onClick={handleSubmit}>
-            Create Session
-          </Button>
+           <Button variant="contained" disabled={!canSubmit || processing} onClick={handleSubmit}>
+              Create Session
+           </Button>
         </Box>
       </Paper>
      </Box>

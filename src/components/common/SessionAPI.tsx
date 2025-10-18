@@ -110,18 +110,21 @@ export async function generateSnapshots(sessionName: string, turnNumber: number)
     }
 }
 
-export async function createSession(sessionName: string, empireData: string[]): Promise<string> {
+export async function createSession(
+  sessionName: string,
+  empireData: string[],
+  overrideProps: Record<string, string> = {}
+): Promise<string> {
     try {
+       const payload = { sessionName, empireData, overrideProps };
+//        console.log('createSession payload (API):', JSON.stringify(payload));
        const response = await fetch("https://api.starempires.com/createSession", {
          method: "POST",
          headers: {
            "Authorization": "Bearer REAL_JWT_TOKEN", // Replace with your token logic
            "Content-Type": "application/json",
          },
-         body: JSON.stringify({
-           sessionName,
-           empireData,
-         }),
+         body: JSON.stringify(payload),
        });
        if (response.status===404) {
           return "";
