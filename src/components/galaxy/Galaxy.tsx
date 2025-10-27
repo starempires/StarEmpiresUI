@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Layer } from 'react-konva';
 import Sector from './Sector';
-import Connections from './Connections';
+import Connections, { Connection } from './Connections';
 import ContextMenu from './ContextMenu';
 import InfoHover from './InfoHover';
 import * as Constants from '../../Constants';
@@ -16,8 +16,8 @@ export default function Galaxy({turnData, onClick, onDblClick }: {turnData: any;
   const [tooltipText, setTooltipText] = useState("");
   const [contextMenuSectorData, setContextMenuSectorData] = useState(null);
 
-  const computeConnections = (turnData: any) => {
-    const connections = [];
+  const computeConnections = (turnData: any): Connection[] => {
+    const connections: Connection[] = [];
     if (turnData.connections) {
       const fromNames = Object.keys(turnData.connections);
       for (let fromName of fromNames) {
@@ -27,7 +27,8 @@ export default function Galaxy({turnData, onClick, onDblClick }: {turnData: any;
           const toSector = turnData.sectors[toName];
           const [fromx, fromy] = Constants.coordsToPosition(turnData.radius, fromSector.oblique, fromSector.y);
           const [tox, toy] = Constants.coordsToPosition(turnData.radius, toSector.oblique, toSector.y);
-          connections.push([fromx, fromy, tox, toy]);
+          const oneWay = !(turnData.connections[toName] && turnData.connections[toName].includes(fromName));
+          connections.push({ fromx, fromy, tox, toy, oneWay });
         }
       }
     }
