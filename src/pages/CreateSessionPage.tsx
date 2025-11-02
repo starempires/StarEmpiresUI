@@ -1,6 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../../amplify/data/resource';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
@@ -15,10 +13,9 @@ import Divider from '@mui/material/Divider';
 import ProcessingDialog from '../components/common/ProcessingDialog';
 import { useNavigate } from 'react-router-dom';
 import { createSession } from '../components/common/SessionAPI';
+import { checkSessionExists, registerEmpire, registerSession } from '../components/common/ClientFunctions';
 
 import '../index.css';
-
-const client = generateClient<Schema>({ authMode: 'userPool' });
 
 interface GMControlsPageProps {
   userAttributes: any;
@@ -65,49 +62,6 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
       return sessionName.trim();
   }, [sessionName]);
 
-async function registerEmpire(
-    name: string,
-    playerName: string,
-    sessionName: string,
-    empireType: 'ABANDONED' | 'ACTIVE' | 'GM' | 'HOMELESS' | 'INACTIVE' | 'NPC' | 'OBSERVER'
-  ): Promise<any> {
-    const result = await client.models.Empire.create({
-              name: name,
-              playerName: playerName,
-              sessionName: sessionName,
-              ordersLocked: false,
-              empireType: empireType
-    });
-    return result.data;
-}
-
-async function registerSession(name: string, numPlayers: number): Promise<any> {
-     const result = await client.models.Session.create({
-          name: name,
-          gmPlayerName: userAttributes.preferred_username,
-          currentTurnNumber: 0,
-          status: 'WAITING_FOR_PLAYERS',
-          sessionType: 'STANDARD',
-          numPlayers: numPlayers,
-          updateHours: 168,
-        });
-     return result.data;
-}
-
-async function checkSessionExists(sessionName: string): Promise<boolean> {
-  try {
-    const existing = await client.models.Session.list({
-      filter: { name: { eq: sessionName } }
-    });
-//     console.log("session " + sessionName + ", existing = ", existing);
-
-    return !!(existing.data && existing.data.length > 0);
-  } catch (error) {
-    console.error("Error checking session existence:", error);
-    // being cautious — assume it exists if we hit an error
-    return true;
-  }
-}
 
 //async function createSessionTBD(): {
 //    // 1) Create the Session
@@ -157,7 +111,7 @@ const handleSubmit = async () => {
           return;
       }
 
-      const sessionResult = await registerSession(sessionName, numPlayers);
+      const sessionResult = await registerSession(sessionName, numPlayers, userAttributes.preferred_username);
       if (sessionResult && Array.isArray((sessionResult as any).errors) && (sessionResult as any).errors.length > 0) {
           console.error('Session create errors:', (sessionResult as any).errors);
           const message = (sessionResult as any).errors
@@ -183,7 +137,7 @@ const handleSubmit = async () => {
    }
    console.log('Session created:', sessionResult);
 
-    await registerEmpire("GM", userAttributes.preferred_username, sessionName, 'GM');
+    await registerEmpire(sessionName, userAttributes.preferred_username, "GM", "GM");
     navigate('/');
   } catch (err) {
     console.error('Failed to create session/empires', err);

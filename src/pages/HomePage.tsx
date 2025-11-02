@@ -1,8 +1,6 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { loadOrdersStatus } from '../components/common/SessionAPI';
-import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../../amplify/data/resource';
 import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -15,8 +13,7 @@ import '../index.css';
 import SessionTableRow from './SessionTableRow';
 import SessionWaitingTableRow from './SessionWaitingTableRow';
 import type { Empire, SessionEmpires } from '../components/common/Interfaces';
-
-const client = generateClient<Schema>({ authMode: 'userPool' });
+import { getSession, getEmpiresForPlayer, getEmpiresForSession, getWaitingForPlayerSessions } from '../components/common/ClientFunctions';
 
 interface HomePageProps {
   user: any;
@@ -26,35 +23,6 @@ interface HomePageProps {
 export default function HomePage({ user, userAttributes }: HomePageProps) {
   const [sessionEmpires, setSessionEmpires] = useState<SessionEmpires[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
-  async function fetchSession(name: string): Promise<any> {
-    const result = await client.models.Session.list({
-      filter: { name: { eq: name } },
-    });
-    return result.data || [];
-  }
-
-  async function fetchWaitingForPlayerSessions(): Promise<any> {
-    const result = await client.models.Session.list({
-      filter: { status: { eq: "WAITING_FOR_PLAYERS" } },
-    });
-    return result.data || [];
-  }
-
-  async function fetchEmpiresForSession(sessionName: string): Promise<any> {
-    const result = await client.models.Empire.list({
-      filter: { sessionName: { eq: sessionName } },
-    });
-    return result.data || []; // for now
-  }
-
-  async function fetchEmpiresForPlayer(playerName: string): Promise<any> {
-    const result = await client.models.Empire.list({
-      filter: { playerName: { eq: playerName } }
-    });
-// console.log("result = " + JSON.stringify(result));
-    return result.data || [];
-  }
 
   useEffect(() => {
     const loadSessionEmpires = async () => {
@@ -68,7 +36,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
             return {};
         }
 
-        const playerEmpires = await fetchEmpiresForPlayer(userAttributes?.preferred_username);
+        const playerEmpires = await getEmpiresForPlayer(userAttributes?.preferred_username);
 
         // find empires where this player is the GM
         const gmEmpires = playerEmpires.filter((empire: Empire) => empire.empireType === "GM");
@@ -80,7 +48,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
 
         // load other empires for sessions where this player is the GM
         const gmSessionNames: string[] = Array.from(new Set(gmEmpires.map((empire: Empire) => empire.sessionName)));
-        const gmEmpiresPromises = gmSessionNames.map((sessionName: string) => fetchEmpiresForSession(sessionName));
+        const gmEmpiresPromises = gmSessionNames.map((sessionName: string) => getEmpiresForSession(sessionName));
         const results = await Promise.all(gmEmpiresPromises);
         const gmOtherEmpires = results.flat();
 //         console.log("gmOtherEmpries = " + JSON.stringify(gmOtherEmpires));
@@ -96,7 +64,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
 
 
         // load sessions that are waiting for players
-        const waitingSessions = await fetchWaitingForPlayerSessions();
+        const waitingSessions = await getWaitingForPlayerSessions();
 //         console.log("waiting sessions = " + JSON.stringify(waitingSessions));
 
 //         if (playerEmpires.length == 0) {
@@ -107,7 +75,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
         // all sessions, whether GM or not
         const allSessionNames: string[] = Array.from(new Set(combinedEmpires.map((empire: Empire) => empire.sessionName)));
 //         console.log("all session Names = " + JSON.stringify(allSessionNames));
-        const allSessionPromises = allSessionNames.map((sessionName: string) => fetchSession(sessionName));
+        const allSessionPromises = allSessionNames.map((sessionName: string) => getSession(sessionName));
         const allSessionResults = await Promise.all(allSessionPromises);
         const allSessions = allSessionResults.flat();
         // add sessions that are WAITING_FOR_PLAYERS even if this player doesn't yet have an empire in them

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { generateClient } from 'aws-amplify/data';
 import ProcessingDialog from '../components/common/ProcessingDialog';
 import type { Schema } from '../../amplify/data/resource';
 import type { SessionEmpires } from '../components/common/Interfaces';
 import { updateTurn, generateSnapshots } from '../components/common/SessionAPI';
+import { getCurrentTurnNumber, updateSessionStatus, updateSessionTurnNumber } from '../components/common/ClientFunctions';
 
 const sessionStatuses = [
   'ABANDONED',
@@ -17,8 +17,6 @@ const sessionStatuses = [
   'WAITING_FOR_PLAYERS',
 ];
 
-const client = generateClient<Schema>({ authMode: 'userPool' });
-
 export default function GMControls({
   session,
   onTurnNumberChange,
@@ -31,23 +29,6 @@ export default function GMControls({
     const [processing, setProcessing] = useState<boolean>(false);
     const [processingMessage, setProcessingMessage] = useState<string>("");
 
-    async function updateSessionStatus(
-        sessionId: string,
-        newStatus: NonNullable<Schema["Session"]["type"]["status"]>
-      ): Promise<any> {
-        try {
-           const updated = await client.models.Session.update({
-             id: sessionId,
-             status: newStatus,
-           });
-
-    //       console.log("Session updated:", updated.data);
-          return updated.data;
-        } catch (error) {
-          console.error("Error updating session:", error);
-          throw error;
-        }
-    }
 
     async function handleStatusChange(sessionId: string, status: SessionStatus) {
     //       console.log("Status Changed for session:", sessionId);
@@ -65,21 +46,6 @@ export default function GMControls({
          }
      }
 
-  async function updateSessionTurnNumber(sessionId: string, turnNumber: number): Promise<any> {
-     try {
-       const updated = await client.models.Session.update({
-         id: sessionId,
-         currentTurnNumber: turnNumber,
-       });
-
- //       console.log("Turn number updated:", updated.data);
-       return updated.data;
-     } catch (error) {
-       console.error("Error updating session turn number:", error);
-       throw error;
-     }
-   }
-
    async function handleUpdateTurn(sessionId: string) {
  //       console.log("Update Turn clicked for session:", sessionId);
        setProcessing(true);
@@ -87,8 +53,7 @@ export default function GMControls({
 
        try {
          // fetch current turn
-         const result = await client.models.Session.get({ id: sessionId });
-         const currentTurn = result.data?.currentTurnNumber || 0;
+         const currentTurn = await getCurrentTurnNumber(sessionId);
          // update turn info
          const apiData = await updateTurn(session.sessionName, currentTurn);
          const json = JSON.parse(apiData);
@@ -110,8 +75,7 @@ export default function GMControls({
        setProcessingMessage("Rolling Back Turn ...");
 
        try {
-         const result = await client.models.Session.get({ id: sessionId });
-         const currentTurn = result.data?.currentTurnNumber || 0;
+         const currentTurn = await getCurrentTurnNumber(sessionId);
          if (currentTurn > 0) {
              await updateSessionTurnNumber(sessionId, currentTurn - 1);
  //             console.log("Turn successfully rolled back.");
@@ -131,8 +95,7 @@ export default function GMControls({
 
        try {
          // fetch current turn
-         const result = await client.models.Session.get({ id: sessionId });
-         const currentTurn = result.data?.currentTurnNumber || 0;
+         const currentTurn = await getCurrentTurnNumber(sessionId);
          // update turn info
          const apiData = await generateSnapshots(session.sessionName, currentTurn);
          const json = JSON.parse(apiData);

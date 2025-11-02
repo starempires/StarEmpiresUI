@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../../amplify/data/resource';
 import { List, ListItemButton, ListItemText, Divider, Typography } from '@mui/material';
-
-const client = generateClient<Schema>({ authMode: 'userPool' });
+import { getReceivedMessages, getSentMessages } from '../components/common/ClientFunctions';
 
 // Define the interface for a Message (based on your schema in resource.ts)
 interface Message {
@@ -31,51 +28,6 @@ export default function MessagePage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  async function fetchSentMessages(sessionName: string, empireName: string): Promise<any> {
-       console.log("loading send messages for for " + sessionName + ", " + empireName);
-
-      const result = await client.models.Message.list({
-          filter: {
-            and: [
-              { sessionName: { eq: sessionName } },
-              { sender: { eq: empireName } },
-            ]
-          }
-      });
-//        console.log("result = " + JSON.stringify(result));
-      return result.data || [];
- }
-
-  async function fetchMessage(id: string): Promise<any> {
-//       console.log("fetching message ID " + id);
-      const result = await client.models.Message.list({
-          filter: { id: { eq: id } },
-      });
-//       console.log("fetchMessage result = " + JSON.stringify(result.data));
-      return result.data || [];
- }
-
-  async function fetchReceivedMessages(sessionName: string, empireName: string): Promise<any> {
-//       console.log("fetching received messages for " + sessionName + " " + empireName);
-      var received = await client.models.MessageRecipient.list({
-          filter: {
-            and: [
-              { sessionName: { eq: sessionName } },
-              { recipient: { eq: empireName } },
-            ]
-          }
-      });
-      const receivedData = received?.data || [];
-//       console.log("receivedData = " + JSON.stringify(receivedData));
-      if (!receivedData) {
-          return [];
-      }
-      const promises = receivedData.map((msg: any) => fetchMessage(msg.id));
-      const data = await Promise.all(promises);
-      const messages = data.flat();
-//       console.log("messages = " + JSON.stringify(messages));
-      return messages || [];
- }
 
   // Fetch all messages for the given session and empire.
   // We assume that a message qualifies if the sessionName matches AND either the sender equals the empireName
@@ -83,9 +35,9 @@ export default function MessagePage() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const messages = await fetchSentMessages(sessionName!, empireName!);
+        const messages = await getSentMessages(sessionName!, empireName!);
         console.log("sent messages = " + JSON.stringify(messages));
-        const received = await fetchReceivedMessages(sessionName!, empireName!);
+        const received = await getReceivedMessages(sessionName!, empireName!);
         console.log("received messages = " + JSON.stringify(received));
 //         const promises = received.map((recipient) => fetchMessages(recipient.id));
 //         const result = await.Promise.all(promises);

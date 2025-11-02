@@ -40,7 +40,7 @@ export default function SessionWaitingTableRow({ playerName, session }: { player
         } catch {
             throw new Error("addEmpire returned non-JSON response: " + addResult);
         }
-        await registerEmpire(session.sessionName, playerName, empireName)
+        await registerEmpire(session.sessionName, playerName, empireName, "ACTIVE")
         navigate('/');
      } catch (err) {
         console.error('Failed to create session/empires', err);
@@ -81,7 +81,7 @@ export default function SessionWaitingTableRow({ playerName, session }: { player
             </Box>
            </TableCell>
            <TableCell colSpan={5}>
-                   <Typography variant="subtitle1" sx={{ mb: 1 }}>Enter your empire's information</Typography>
+                   <Typography variant="subtitle1" sx={{ mb: 1 }}>Enter your empire's information.</Typography>
                          <Paper variant="outlined" sx={{ p: 1 }}>
                            <Grid container spacing={1} alignItems="flex-start">
                              <Grid size={{xs:12, md:2}}>
