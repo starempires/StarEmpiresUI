@@ -51,7 +51,7 @@ export default function Connections({ connections }: { connections: Connection[]
                     stroke={Constants.CONNECTION_COLOR}
                     shadowEnabled={false}
                     listening={false}
-                    dash={[6, 6]}
+                    dash={[8, 6]}
                   />
                 );
 

@@ -18,6 +18,7 @@ const schema = a.schema({
   Session: a
     .model({
       name: a.string().required(),
+      gmPlayerName: a.string().required(),
       started: a.datetime(), // optional
       status: a.enum([
         'ABANDONED',

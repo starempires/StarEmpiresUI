@@ -112,11 +112,10 @@ export async function generateSnapshots(sessionName: string, turnNumber: number)
 
 export async function createSession(
   sessionName: string,
-  empireData: string[],
   overrideProps: Record<string, string> = {}
 ): Promise<string> {
     try {
-       const payload = { sessionName, empireData, overrideProps };
+       const payload = { sessionName, overrideProps };
 //        console.log('createSession payload (API):', JSON.stringify(payload));
        const response = await fetch("https://api.starempires.com/createSession", {
          method: "POST",
@@ -135,6 +134,62 @@ export async function createSession(
        return "";
     } catch (error) {
       console.error("Error in createSession:", error);
+      throw error;
+    }
+}
+
+export async function startSession(
+  sessionName: string
+): Promise<string> {
+    try {
+       const payload = { sessionName };
+       const response = await fetch("https://api.starempires.com/startSession", {
+         method: "POST",
+         headers: {
+           "Authorization": "Bearer REAL_JWT_TOKEN", // Replace with your token logic
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify(payload),
+       });
+       if (response.status===404) {
+          return "";
+       }
+       if (response.ok && response.status===200) {
+           return await response.text();
+       }
+       return "";
+    } catch (error) {
+      console.error("Error in startSession:", error);
+      throw error;
+    }
+}
+
+export async function addEmpire(
+  sessionName: string,
+  empireName: string,
+  abbreviation: string,
+  homeworld: string,
+  starbase: string
+): Promise<string> {
+    try {
+       const payload = { sessionName, empireName, abbreviation, homeworld, starbase };
+       const response = await fetch("https://api.starempires.com/addEmpire", {
+         method: "POST",
+         headers: {
+           "Authorization": "Bearer REAL_JWT_TOKEN", // Replace with your token logic
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify(payload),
+       });
+       if (response.status===404) {
+          return "";
+       }
+       if (response.ok && response.status===200) {
+           return await response.text();
+       }
+       return "";
+    } catch (error) {
+      console.error("Error in addEmpire:", error);
       throw error;
     }
 }

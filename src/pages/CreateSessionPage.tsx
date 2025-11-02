@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 import Typography from '@mui/material/Typography';
@@ -26,14 +26,6 @@ interface GMControlsPageProps {
   userAttributes: any;
   userGroups: any;
 }
-
-interface EmpireRow {
-  empireName: string;
-  homeworldName: string;
-  starbaseName: string;
-  playerName: string;
-}
-
 
 const toUnderscore = (s: string) => (s ?? '').replace(/\s+/g, '_');
 
@@ -65,90 +57,15 @@ const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(mi
 export default function CreateSessionPage({ userAttributes, userGroups }: GMControlsPageProps) {
   const [sessionName, setSessionName] = useState('');
   const [numPlayers, setNumPlayers] = useState<number>(6);
-  const [rows, setRows] = useState<EmpireRow[]>(() => Array.from({ length: 2 }, () => ({ empireName: '', homeworldName: '', starbaseName: '', playerName: '' })));
   const [processing, setProcessing] = useState<boolean>(false);
   const [configValues, setConfigValues] = useState<Record<string, number>>(
     () => Object.fromEntries(SESSION_PROPERTIES_LIST.map(def => [def.key, def.defaultValue]))
   );
   const navigate = useNavigate();
 
-//   console.log("user attributes = ", userAttributes);
-
-  // keep rows array length in sync with selected number of players
-  useEffect(() => {
-    setRows((prev) => {
-      if (prev.length === numPlayers) return prev;
-      if (prev.length < numPlayers) {
-        return prev.concat(Array.from({ length: numPlayers - prev.length }, () => ({ empireName: '', homeworldName: '', starbaseName: '', playerName: '' })));
-      }
-      return prev.slice(0, numPlayers);
-    });
-  }, [numPlayers]);
-
-  const abbrevs = useMemo(() => {
-    const used = new Set<string>();
-    const result: string[] = [];
-
-    const lettersOnly = (s: string) => (s || '').replace(/[^A-Za-z]/g, '').toUpperCase();
-
-    const normalizeName = (name: string): string => {
-      // Replace underscores with spaces, trim, then drop leading "The" (case-insensitive)
-      const base = (name || '').replace(/_/g, ' ').trim();
-      return base.replace(/^\s*the\b[\s_-]*/i, '').trim();
-    };
-
-    const candidatesFromName = (name: string): string[] => {
-      const cleaned = normalizeName(name);
-      const letters = lettersOnly(cleaned);
-      const cands: string[] = [];
-      // primary: first two letters
-      if (letters.length >= 2) cands.push(letters.slice(0, 2));
-      // fallbacks: all ordered pairs i<j from the name
-      for (let i = 0; i < letters.length; i++) {
-        for (let j = i + 1; j < letters.length; j++) {
-          const cand = letters[i] + letters[j];
-          if (!cands.includes(cand)) cands.push(cand);
-        }
-      }
-      // final fallbacks: first letter + A..Z
-      const first = letters[0] ?? 'X';
-      for (let k = 0; k < 26; k++) {
-        const cand = first + String.fromCharCode(65 + k);
-        if (!cands.includes(cand)) cands.push(cand);
-      }
-      // absolute fallback
-      cands.push('XX');
-      return cands;
-    };
-
-    for (const r of rows) {
-      const cands = candidatesFromName(r.empireName);
-      let chosen = 'XX';
-      for (const c of cands) {
-        if (!used.has(c)) {
-          chosen = c;
-          break;
-        }
-      }
-      used.add(chosen);
-      result.push(chosen);
-    }
-    return result;
-  }, [rows]);
-
   const canSubmit = useMemo(() => {
-    if (!sessionName.trim()) return false;
-    return rows.every(r => r.empireName.trim() && r.homeworldName.trim() && r.starbaseName.trim() && r.playerName.trim());
-  }, [sessionName, rows]);
-
-  const handleRowChange = (index: number, field: keyof EmpireRow, value: string) => {
-    setRows(prev => {
-      const next = [...prev];
-      const sanitized = field === 'playerName' ? value.replace(/\s+/g, '') : toUnderscore(value);
-      next[index] = { ...next[index], [field]: sanitized } as EmpireRow;
-      return next;
-    });
-  };
+      return sessionName.trim();
+  }, [sessionName]);
 
 async function registerEmpire(
     name: string,
@@ -169,8 +86,9 @@ async function registerEmpire(
 async function registerSession(name: string, numPlayers: number): Promise<any> {
      const result = await client.models.Session.create({
           name: name,
+          gmPlayerName: userAttributes.preferred_username,
           currentTurnNumber: 0,
-          status: 'CREATED',
+          status: 'WAITING_FOR_PLAYERS',
           sessionType: 'STANDARD',
           numPlayers: numPlayers,
           updateHours: 168,
@@ -193,79 +111,82 @@ async function checkSessionExists(sessionName: string): Promise<boolean> {
   }
 }
 
-function assembleEmpireData(): string[] {
-  return rows.map((row, idx) => {
-    const empireType = 'ACTIVE';
-    const abbrev = abbrevs[idx];
-    return [row.empireName, abbrev, empireType, row.homeworldName, row.starbaseName].join(',');
-  });
-}
+//async function createSessionTBD(): {
+//    // 1) Create the Session
+//    const empireData = assembleEmpireData();
+//    const overrideProperties: Record<string, string> =
+//      Object.fromEntries(Object.entries(configValues).map(([k, v]) => [k, String(v)]));
+////     console.log('createSession payload (UI):', JSON.stringify({ sessionName, empireData, overrideProperties }));
+//    const createResult = await createSession(sessionName, empireData, overrideProperties);
+////     console.log("createSession result " + JSON.stringify(createResult));
+//
+//    try {
+//       const parsedResult = JSON.parse(createResult);
+//       if (!parsedResult || parsedResult.data !== "OK") {
+//         const msg = parsedResult?.message || "(no message)";
+//         throw new Error("Error creating session: " + msg);
+//       }
+//    } catch {
+//      throw new Error("createSession returned non-JSON response: " + createResult);
+//    }
+//
+//    // 2) Create one Empire per player row
+//    await Promise.all(
+//      rows.map(async (row) => {
+//        const empireResult = await registerEmpire(row.empireName, row.playerName, sessionName, 'ACTIVE');
+//
+//        if (empireResult && Array.isArray((empireResult as any).errors) && (empireResult as any).errors.length > 0) {
+//            console.error('Empire create errors:', (empireResult as any).errors);
+//            const message = (empireResult as any).errors
+//              .map((e: any) => e?.message || JSON.stringify(e))
+//              .join('; ');
+//            throw new Error(message || 'Unknown error creating empire');
+//        }
+//
+//         console.log('Empire created:', empireResult);
+//      })
+//    );
+// }
+
 
 const handleSubmit = async () => {
-  setProcessing(true);
+   setProcessing(true);
 
-  try {
-    const exists = await checkSessionExists(sessionName);
-    if (exists) {
-        console.log(`Session "${sessionName}" already exists.`);
-        return;
-    }
+   try {
+      const exists = await checkSessionExists(sessionName);
+      if (exists) {
+          console.log(`Session "${sessionName}" already exists.`);
+          return;
+      }
 
-    // 1) Create the Session
-    const empireData = assembleEmpireData();
-    const overrideProperties: Record<string, string> =
-      Object.fromEntries(Object.entries(configValues).map(([k, v]) => [k, String(v)]));
+      const sessionResult = await registerSession(sessionName, numPlayers);
+      if (sessionResult && Array.isArray((sessionResult as any).errors) && (sessionResult as any).errors.length > 0) {
+          console.error('Session create errors:', (sessionResult as any).errors);
+          const message = (sessionResult as any).errors
+            .map((e: any) => e?.message || JSON.stringify(e))
+            .join('; ');
+          throw new Error(message || 'Unknown error creating session');
+      }
+
+      const overrideProperties: Record<string, string> =
+        Object.fromEntries(Object.entries(configValues).map(([k, v]) => [k, String(v)]));
 //     console.log('createSession payload (UI):', JSON.stringify({ sessionName, empireData, overrideProperties }));
-    const createResult = await createSession(sessionName, empireData, overrideProperties);
+      const createResult = await createSession(sessionName, overrideProperties);
 //     console.log("createSession result " + JSON.stringify(createResult));
 
-    try {
-       const parsedResult = JSON.parse(createResult);
-       if (!parsedResult || parsedResult.data !== "OK") {
-         const msg = parsedResult?.message || "(no message)";
-         throw new Error("Error creating session: " + msg);
-       }
-    } catch {
+   try {
+      const parsedResult = JSON.parse(createResult);
+      if (!parsedResult || parsedResult.data !== "OK") {
+        const msg = parsedResult?.message || "(no message)";
+        throw new Error("Error creating session: " + msg);
+      }
+   } catch {
       throw new Error("createSession returned non-JSON response: " + createResult);
-    }
+   }
+   console.log('Session created:', sessionResult);
 
-    const sessionResult = await registerSession(sessionName, numPlayers);
-
-    // Optional: surface backend-reported errors (Amplify Gen2 returns { data, errors })
-    if (sessionResult && Array.isArray((sessionResult as any).errors) && (sessionResult as any).errors.length > 0) {
-      console.error('Session create errors:', (sessionResult as any).errors);
-      const message = (sessionResult as any).errors
-        .map((e: any) => e?.message || JSON.stringify(e))
-        .join('; ');
-      throw new Error(message || 'Unknown error creating session');
-    }
-
-    console.log('Session created:', sessionResult);
-
-    // 2) Create one Empire per player row
-    await Promise.all(
-      rows.map(async (row) => {
-        const empireResult = await registerEmpire(row.empireName, row.playerName, sessionName, 'ACTIVE');
-
-        if (empireResult && Array.isArray((empireResult as any).errors) && (empireResult as any).errors.length > 0) {
-            console.error('Empire create errors:', (empireResult as any).errors);
-            const message = (empireResult as any).errors
-              .map((e: any) => e?.message || JSON.stringify(e))
-              .join('; ');
-            throw new Error(message || 'Unknown error creating empire');
-        }
-
-//         console.log('Empire created:', empireResult);
-      })
-    );
     await registerEmpire("GM", userAttributes.preferred_username, sessionName, 'GM');
     navigate('/');
-
-    // (Optional) Reset the form
-    // setSessionName('');
-    // setNumPlayers(2);
-    // setRows(Array.from({ length: 2 }, () => ({ empireName: '', homeworldName: '', starbaseName: '', playerName: '' })));
-
   } catch (err) {
     console.error('Failed to create session/empires', err);
   } finally {
@@ -332,79 +253,6 @@ const handleSubmit = async () => {
               </Select>
             </FormControl>
           </Grid>
-        </Grid>
-
-        <Divider sx={{ my: 3 }} />
-        <Typography variant="h6" sx={{ mb: 1 }}>Empire Configuration</Typography>
-
-        <Grid container spacing={1}>
-          {rows.map((row, idx) => (
-            <Grid key={idx} size={{xs:12}}>
-              <Paper variant="outlined" sx={{ p: 1 }}>
-                <Grid container spacing={1} alignItems="flex-start">
-                  <Grid size={{xs:12}}>
-                    <Typography variant="subtitle2" sx={{ lineHeight: 1, mb: 0 }}>Empire {idx + 1}</Typography>
-                  </Grid>
-                  <Grid size={{xs:12, md:2}}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="Empire Name"
-                      value={row.empireName}
-                      onChange={(e) => handleRowChange(idx, 'empireName', e.target.value)}
-                      size="small"
-                      margin="dense"
-                      sx={{ maxWidth: 200 }}
-                    />
-                    <Box sx={{ mt: 0 }}>
-                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                        Abbreviation: {abbrevs[idx]}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                  <Grid size={{xs:12, md:2}}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="Homeworld Name"
-                      value={row.homeworldName}
-                      onChange={(e) => handleRowChange(idx, 'homeworldName', e.target.value)}
-                      size="small"
-                      margin="dense"
-                      sx={{ maxWidth: 200 }}
-                    />
-                  </Grid>
-                  <Grid size={{xs:12, md:2}}>
-                    <TextField
-                      fullWidth
-                      required
-                      label="Starbase Name"
-                      value={row.starbaseName}
-                      onChange={(e) => handleRowChange(idx, 'starbaseName', e.target.value)}
-                      size="small"
-                      margin="dense"
-                      sx={{ maxWidth: 200 }}
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12, md: 2 }}>
-                    <TextField
-                      fullWidth
-                      required
-                      type="text"
-                      label="Player Name"
-                      value={row.playerName}
-                      onChange={(e) => handleRowChange(idx, 'playerName', e.target.value)}
-                      onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Spacebar') e.preventDefault(); }}
-                      inputProps={{ pattern: "\\S*" }}
-                      size="small"
-                      margin="dense"
-                      sx={{ maxWidth: 200 }}
-                    />
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Grid>
-          ))}
         </Grid>
 
 

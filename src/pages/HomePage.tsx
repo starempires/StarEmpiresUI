@@ -13,6 +13,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import '../index.css';
 import SessionTableRow from './SessionTableRow';
+import SessionWaitingTableRow from './SessionWaitingTableRow';
 import type { Empire, SessionEmpires } from '../components/common/Interfaces';
 
 const client = generateClient<Schema>({ authMode: 'userPool' });
@@ -29,6 +30,13 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
   async function fetchSession(name: string): Promise<any> {
     const result = await client.models.Session.list({
       filter: { name: { eq: name } },
+    });
+    return result.data || [];
+  }
+
+  async function fetchWaitingForPlayerSessions(): Promise<any> {
+    const result = await client.models.Session.list({
+      filter: { status: { eq: "WAITING_FOR_PLAYERS" } },
     });
     return result.data || [];
   }
@@ -61,20 +69,21 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
         }
 
         const playerEmpires = await fetchEmpiresForPlayer(userAttributes?.preferred_username);
-        if (playerEmpires.length == 0) {
-            return {};
-        }
 
+        // find empires where this player is the GM
         const gmEmpires = playerEmpires.filter((empire: Empire) => empire.empireType === "GM");
 //         console.log("gmEmpries = " + JSON.stringify(gmEmpires));
+        // find empires where this player is not the GM
         const nonGMEmpires = playerEmpires.filter((empire: Empire) => empire.empireType !== "GM");
 //         console.log("nongmEmpries = " + JSON.stringify(nonGMEmpires));
 
+
+        // load other empires for sessions where this player is the GM
         const gmSessionNames: string[] = Array.from(new Set(gmEmpires.map((empire: Empire) => empire.sessionName)));
         const gmEmpiresPromises = gmSessionNames.map((sessionName: string) => fetchEmpiresForSession(sessionName));
         const results = await Promise.all(gmEmpiresPromises);
         const gmOtherEmpires = results.flat();
-//         console.log("gmotherEmpries = " + JSON.stringify(gmOtherEmpires));
+//         console.log("gmOtherEmpries = " + JSON.stringify(gmOtherEmpires));
 
         // get unique empires
         const allPlayerEmpires = [...gmEmpires, ...nonGMEmpires, ...gmOtherEmpires];
@@ -85,12 +94,30 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
         const combinedEmpires = Array.from(map.values());
 //         console.log("combined = " + JSON.stringify(combinedEmpires));
 
+
+        // load sessions that are waiting for players
+        const waitingSessions = await fetchWaitingForPlayerSessions();
+//         console.log("waiting sessions = " + JSON.stringify(waitingSessions));
+
+//         if (playerEmpires.length == 0) {
+//             return {};
+//         }
+
+
         // all sessions, whether GM or not
         const allSessionNames: string[] = Array.from(new Set(combinedEmpires.map((empire: Empire) => empire.sessionName)));
 //         console.log("all session Names = " + JSON.stringify(allSessionNames));
         const allSessionPromises = allSessionNames.map((sessionName: string) => fetchSession(sessionName));
         const allSessionResults = await Promise.all(allSessionPromises);
         const allSessions = allSessionResults.flat();
+        // add sessions that are WAITING_FOR_PLAYERS even if this player doesn't yet have an empire in them
+        const existingSessionNames = new Set(allSessions.map((s: any) => s.name));
+        waitingSessions.forEach((s: any) => {
+           if (!existingSessionNames.has(s.name)) {
+               allSessions.push(s);
+           }
+        });
+
 //         console.log("all sessions = " + JSON.stringify(allSessions));
 
         const sessionEmpires: SessionEmpires[] = await Promise.all(
@@ -98,8 +125,11 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
             const empiresForThisSession = combinedEmpires.filter((empire: Empire) => empire.sessionName === session.name);
             return {
               sessionName: session.name,
+              gmPlayerName: session.gmPlayerName,
+              currentPlayerIsGM: session.gmPlayerName === userAttributes?.preferred_username,
               sessionId: session.id,
               currentTurnNumber: session.currentTurnNumber,
+              numPlayers: session.numPlayers,
               deadline: session.deadline,
               status: session.status,
               empires: await Promise.all(
@@ -107,6 +137,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
                   name: empire.name,
                   empireType: empire.empireType,
                   sessionName: session.name,
+                  playerName: empire.playerName,
                   orderStatus: empire.empireType === "GM" ? "" : await loadOrdersStatus(session.name, empire.name, session.currentTurnNumber),
                 }))
               )
@@ -126,6 +157,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
             return a.name.localeCompare(b.name);
           });
         });
+//     console.log("session Empires = " + JSON.stringify(sessionEmpires));
 
         setSessionEmpires(sessionEmpires);
       } catch (error) {
@@ -150,7 +182,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
 
  return (
      <div className="p-6">
-       <Typography variant="h6" gutterBottom>
+       <Typography variant="h6" sx={{ml:1}} gutterBottom>
          Sessions for {userAttributes?.preferred_username}
        </Typography>
        <TableContainer component={Paper}>
@@ -168,7 +200,14 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
            <TableBody>
              {sessionEmpires.map((session) => (
                <React.Fragment key={session.sessionId}>
-                 <SessionTableRow session={session} />
+                 {(session.status === "WAITING_FOR_PLAYERS"
+                   && !session.currentPlayerIsGM
+                   && !session.empires.some(e => e.playerName === userAttributes?.preferred_username)
+                 ) ? (
+                   <SessionWaitingTableRow playerName={userAttributes?.preferred_username} session={session} />
+                 ) : (
+                   <SessionTableRow session={session} />
+                 )}
                  <TableRow>
                    <TableCell colSpan={6} sx={{ borderBottom: 3, borderColor: 'divider', p: 0 }} />
                  </TableRow>
