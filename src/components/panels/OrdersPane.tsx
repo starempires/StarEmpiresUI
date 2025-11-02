@@ -1,12 +1,12 @@
-import {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { PanelGroup, Panel } from 'react-resizable-panels';
 import { fetchSessionObject, loadOrdersStatus } from '../common/SessionAPI';
+import ProcessingDialog from '../common/ProcessingDialog';
 
 interface OrderSubmissionPaneProps {
   sessionName: string;
@@ -19,7 +19,8 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
   const [ordersText, setOrdersText] = useState<string>('');
   const [submitTrigger, setSubmitTrigger] = useState<number>(0);
   const [lockedTrigger, setLockedTrigger] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean>(false);
+  const [processingMessage, setProcessingMessage] = useState<string>("");
   const [locked, setLocked] = useState<boolean>(false);
   const lockedTriggerInitialized = useRef(false);
 
@@ -146,15 +147,19 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
            lockedTriggerInitialized.current = true;
          }
 
+      setProcessing(true);
+      setProcessingMessage("Loading ...");
       loadOrders();
       initializeStatus();
+      setProcessing(false);
     }, [sessionName, empireName, turnNumber]);
 
     useEffect(() => {
         if (submitTrigger === 0) {
             return;
         }
-        setIsSubmitting(true);
+        setProcessing(true);
+        setProcessingMessage("Submitting Orders ...");
 
         const submitOrders = async () => {
           try {
@@ -180,7 +185,7 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
            } catch (error) {
               console.error("Error submitting orders:", error);
            } finally {
-             setIsSubmitting(false);
+             setProcessing(false);
            }
       };
 
@@ -191,6 +196,9 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
       if (!lockedTriggerInitialized.current) {
         return;
       }
+  console.log("locking orders")
+      setProcessing(true);
+      setProcessingMessage("Locking Orders ...");
 
       const setOrdersLockStatus = async () => {
         try {
@@ -216,6 +224,7 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
     };
 
     setOrdersLockStatus();
+    setProcessing(false);
   }, [lockedTrigger]);
 
   const handleSubmit = () => {
@@ -227,122 +236,120 @@ export default function OrderPane({ sessionName, empireName, turnNumber }: Order
   };
 
   return (
+
+   <React.Fragment>
+    <ProcessingDialog open={processing} message={processingMessage} />
     <Box sx={{ ml: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Typography sx={{m1: 0}} variant="h6" gutterBottom>
         Enter Turn {turnNumber} Orders
       </Typography>
 
       {/* Resizable split between orders text and controls */}
-      <Box sx={{ flex: 1, minHeight: 0 }}>
-        <PanelGroup direction="vertical" style={{ height: '100%' }}>
-          {/* Top panel: Text field fills available space */}
-          <Panel defaultSize={75} minSize={30}>
-            <Box
-              sx={{ height: '100%', overflow: 'hidden', ml: 0, overscrollBehavior: 'contain' }}
-              onWheelCapture={handleWrapperWheel}
-              onTouchStartCapture={handleWrapperTouchStart}
-              onTouchMoveCapture={handleWrapperTouchMove}
-            >
-              <TextField
-                fullWidth
-                multiline
-                variant="outlined"
-                value={ordersText}
-                onChange={(e) => setOrdersText(e.target.value)}
-                placeholder={`Enter your turn ${turnNumber} orders here`}
-                inputRef={textAreaRef}
-                inputProps={{
-                  onWheel: handleWheelOnTextarea,
-                  onTouchStart: handleTouchStart,
-                  onTouchMove: handleTouchMove,
-                  style: { height: '100%', overflowY: 'auto' }
-                }}
-                sx={{
-                  height: '100%',
-                  backgroundColor: 'white',
-                  '& .MuiInputBase-root': {
-                    height: '100%',
-                    alignItems: 'stretch',
-                    overflow: 'hidden',
-                  },
-                  '& .MuiOutlinedInput-root': {
-                    height: '100%',
-                    alignItems: 'stretch',
-                  },
-                  '& .MuiInputBase-input': {
-                    color: 'black',
-                    overflowY: 'auto',
-                  },
-                  '& .MuiOutlinedInput-input': {
-                    overflowY: 'auto',
-                  },
-                  '& .MuiInputBase-inputMultiline': {
-                    height: '100% !important',
-                    overflowY: 'auto',
-                    overscrollBehavior: 'contain',
-                    resize: 'none',
-                    WebkitOverflowScrolling: 'touch',
-                    touchAction: 'manipulation',
-                  },
-                  '& .MuiOutlinedInput-inputMultiline': {
-                    height: '100% !important',
-                    overflowY: 'auto',
-                    overscrollBehavior: 'contain',
-                    resize: 'none',
-                    WebkitOverflowScrolling: 'touch',
-                    touchAction: 'manipulation',
-                  },
-                  '& textarea': {
-                    height: '100% !important',
-                    boxSizing: 'border-box',
-                    overflowY: 'auto',
-                    overscrollBehavior: 'contain',
-                    resize: 'none',
-                    WebkitOverflowScrolling: 'touch',
-                    touchAction: 'manipulation',
-                  },
-                }}
-              />
-            </Box>
-          </Panel>
+      <Box
+        sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+        onWheelCapture={handleWrapperWheel}
+        onTouchStartCapture={handleWrapperTouchStart}
+        onTouchMoveCapture={handleWrapperTouchMove}
+      >
+        {/* Top area: Text field fills available space */}
+        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+          <TextField
+            fullWidth
+            multiline
+            variant="outlined"
+            value={ordersText}
+            onChange={(e) => setOrdersText(e.target.value)}
+            placeholder={`Enter your turn ${turnNumber} orders here`}
+            inputRef={textAreaRef}
+            inputProps={{
+              onWheel: handleWheelOnTextarea,
+              onTouchStart: handleTouchStart,
+              onTouchMove: handleTouchMove,
+              style: { height: '100%', overflowY: 'auto' },
+            }}
+            sx={{
+              height: '100%',
+              backgroundColor: 'white',
+              '& .MuiInputBase-root': {
+                height: '100%',
+                alignItems: 'stretch',
+                overflow: 'hidden',
+              },
+              '& .MuiOutlinedInput-root': {
+                height: '100%',
+                alignItems: 'stretch',
+              },
+              '& .MuiInputBase-input': {
+                color: 'black',
+                overflowY: 'auto',
+              },
+              '& .MuiOutlinedInput-input': {
+                overflowY: 'auto',
+              },
+              '& .MuiInputBase-inputMultiline': {
+                height: '100% !important',
+                overflowY: 'auto',
+                overscrollBehavior: 'contain',
+                resize: 'none',
+                WebkitOverflowScrolling: 'touch',
+                touchAction: 'manipulation',
+              },
+              '& .MuiOutlinedInput-inputMultiline': {
+                height: '100% !important',
+                overflowY: 'auto',
+                overscrollBehavior: 'contain',
+                resize: 'none',
+                WebkitOverflowScrolling: 'touch',
+                touchAction: 'manipulation',
+              },
+              '& textarea': {
+                height: '100% !important',
+                boxSizing: 'border-box',
+                overflowY: 'auto',
+                overscrollBehavior: 'contain',
+                resize: 'none',
+                WebkitOverflowScrolling: 'touch',
+                touchAction: 'manipulation',
+              },
+            }}
+          />
+        </Box>
 
-          {/* Bottom panel: Buttons/checkbox row */}
-          <Panel defaultSize={25} minSize={10}>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', mt: 1, mr: 1 }}>
-              <Button
-                variant="contained"
+        {/* Bottom area: Buttons and checkbox */}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center', mt: 1, mr: 1 }}>
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: processing ? '#265100' : '#1976d2',
+              '&:hover': {
+                backgroundColor: processing ? '#265100' : '#115293',
+              },
+            }}
+            onClick={handleSubmit}
+            disabled={processing}
+          >
+            Save Orders
+          </Button>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={locked}
+                color="success"
+                onChange={(e) => handleLocked(e.target.checked)}
                 sx={{
-                  backgroundColor: isSubmitting ? '#265100' : '#1976d2',
-                  '&:hover': {
-                    backgroundColor: isSubmitting ? '#265100' : '#115293'
+                  ml: 1,
+                  color: 'white',
+                  '&.Mui-checked': {
+                    color: 'success',
                   },
                 }}
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Saving Orders...' : 'Save Orders'}
-              </Button>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={locked}
-                    color="success"
-                    onChange={(e) => handleLocked(e.target.checked)}
-                    sx={{
-                      ml: 1,
-                      color: 'white',
-                      '&.Mui-checked': {
-                        color: 'success',
-                      },
-                    }}
-                  />
-                }
-                label="Lock Orders"
               />
-            </Box>
-          </Panel>
-        </PanelGroup>
+            }
+            label="Lock Orders"
+          />
+        </Box>
       </Box>
     </Box>
+    </React.Fragment>
   );
 }

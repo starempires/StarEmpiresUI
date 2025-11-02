@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { generateClient } from 'aws-amplify/data';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import CircularProgress from '@mui/material/CircularProgress';
+import ProcessingDialog from '../components/common/ProcessingDialog';
 import type { Schema } from '../../amplify/data/resource';
 import type { SessionEmpires } from '../components/common/Interfaces';
 import { updateTurn, generateSnapshots } from '../components/common/SessionAPI';
@@ -31,6 +29,7 @@ export default function GMControls({
     type SessionStatus = NonNullable<Schema["Session"]["type"]["status"]>;
     const [selectedStatus, setSelectedStatus] = useState<SessionStatus>(session.status as SessionStatus);
     const [processing, setProcessing] = useState<boolean>(false);
+    const [processingMessage, setProcessingMessage] = useState<string>("");
 
     async function updateSessionStatus(
         sessionId: string,
@@ -53,6 +52,7 @@ export default function GMControls({
     async function handleStatusChange(sessionId: string, status: SessionStatus) {
     //       console.log("Status Changed for session:", sessionId);
           setProcessing(true);
+          setProcessingMessage("Updating Status ...");
 
           try {
              await updateSessionStatus(sessionId, status);
@@ -83,6 +83,7 @@ export default function GMControls({
    async function handleUpdateTurn(sessionId: string) {
  //       console.log("Update Turn clicked for session:", sessionId);
        setProcessing(true);
+       setProcessingMessage("Updating Turn ...");
 
        try {
          // fetch current turn
@@ -106,6 +107,7 @@ export default function GMControls({
      async function handleRollbackTurn(sessionId: string) {
  //       console.log("Rollback Turn clicked for session:", sessionId);
        setProcessing(true);
+       setProcessingMessage("Rolling Back Turn ...");
 
        try {
          const result = await client.models.Session.get({ id: sessionId });
@@ -125,6 +127,7 @@ export default function GMControls({
      async function handleGenerateSnapshots(sessionId: string) {
        console.log("Generate Snapshots for session:", sessionId);
        setProcessing(true);
+       setProcessingMessage("Generating Snapshots ...");
 
        try {
          // fetch current turn
@@ -144,6 +147,7 @@ export default function GMControls({
      async function handleStartSession(sessionId: string) {
        console.log("Starting session:", sessionId);
        setProcessing(true);
+       setProcessingMessage("Starting Session ...");
        try {
 //          const apiData = await generateSnapshots(session.sessionName, currentTurn);
 //          const json = JSON.parse(apiData);
@@ -159,14 +163,7 @@ export default function GMControls({
 
     return (
       <React.Fragment>
-             <Dialog open={processing}>
-                <DialogTitle>
-                  Processing...
-                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-                     <CircularProgress />
-                  </div>
-                </DialogTitle>
-             </Dialog>
+         <ProcessingDialog open={processing} message={processingMessage} />
          <br />
          <div
             style={{ marginBottom: '8px', display: 'inline-flex', alignItems: 'center', gap: 8 }}

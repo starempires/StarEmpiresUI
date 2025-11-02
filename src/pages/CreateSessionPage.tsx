@@ -12,9 +12,7 @@ import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import CircularProgress from '@mui/material/CircularProgress';
+import ProcessingDialog from '../components/common/ProcessingDialog';
 import { useNavigate } from 'react-router-dom';
 import { createSession } from '../components/common/SessionAPI';
 
@@ -211,14 +209,7 @@ const handleSubmit = async () => {
 
   return (
     <React.Fragment>
-          <Dialog open={processing}>
-              <DialogTitle>
-                Creating Session...
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-                   <CircularProgress />
-                </div>
-              </DialogTitle>
-           </Dialog>
+     <ProcessingDialog open={processing} message="Creating Session..." />
      <Box className="p-6">
       <Typography variant="h6" gutterBottom>
         Welcome, {userAttributes?.preferred_username}.

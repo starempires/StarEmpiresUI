@@ -6,6 +6,7 @@ import type { SessionEmpires } from '../components/common/Interfaces';
 import { addEmpire } from '../components/common/SessionAPI';
 import { registerEmpire } from '../components/common/ClientFunctions';
 import { useNavigate } from 'react-router-dom';
+import ProcessingDialog from '../components/common/ProcessingDialog';
 
 export default function SessionWaitingTableRow({ playerName, session }: { playerName: string, session: SessionEmpires }) {
     const [processing, setProcessing] = useState<boolean>(false);
@@ -65,6 +66,7 @@ export default function SessionWaitingTableRow({ playerName, session }: { player
 
     return (
      <React.Fragment>
+         <ProcessingDialog open={processing} message="Joining Session ..." />
          <TableRow key={`${session.sessionName}`}>
            <TableCell>
             <strong>{session.sessionName}</strong> ({session.numPlayers} players)
