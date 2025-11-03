@@ -169,10 +169,11 @@ export async function addEmpire(
   empireName: string,
   abbreviation: string,
   homeworld: string,
-  starbase: string
+  starbase: string,
+  empireType: string
 ): Promise<string> {
     try {
-       const payload = { sessionName, empireName, abbreviation, homeworld, starbase };
+       const payload = { sessionName, empireName, abbreviation, homeworld, starbase, empireType };
        const response = await fetch("https://api.starempires.com/addEmpire", {
          method: "POST",
          headers: {

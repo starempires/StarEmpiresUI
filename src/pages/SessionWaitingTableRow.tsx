@@ -29,7 +29,7 @@ export default function SessionWaitingTableRow({ playerName, session }: { player
   const handleJoinSession = async () => {
      setProcessing(true);
      try {
-        const addResult = await addEmpire(session.sessionName, empireName, abbreviation, homeworldName, starbaseName );
+        const addResult = await addEmpire(session.sessionName, empireName, abbreviation, homeworldName, starbaseName, "ACTIVE");
 //         console.log("Addresult = " + JSON.stringify(addResult));
         try {
             const parsedResult = JSON.parse(addResult);

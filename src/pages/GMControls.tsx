@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import ProcessingDialog from '../components/common/ProcessingDialog';
 import type { Schema } from '../../amplify/data/resource';
 import type { SessionEmpires } from '../components/common/Interfaces';
-import { updateTurn, generateSnapshots } from '../components/common/SessionAPI';
+import { updateTurn, generateSnapshots, startSession } from '../components/common/SessionAPI';
 import { getCurrentTurnNumber, updateSessionStatus, updateSessionTurnNumber } from '../components/common/ClientFunctions';
+import { useNavigate } from 'react-router-dom';
 
 const sessionStatuses = [
   'ABANDONED',
@@ -28,6 +29,8 @@ export default function GMControls({
     const [selectedStatus, setSelectedStatus] = useState<SessionStatus>(session.status as SessionStatus);
     const [processing, setProcessing] = useState<boolean>(false);
     const [processingMessage, setProcessingMessage] = useState<string>("");
+
+    const navigate = useNavigate();
 
 
     async function handleStatusChange(sessionId: string, status: SessionStatus) {
@@ -107,16 +110,18 @@ export default function GMControls({
        }
      }
 
-     async function handleStartSession(sessionId: string) {
-       console.log("Starting session:", sessionId);
+     async function handleStartSession(session: SessionEmpires) {
        setProcessing(true);
        setProcessingMessage("Starting Session ...");
        try {
-//          const apiData = await generateSnapshots(session.sessionName, currentTurn);
-//          const json = JSON.parse(apiData);
-//          console.log(JSON.stringify(json));
+          const apiData = await startSession(session.sessionName);
+          const json = JSON.parse(apiData);
+          console.log(JSON.stringify(json));
+           // set status to In Progress
+          await updateSessionStatus(session.sessionId, "IN_PROGRESS");
+          navigate('/');
        } catch (error) {
-         console.error("Failed to generate snapshots:", error);
+         console.error("Failed to start session:", error);
        } finally {
          setProcessing(false);
        }
@@ -155,7 +160,7 @@ export default function GMControls({
          <div style={{ marginTop: '8px', display: 'inline-flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
             {session.status === 'WAITING_FOR_PLAYERS' ? (
               <React.Fragment>
-                 <button onClick={() => handleStartSession(session.sessionId)} disabled={processing || numMissingPlayers > 0} style={{ backgroundColor: 'lightgreen' }} >
+                 <button onClick={() => handleStartSession(session)} disabled={processing || numMissingPlayers > 0} style={{ backgroundColor: 'lightgreen' }} >
                     Start Session
                  </button>
               </React.Fragment>

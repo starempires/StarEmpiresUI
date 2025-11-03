@@ -14,6 +14,7 @@ import SessionTableRow from './SessionTableRow';
 import SessionWaitingTableRow from './SessionWaitingTableRow';
 import type { Empire, SessionEmpires } from '../components/common/Interfaces';
 import { getSession, getEmpiresForPlayer, getEmpiresForSession, getWaitingForPlayerSessions } from '../components/common/ClientFunctions';
+import { useLocation } from 'react-router-dom';
 
 interface HomePageProps {
   user: any;
@@ -23,6 +24,8 @@ interface HomePageProps {
 export default function HomePage({ user, userAttributes }: HomePageProps) {
   const [sessionEmpires, setSessionEmpires] = useState<SessionEmpires[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const location = useLocation();
 
   useEffect(() => {
     const loadSessionEmpires = async () => {
@@ -40,10 +43,10 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
 
         // find empires where this player is the GM
         const gmEmpires = playerEmpires.filter((empire: Empire) => empire.empireType === "GM");
-//         console.log("gmEmpries = " + JSON.stringify(gmEmpires));
+//         console.log("gmEmpires = " + JSON.stringify(gmEmpires));
         // find empires where this player is not the GM
         const nonGMEmpires = playerEmpires.filter((empire: Empire) => empire.empireType !== "GM");
-//         console.log("nongmEmpries = " + JSON.stringify(nonGMEmpires));
+//         console.log("nongmEmpires = " + JSON.stringify(nonGMEmpires));
 
 
         // load other empires for sessions where this player is the GM
@@ -138,7 +141,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
     if (user?.userId) {
        loadSessionEmpires();
     }
-  }, [user, userAttributes]);
+  }, [user, userAttributes, location.key]);
 
   if (loading) {
       return <Typography variant="h6" sx={{ ml: 5 }}>Loading...</Typography>;

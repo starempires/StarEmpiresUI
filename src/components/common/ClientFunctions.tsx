@@ -148,8 +148,7 @@ export async function getSession(name: string): Promise<any> {
       filter: { name: { eq: name } },
     });
     return result.data || [];
-  }
-
+}
 
 export async function getWaitingForPlayerSessions(): Promise<any> {
     const result = await client.models.Session.list({
