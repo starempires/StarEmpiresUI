@@ -10,6 +10,7 @@ export default function Hex({x, y, color}: {x: number; y: number; color: string}
             sides={6}
             radius={Constants.RADIUS}
             rotation={30}
+            listening={true}
             fill={color}
         />
     );

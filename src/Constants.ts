@@ -86,7 +86,8 @@ export function getXCount(column: number): number {
   }
 }
 
-// Given a radius, oblique, and y coordinate, computes the corresponding x and y positions.
+// Given a radius, oblique, and y coordinate, computes the corresponding x and y positions
+// for the "top-middle" of the hex
 // Returns a tuple with both values rounded to the nearest integers.
 export function coordsToPosition(radius: number, oblique: number, y: number): [number, number] {
   const cols: number = 2 * radius + 1;

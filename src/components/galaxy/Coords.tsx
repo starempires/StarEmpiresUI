@@ -21,6 +21,7 @@ export default function Coords({x, y, text, color} : {x: number; y: number; text
                    stroke={color}
                    fill={color}
                    align="center"
+                   listening={false}
                    strokeWidth={0.3}
                    text={text} fontSize={Constants.COORDS_FONT_SIZE} fontFamily={Constants.COORDS_FONT_FAMILY}
              />
