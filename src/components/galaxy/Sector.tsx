@@ -64,7 +64,7 @@ export default function Sector(props: SectorProps) {
       let borderType: BorderType = Constants.BORDER_TYPE.Regular;
       if (sectorData.storms) {
           borderType = Constants.BORDER_TYPE.Nebula;
-          if (sectorData.storms.find((storm: any) => storm.rating > 0)) {
+          if (sectorData.storms.find((storm: any) => storm.intensity > 0)) {
               borderType = Constants.BORDER_TYPE.Storm;
           }
       }

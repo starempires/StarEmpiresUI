@@ -35,7 +35,7 @@ interface SessionPropertyDef {
 
 const SESSION_PROPERTIES: Record<string, SessionPropertyDef> = {
   radius: { key: 'radius', name: 'Galaxy Radius', min: 2, max: 10, defaultValue: 5 },
-  maxStormRating: { key: 'maxStormRating', name: 'Max Storm Rating', min: 0, max: 5, defaultValue: 3 },
+  maxStormIntensity: { key: 'maxStormIntensity', name: 'Max Storm Intensity', min: 0, max: 10, defaultValue: 5 },
   numWormnets: { key: 'numWormnets', name: 'Number of Wormnets', min: 0, max: 3, defaultValue: 1 },
   maxWormnetPortals: { key: 'maxWormnetPortals', name: 'Max Wormnet Portals', min: 2, max: 5, defaultValue: 3 },
   worldDensity: { key: 'worldDensity', name: 'World Density', min: 1, max: 10, defaultValue: 5 },

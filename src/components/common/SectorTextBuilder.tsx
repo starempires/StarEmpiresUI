@@ -52,7 +52,7 @@ const buildCoordsText = (sectorData: any): string =>
         if (sectorData.storms) {
             if (sectorData.status !== Constants.SCAN_STATUS_TYPE.Unknown) {
                 sectorData.storms.forEach((storm: any) => {
-                    text += "\n" + storm.name + " (" + (storm.rating > 0 ? ("intensity " + storm.rating + " ion storm") : "nebula") + ")";
+                    text += "\n" + storm.name + " (" + (storm.intensity > 0 ? ("intensity " + storm.intensity + " ion storm") : "nebula") + ")";
                 });
             }
         }
@@ -68,13 +68,13 @@ const buildCoordsText = (sectorData: any): string =>
                 if (numStorms > 1) {
                     let intensity = 0;
                     sectorData.storms.forEach((storm: any) => {
-                        intensity += storm.rating;
+                        intensity += storm.intensity;
                     });
                     text += "\n" + numStorms + " storms (total intensity " + intensity + ")";
                 }
                 else {
                     const storm = sectorData.storms[0];
-                    text += "\n" + storm.name + " (" + (storm.rating > 0 ? ("intensity " + storm.rating + " ion storm") : "nebula") + ")";
+                    text += "\n" + storm.name + " (" + (storm.intensity > 0 ? ("intensity " + storm.intensity + " ion storm") : "nebula") + ")";
                 }
             }
         }
