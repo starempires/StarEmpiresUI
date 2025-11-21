@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { fetchUserAttributes } from '@aws-amplify/auth';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { fetchUserAttributes, fetchAuthSession } from 'aws-amplify/auth';
 import HomePage from './pages/HomePage';
 import MapPage from './pages/MapPage';
 import MessagesPage from './pages/MessagesPage';
