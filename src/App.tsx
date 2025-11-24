@@ -8,8 +8,10 @@ import ShipDesignPage from './pages/ShipDesignPage';
 import NewsPage from './pages/NewsPage';
 import ShipClassesPage from './pages/ShipClassesPage';
 import CreateSessionPage from './pages/CreateSessionPage';
+import UnauthorizedPage from './pages/UnauthorizedPage';
 import NavBanner from './components/common/NavBanner';
 import { SnapshotContext } from './components/common/SnapshotContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { ensurePlayerExists } from '../amplify/players';
 
 export default function App({user, signOut}: {user: any; signOut: () => void;}) {
@@ -41,13 +43,49 @@ export default function App({user, signOut}: {user: any; signOut: () => void;}) 
        <BrowserRouter>
           <NavBanner signOut={signOut} userAttributes={userAttributes} userGroups={userGroups} />
           <Routes>
-            <Route path="/" element={<HomePage user={user} userAttributes={userAttributes} />} />
-            <Route path="/session/:sessionName/:empireName/:turnNumber" element={<MapPage/>} />
-            <Route path="/news/:sessionName/:empireName/:turnNumber" element={<NewsPage />} />
-            <Route path="/messages/:sessionName/:empireName" element={<MessagesPage />} />
-            <Route path="/ship-design/" element={<ShipDesignPage />} />
-            <Route path="/ship-classes/:sessionName/:empireName/:turnNumber" element={<ShipClassesPage />} />
-            <Route path="/create-session/" element={<CreateSessionPage userAttributes={userAttributes} userGroups={userGroups} />} />
+            {/* HomePage - Authentication only (session view) */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <HomePage user={user} userAttributes={userAttributes} />
+              </ProtectedRoute>
+            } />
+            
+            {/* Empire-specific routes - Require empire access */}
+            <Route path="/session/:sessionName/:empireName/:turnNumber" element={
+              <ProtectedRoute requiresEmpireAccess={true}>
+                <MapPage/>
+              </ProtectedRoute>
+            } />
+            <Route path="/news/:sessionName/:empireName/:turnNumber" element={
+              <ProtectedRoute requiresEmpireAccess={true}>
+                <NewsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/messages/:sessionName/:empireName" element={
+              <ProtectedRoute requiresEmpireAccess={true}>
+                <MessagesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/ship-classes/:sessionName/:empireName/:turnNumber" element={
+              <ProtectedRoute requiresEmpireAccess={true}>
+                <ShipClassesPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Static routes - Authentication only, no empire access required */}
+            <Route path="/ship-design/" element={
+              <ProtectedRoute staticPage={true}>
+                <ShipDesignPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/create-session/" element={
+              <ProtectedRoute staticPage={true}>
+                <CreateSessionPage userAttributes={userAttributes} userGroups={userGroups} />
+              </ProtectedRoute>
+            } />
+            
+            {/* Unauthorized page - No protection needed */}
+            <Route path="/unauthorized" element={<UnauthorizedPage />} />
           </Routes>
         </BrowserRouter>
        </SnapshotContext.Provider>

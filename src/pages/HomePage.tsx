@@ -30,74 +30,81 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
   useEffect(() => {
     const loadSessionEmpires = async () => {
       try {
-          // get all empires for player
-          // separate them into GM and non-GM empires
-          // for GM empires, fetch all empires in that session
-          // fetch all unique sessions
-          // join session w/empire data
         if (!userAttributes) {
             return {};
         }
 
-        const playerEmpires = await getEmpiresForPlayer(userAttributes?.preferred_username);
+        const currentUsername = userAttributes?.preferred_username;
 
-        // find empires where this player is the GM
+        // Get all empires for this player
+        const playerEmpires = await getEmpiresForPlayer(currentUsername);
+
+        // Separate GM and non-GM empires
         const gmEmpires = playerEmpires.filter((empire: Empire) => empire.empireType === "GM");
-//         console.log("gmEmpires = " + JSON.stringify(gmEmpires));
-        // find empires where this player is not the GM
         const nonGMEmpires = playerEmpires.filter((empire: Empire) => empire.empireType !== "GM");
-//         console.log("nongmEmpires = " + JSON.stringify(nonGMEmpires));
 
-
-        // load other empires for sessions where this player is the GM
+        // For sessions where this player is GM, load all empires in those sessions
         const gmSessionNames: string[] = Array.from(new Set(gmEmpires.map((empire: Empire) => empire.sessionName)));
         const gmEmpiresPromises = gmSessionNames.map((sessionName: string) => getEmpiresForSession(sessionName));
         const results = await Promise.all(gmEmpiresPromises);
-        const gmOtherEmpires = results.flat();
-//         console.log("gmOtherEmpries = " + JSON.stringify(gmOtherEmpires));
+        const gmSessionEmpires = results.flat();
 
-        // get unique empires
-        const allPlayerEmpires = [...gmEmpires, ...nonGMEmpires, ...gmOtherEmpires];
-//         console.log("allPlayerEmpires = " + JSON.stringify(allPlayerEmpires));
+        // Combine all empires, removing duplicates
+        const allPlayerEmpires = [...gmEmpires, ...nonGMEmpires, ...gmSessionEmpires];
         const map = new Map(
             allPlayerEmpires.map(empire => [`${empire.sessionName}:${empire.name}`, empire])
-          );
+        );
         const combinedEmpires = Array.from(map.values());
-//         console.log("combined = " + JSON.stringify(combinedEmpires));
 
+        // Filter empires to only include those the player can access:
+        // 1. Empires owned by the player (playerName matches)
+        // 2. Empires in sessions where the player is GM
+        const accessibleEmpires = combinedEmpires.filter((empire: Empire) => {
+          // Player owns this empire
+          if (empire.playerName === currentUsername) {
+            return true;
+          }
+          // Player is GM for this session
+          if (gmSessionNames.includes(empire.sessionName)) {
+            return true;
+          }
+          return false;
+        });
 
-        // load sessions that are waiting for players
+        // Get unique session names from accessible empires
+        // Only show sessions where the player has at least one empire
+        const sessionNamesWithEmpires: string[] = Array.from(
+          new Set(accessibleEmpires.map((empire: Empire) => empire.sessionName))
+        );
+
+        // Load session data for sessions where player has empires
+        const sessionPromises = sessionNamesWithEmpires.map((sessionName: string) => getSession(sessionName));
+        const sessionResults = await Promise.all(sessionPromises);
+        const sessions = sessionResults.flat();
+
+        // Also load sessions that are WAITING_FOR_PLAYERS (for join functionality)
         const waitingSessions = await getWaitingForPlayerSessions();
-//         console.log("waiting sessions = " + JSON.stringify(waitingSessions));
-
-//         if (playerEmpires.length == 0) {
-//             return {};
-//         }
-
-
-        // all sessions, whether GM or not
-        const allSessionNames: string[] = Array.from(new Set(combinedEmpires.map((empire: Empire) => empire.sessionName)));
-//         console.log("all session Names = " + JSON.stringify(allSessionNames));
-        const allSessionPromises = allSessionNames.map((sessionName: string) => getSession(sessionName));
-        const allSessionResults = await Promise.all(allSessionPromises);
-        const allSessions = allSessionResults.flat();
-        // add sessions that are WAITING_FOR_PLAYERS even if this player doesn't yet have an empire in them
-        const existingSessionNames = new Set(allSessions.map((s: any) => s.name));
+        const existingSessionNames = new Set(sessions.map((s: any) => s.name));
         waitingSessions.forEach((s: any) => {
            if (!existingSessionNames.has(s.name)) {
-               allSessions.push(s);
+               sessions.push(s);
            }
         });
 
-//         console.log("all sessions = " + JSON.stringify(allSessions));
-
+        // Build SessionEmpires structure with filtered empires
         const sessionEmpires: SessionEmpires[] = await Promise.all(
-          allSessions.map(async session => {
-            const empiresForThisSession = combinedEmpires.filter((empire: Empire) => empire.sessionName === session.name);
+          sessions.map(async session => {
+            // Get empires for this session that the player can access
+            const empiresForThisSession = accessibleEmpires.filter(
+              (empire: Empire) => empire.sessionName === session.name
+            );
+            
+            const currentPlayerIsGM = gmSessionNames.includes(session.name);
+
             return {
               sessionName: session.name,
               gmPlayerName: session.gmPlayerName,
-              currentPlayerIsGM: session.gmPlayerName === userAttributes?.preferred_username,
+              currentPlayerIsGM: currentPlayerIsGM,
               sessionId: session.id,
               currentTurnNumber: session.currentTurnNumber,
               numPlayers: session.numPlayers,
@@ -116,19 +123,19 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
           })
         );
 
-        // Sort sessions alphabetically by sessionName.
-        sessionEmpires.sort((a:SessionEmpires, b:SessionEmpires) => a.sessionName.localeCompare(b.sessionName));
+        // Sort sessions alphabetically by sessionName
+        sessionEmpires.sort((a: SessionEmpires, b: SessionEmpires) => 
+          a.sessionName.localeCompare(b.sessionName)
+        );
 
-        // For each session, sort the empires so that the GM empire is first,
-        // and the rest are sorted alphabetically by empireName.
+        // For each session, sort empires: GM first, then alphabetically
         sessionEmpires.forEach(session => {
-          session.empires.sort((a:Empire, b:Empire) => {
+          session.empires.sort((a: Empire, b: Empire) => {
             if (a.empireType === "GM" && b.empireType !== "GM") return -1;
             if (b.empireType === "GM" && a.empireType !== "GM") return 1;
             return a.name.localeCompare(b.name);
           });
         });
-//     console.log("session Empires = " + JSON.stringify(sessionEmpires));
 
         setSessionEmpires(sessionEmpires);
       } catch (error) {

@@ -163,3 +163,28 @@ export async function getEmpiresForSession(sessionName: string): Promise<any> {
     });
     return result.data || []; // for now
 }
+
+export async function getEmpire(sessionName: string, empireName: string): Promise<any> {
+    const result = await client.models.Empire.list({
+      filter: {
+        and: [
+          { sessionName: { eq: sessionName } },
+          { name: { eq: empireName } }
+        ]
+      }
+    });
+    return result.data?.[0] || null;
+}
+
+export async function getGMEmpireForPlayer(sessionName: string, playerName: string): Promise<any> {
+    const result = await client.models.Empire.list({
+      filter: {
+        and: [
+          { sessionName: { eq: sessionName } },
+          { playerName: { eq: playerName } },
+          { empireType: { eq: 'GM' } }
+        ]
+      }
+    });
+    return result.data?.[0] || null;
+}

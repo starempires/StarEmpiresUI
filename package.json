@@ -40,7 +40,10 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "start": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
   },
   "eslintConfig": {
     "extends": [
@@ -66,6 +69,7 @@
     "@aws-sdk/client-cognito-identity-provider": "^3.859.0",
     "@types/aws-lambda": "^8.10.152",
     "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/ui": "^4.0.13",
     "aws-cdk": "^2.1023.0",
     "aws-cdk-lib": "^2.209.0",
     "constructs": "^10.4.2",
@@ -73,8 +77,11 @@
     "eslint": "^9.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "fast-check": "^4.3.0",
+    "jsdom": "^27.2.0",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2",
-    "vite": "^7.0.6"
+    "vite": "^7.0.6",
+    "vitest": "^4.0.13"
   }
 }

@@ -85,7 +85,7 @@
   - If build fails, fix errors immediately before proceeding
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 4.1, 4.2, 4.3, 4.4, 4.5, 6.1, 6.2, 6.3_
 
-- [-] 7.1 Commit migration fixes to git
+- [x] 7.1 Commit migration fixes to git
   - Review all changes with `git status` and `git diff`
   - Stage changes with `git add`
   - Commit changes to main branch with clear message describing the Gen 2 migration fixes

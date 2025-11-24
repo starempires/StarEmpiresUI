@@ -21,4 +21,9 @@ export default defineConfig({
       '@': '/src', // Optional alias
     },
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './tests/setupTests.js',
+  },
 });
