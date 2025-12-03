@@ -23,9 +23,9 @@ const schema = a.schema({
       status: a.enum([
         'ABANDONED',
         'ARCHIVED',
-        'CREATED',
         'GAME_OVER',
         'IN_PROGRESS',
+        'READY_TO_START',
         'REPLACEMENT_NEEDED',
         'TEMPORARILY_CLOSED',
         'UPDATE_BEING_RUN',

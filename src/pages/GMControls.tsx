@@ -9,9 +9,9 @@ import { useNavigate } from 'react-router-dom';
 const sessionStatuses = [
   'ABANDONED',
   'ARCHIVED',
-  'CREATED',
   'GAME_OVER',
   'IN_PROGRESS',
+  'READY_TO_START',
   'REPLACEMENT_NEEDED',
   'TEMPORARILY_CLOSED',
   'UPDATE_BEING_RUN',
@@ -158,14 +158,17 @@ export default function GMControls({
          </div>
          <br />
          <div style={{ marginTop: '8px', display: 'inline-flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-start' }}>
-            {session.status === 'WAITING_FOR_PLAYERS' ? (
+            {session.status === 'WAITING_FOR_PLAYERS' && (
               <React.Fragment>
                  <button onClick={() => handleStartSession(session)} disabled={processing || numMissingPlayers > 0} style={{ backgroundColor: 'lightgreen' }} >
                     Start Session
                  </button>
+                {numMissingPlayers == 0 && <button onClick={() => handleGenerateSnapshots(session.sessionId)} disabled={processing} style={{ backgroundColor: 'lightblue' }} >
+                   Generate Snapshots
+                </button>}
               </React.Fragment>
-            ) :
-            (
+            )}
+            {session.status === 'IN_PROGRESS' && (
               <React.Fragment>
                 <button onClick={() => handleUpdateTurn(session.sessionId)} disabled={processing} style={{ backgroundColor: 'lightblue' }} >
                    Update Turn

@@ -27,8 +27,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
 
   const location = useLocation();
 
-  useEffect(() => {
-    const loadSessionEmpires = async () => {
+  const loadSessionEmpires = async () => {
       try {
         if (!userAttributes) {
             return {};
@@ -145,6 +144,7 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
       }
     };
 
+  useEffect(() => {
     if (user?.userId) {
        loadSessionEmpires();
     }
@@ -182,9 +182,17 @@ export default function HomePage({ user, userAttributes }: HomePageProps) {
                    && !session.currentPlayerIsGM
                    && !session.empires.some(e => e.playerName === userAttributes?.preferred_username)
                  ) ? (
-                   <SessionWaitingTableRow playerName={userAttributes?.preferred_username} session={session} />
+                   <SessionWaitingTableRow 
+                     playerName={userAttributes?.preferred_username} 
+                     session={session}
+                     onSessionUpdate={loadSessionEmpires}
+                   />
                  ) : (
-                   <SessionTableRow session={session} />
+                   <SessionTableRow 
+                     session={session} 
+                     playerName={userAttributes?.preferred_username}
+                     onSessionUpdate={loadSessionEmpires}
+                   />
                  )}
                  <TableRow>
                    <TableCell colSpan={6} sx={{ borderBottom: 3, borderColor: 'divider', p: 0 }} />

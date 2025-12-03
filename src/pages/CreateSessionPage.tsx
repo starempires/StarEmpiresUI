@@ -62,46 +62,7 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
       return sessionName.trim();
   }, [sessionName]);
 
-
-//async function createSessionTBD(): {
-//    // 1) Create the Session
-//    const empireData = assembleEmpireData();
-//    const overrideProperties: Record<string, string> =
-//      Object.fromEntries(Object.entries(configValues).map(([k, v]) => [k, String(v)]));
-////     console.log('createSession payload (UI):', JSON.stringify({ sessionName, empireData, overrideProperties }));
-//    const createResult = await createSession(sessionName, empireData, overrideProperties);
-////     console.log("createSession result " + JSON.stringify(createResult));
-//
-//    try {
-//       const parsedResult = JSON.parse(createResult);
-//       if (!parsedResult || parsedResult.data !== "OK") {
-//         const msg = parsedResult?.message || "(no message)";
-//         throw new Error("Error creating session: " + msg);
-//       }
-//    } catch {
-//      throw new Error("createSession returned non-JSON response: " + createResult);
-//    }
-//
-//    // 2) Create one Empire per player row
-//    await Promise.all(
-//      rows.map(async (row) => {
-//        const empireResult = await registerEmpire(row.empireName, row.playerName, sessionName, 'ACTIVE');
-//
-//        if (empireResult && Array.isArray((empireResult as any).errors) && (empireResult as any).errors.length > 0) {
-//            console.error('Empire create errors:', (empireResult as any).errors);
-//            const message = (empireResult as any).errors
-//              .map((e: any) => e?.message || JSON.stringify(e))
-//              .join('; ');
-//            throw new Error(message || 'Unknown error creating empire');
-//        }
-//
-//         console.log('Empire created:', empireResult);
-//      })
-//    );
-// }
-
-
-const handleSubmit = async () => {
+  const handleSubmit = async () => {
    setProcessing(true);
 
    try {
