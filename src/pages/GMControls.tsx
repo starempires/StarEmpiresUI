@@ -42,6 +42,7 @@ export default function GMControls({
              await updateSessionStatus(sessionId, status);
     //          console.log("Status successfully updated.");
              setSelectedStatus(status);
+             navigate('/');
          } catch (error) {
     //          console.error("Failed to update status:", error);
          } finally {
@@ -58,13 +59,21 @@ export default function GMControls({
          // fetch current turn
          const currentTurn = await getCurrentTurnNumber(sessionId);
          // update turn info
-         const apiData = await updateTurn(session.sessionName, currentTurn);
-         const json = JSON.parse(apiData);
-         console.log(JSON.stringify(json));
+         let apiData = await updateTurn(session.sessionName, currentTurn);
+         let json = JSON.parse(apiData);
+         setProcessingMessage(json.message || "Turn updated");
+        //  console.log(JSON.stringify(json));
+         setProcessingMessage("Generating Snapshots...");
+         const subsequentTurn = currentTurn + 1;
+         apiData = await generateSnapshots(session.sessionName, subsequentTurn);
+         json = JSON.parse(apiData);
+         setProcessingMessage(json.message || "Snapshots generated");
+//          json = JSON.parse(apiData);
+//          console.log(JSON.stringify(json));
          // update turn number
-         await updateSessionTurnNumber(sessionId, currentTurn + 1);
-         onTurnNumberChange(currentTurn + 1);
- //         console.log("Turn successfully updated to turn number " + (currentTurn + 1));
+         await updateSessionTurnNumber(sessionId, subsequentTurn);
+         onTurnNumberChange(subsequentTurn);
+ //         console.log("Turn successfully updated to turn number " + subsequentTurn);
        } catch (error) {
          console.error("Failed to update turn:", error);
        } finally {
@@ -83,6 +92,7 @@ export default function GMControls({
              await updateSessionTurnNumber(sessionId, currentTurn - 1);
  //             console.log("Turn successfully rolled back.");
              onTurnNumberChange(currentTurn - 1);
+             navigate('/');
          }
        } catch (error) {
          console.error("Failed to update turn:", error);
@@ -92,7 +102,7 @@ export default function GMControls({
      }
 
      async function handleGenerateSnapshots(sessionId: string) {
-       console.log("Generate Snapshots for session:", sessionId);
+       //console.log("Generate Snapshots for session:", sessionId);
        setProcessing(true);
        setProcessingMessage("Generating Snapshots ...");
 
@@ -116,7 +126,8 @@ export default function GMControls({
        try {
           const apiData = await startSession(session.sessionName);
           const json = JSON.parse(apiData);
-          console.log(JSON.stringify(json));
+          setProcessingMessage(json.message || "Session")
+          // console.log(JSON.stringify(json));
            // set status to In Progress
           await updateSessionStatus(session.sessionId, "IN_PROGRESS");
           navigate('/');
