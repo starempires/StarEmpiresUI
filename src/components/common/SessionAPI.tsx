@@ -58,18 +58,26 @@ export async function loadOrdersStatus(sessionName: string, empireName: string, 
     return "UNKNOWN";
 }
 
-export async function updateTurn(sessionName: string, turnNumber: number): Promise<string> {
+export async function updateTurn(sessionName: string, turnNumber: number, processAdminOnly?: boolean): Promise<string> {
     try {
+       // Construct payload conditionally including processAdminOnly when true
+       const payload: { sessionName: string; turnNumber: number; processAdminOnly?: boolean } = {
+         sessionName,
+         turnNumber,
+       };
+       
+       // Only include processAdminOnly in payload when explicitly set to true
+       if (processAdminOnly === true) {
+         payload.processAdminOnly = true;
+       }
+       
        const response = await fetch("https://api.starempires.com/updateTurn", {
          method: "POST",
          headers: {
            "Authorization": "Bearer REAL_JWT_TOKEN", // Replace with your token logic
            "Content-Type": "application/json",
          },
-         body: JSON.stringify({
-           sessionName,
-           turnNumber,
-         }),
+         body: JSON.stringify(payload),
        });
        if (response.status===404) {
           return "";

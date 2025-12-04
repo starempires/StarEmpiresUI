@@ -138,6 +138,33 @@ export default function GMControls({
        }
      }
 
+     async function handleProcessAdminOrders(sessionId: string) {
+       setProcessing(true);
+       setProcessingMessage("Processing Admin Orders...");
+
+       try {
+         // Get current turn number
+         const currentTurn = await getCurrentTurnNumber(sessionId);
+         
+         // Call updateTurn with processAdminOnly flag set to true
+         let apiData = await updateTurn(session.sessionName, currentTurn, true);
+         let json = JSON.parse(apiData);
+         setProcessingMessage(json.message || "Admin orders processed");
+         
+         // Update processing message to indicate snapshot generation
+         setProcessingMessage("Generating Snapshots...");
+         
+         // Call generateSnapshots to refresh snapshots
+         apiData = await generateSnapshots(session.sessionName, currentTurn);
+         json = JSON.parse(apiData);
+         setProcessingMessage(json.message || "Snapshots generated");
+       } catch (error) {
+         console.error("Failed to process admin orders:", error);
+       } finally {
+         setProcessing(false);
+       }
+     }
+
     const numMissingPlayers = session.numPlayers - session.empires.length + 1;
 
     return (
@@ -177,6 +204,16 @@ export default function GMControls({
                 {numMissingPlayers == 0 && <button onClick={() => handleGenerateSnapshots(session.sessionId)} disabled={processing} style={{ backgroundColor: 'lightblue' }} >
                    Generate Snapshots
                 </button>}
+              </React.Fragment>
+            )}
+            {session.status === 'READY_TO_START' && (
+              <React.Fragment>
+                <button onClick={() => handleProcessAdminOrders(session.sessionId)} disabled={processing} style={{ backgroundColor: 'lightblue' }} >
+                   Process Admin Orders
+                </button>
+                <button onClick={() => handleGenerateSnapshots(session.sessionId)} disabled={processing} style={{ backgroundColor: 'lightblue' }} >
+                   Generate Snapshots
+                </button>
               </React.Fragment>
             )}
             {session.status === 'IN_PROGRESS' && (
