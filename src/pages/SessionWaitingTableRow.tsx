@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { TableRow, TableCell, TextField, Typography, Box, Alert } from '@mui/material';
+import { TableRow, TableCell, Typography, Box, Alert } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import type { SessionEmpires } from '../components/common/Interfaces';
@@ -7,6 +7,8 @@ import { addEmpire } from '../components/common/SessionAPI';
 import { registerEmpire, attemptAutoStart } from '../components/common/ClientFunctions';
 import { useNavigate } from 'react-router-dom';
 import ProcessingDialog from '../components/common/ProcessingDialog';
+import AlphanumericTextField from '../components/common/AlphanumericTextField';
+import { NAME_MAX_LENGTHS } from '../components/common/ValidationUtils';
 
 export default function SessionWaitingTableRow({ playerName, session, onSessionUpdate }: { 
     playerName: string, 
@@ -115,20 +117,7 @@ export default function SessionWaitingTableRow({ playerName, session, onSessionU
      }
    };
 
-    const handleItemChange = (field: 'empireName' | 'homeworldName' | 'starbaseName', value: string) => {
-        const sanitized = value.replace(/\s+/g, '_').trim();
-        switch (field) {
-          case 'empireName':
-            setEmpireName(sanitized);
-            break;
-          case 'homeworldName':
-            setHomeworldName(sanitized);
-            break;
-          case 'starbaseName':
-            setStarbaseName(sanitized);
-            break;
-        }
-    };
+
 
     return (
      <React.Fragment>
@@ -160,15 +149,16 @@ export default function SessionWaitingTableRow({ playerName, session, onSessionU
                          <Paper variant="outlined" sx={{ p: 1 }}>
                            <Grid container spacing={1} alignItems="flex-start">
                              <Grid size={{xs:12, md:2}}>
-                               <TextField
+                               <AlphanumericTextField
                                  fullWidth
                                  required
                                  label="Empire Name"
                                  value={empireName}
-                                 onChange={(e) => handleItemChange('empireName', e.target.value)}
+                                 onChange={setEmpireName}
                                  size="small"
                                  margin="dense"
                                  sx={{ maxWidth: 200 }}
+                                 maxLength={NAME_MAX_LENGTHS.EMPIRE_NAME}
                                />
                                <Box sx={{ mt: 0 }}>
                                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
@@ -177,27 +167,29 @@ export default function SessionWaitingTableRow({ playerName, session, onSessionU
                                </Box>
                              </Grid>
                              <Grid size={{xs:12, md:2}}>
-                               <TextField
+                               <AlphanumericTextField
                                  fullWidth
                                  required
                                  label="Homeworld Name"
                                  value={homeworldName}
-                                 onChange={(e) => handleItemChange('homeworldName', e.target.value)}
+                                 onChange={setHomeworldName}
                                  size="small"
                                  margin="dense"
                                  sx={{ maxWidth: 200 }}
+                                 maxLength={NAME_MAX_LENGTHS.HOMEWORLD_NAME}
                                />
                              </Grid>
                              <Grid size={{xs:12, md:2}}>
-                               <TextField
+                               <AlphanumericTextField
                                  fullWidth
                                  required
                                  label="Starbase Name"
                                  value={starbaseName}
-                                 onChange={(e) => handleItemChange('starbaseName', e.target.value)}
+                                 onChange={setStarbaseName}
                                  size="small"
                                  margin="dense"
                                  sx={{ maxWidth: 200 }}
+                                 maxLength={NAME_MAX_LENGTHS.STARBASE_NAME}
                                />
                              </Grid>
                            </Grid>

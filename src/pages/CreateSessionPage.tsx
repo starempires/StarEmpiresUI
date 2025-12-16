@@ -11,6 +11,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import ProcessingDialog from '../components/common/ProcessingDialog';
+import AlphanumericTextField from '../components/common/AlphanumericTextField';
 import { useNavigate } from 'react-router-dom';
 import { createSession } from '../components/common/SessionAPI';
 import { checkSessionExists, registerEmpire, registerSession } from '../components/common/ClientFunctions';
@@ -22,7 +23,7 @@ interface GMControlsPageProps {
   userGroups: any;
 }
 
-const toUnderscore = (s: string) => (s ?? '').replace(/\s+/g, '_');
+
 
 // Centralized session property definitions
 interface SessionPropertyDef {
@@ -133,14 +134,15 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
       <Paper sx={{ p: 3 }}>
         <Grid container spacing={2} alignItems="center">
           <Grid size={{xs:'auto'}}>
-            <TextField
+            <AlphanumericTextField
               required
               label="Session Name"
               value={sessionName}
-              onChange={(e) => setSessionName(toUnderscore(e.target.value))}
+              onChange={setSessionName}
               size="small"
               margin="dense"
               sx={{ width: 280 }}
+              maxLength={50}
             />
           </Grid>
           <Grid size={{xs:'auto'}}>
