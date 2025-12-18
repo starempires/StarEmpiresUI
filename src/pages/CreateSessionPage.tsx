@@ -6,6 +6,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 import Paper from '@mui/material/Paper';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
@@ -23,10 +25,8 @@ interface GMControlsPageProps {
   userGroups: any;
 }
 
-
-
 // Centralized session property definitions
-interface SessionPropertyDef {
+interface IntSessionPropertyDef {
   key: string;
   name: string;
   min: number;
@@ -34,7 +34,13 @@ interface SessionPropertyDef {
   defaultValue: number;
 }
 
-const SESSION_PROPERTIES: Record<string, SessionPropertyDef> = {
+interface BooleanSessionPropertyDef {
+  key: string;
+  name: string;
+  defaultValue: boolean;
+}
+
+const INT_SESSION_PROPERTIES: Record<string, IntSessionPropertyDef> = {
   radius: { key: 'radius', name: 'Galaxy Radius', min: 2, max: 10, defaultValue: 5 },
   maxStormIntensity: { key: 'maxStormIntensity', name: 'Max Storm Intensity', min: 0, max: 10, defaultValue: 5 },
   numWormnets: { key: 'numWormnets', name: 'Number of Wormnets', min: 0, max: 3, defaultValue: 1 },
@@ -44,7 +50,16 @@ const SESSION_PROPERTIES: Record<string, SessionPropertyDef> = {
   nebulaDensity: { key: 'nebulaDensity', name: 'Nebula Density', min: 1, max: 10, defaultValue: 5 },
 };
 
-const SESSION_PROPERTIES_LIST: SessionPropertyDef[] = Object.values(SESSION_PROPERTIES);
+const BOOLEAN_SESSION_PROPERTIES: Record<string, BooleanSessionPropertyDef> = {
+  localizeFramesOfReference: {
+    key: 'localizeFramesOfReference',
+    name: 'Localize Frames of Reference',
+    defaultValue: true,
+  },
+};
+
+const INT_SESSION_PROPERTIES_LIST: IntSessionPropertyDef[] = Object.values(INT_SESSION_PROPERTIES);
+const BOOLEAN_SESSION_PROPERTIES_LIST: BooleanSessionPropertyDef[] = Object.values(BOOLEAN_SESSION_PROPERTIES);
 const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
 
 // const makeRange = (min: number, max: number) =>
@@ -55,7 +70,10 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
   const [numPlayers, setNumPlayers] = useState<number>(6);
   const [processing, setProcessing] = useState<boolean>(false);
   const [configValues, setConfigValues] = useState<Record<string, number>>(
-    () => Object.fromEntries(SESSION_PROPERTIES_LIST.map(def => [def.key, def.defaultValue]))
+    () => Object.fromEntries(INT_SESSION_PROPERTIES_LIST.map(def => [def.key, def.defaultValue]))
+  );
+  const [booleanConfigValues, setBooleanConfigValues] = useState<Record<string, boolean>>(
+    () => Object.fromEntries(BOOLEAN_SESSION_PROPERTIES_LIST.map(def => [def.key, def.defaultValue]))
   );
   const navigate = useNavigate();
 
@@ -82,8 +100,16 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
           throw new Error(message || 'Unknown error creating session');
       }
 
-      const overrideProperties: Record<string, string> =
+      const intOverrideProperties: Record<string, string> =
         Object.fromEntries(Object.entries(configValues).map(([k, v]) => [k, String(v)]));
+      
+      const booleanOverrideProperties: Record<string, string> =
+        Object.fromEntries(Object.entries(booleanConfigValues).map(([k, v]) => [k, String(v)]));
+      
+      const overrideProperties: Record<string, string> = {
+        ...intOverrideProperties,
+        ...booleanOverrideProperties,
+      };
 //     console.log('createSession payload (UI):', JSON.stringify({ sessionName, empireData, overrideProperties }));
       const createResult = await createSession(sessionName, overrideProperties);
 //     console.log("createSession result " + JSON.stringify(createResult));
@@ -169,7 +195,7 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
         <Typography variant="h6" sx={{ mb: 1 }}>Session Parameters</Typography>
 
         <Grid container spacing={2}>
-          {SESSION_PROPERTIES_LIST.map((def) => (
+          {INT_SESSION_PROPERTIES_LIST.map((def) => (
             <Grid key={def.key} size={{ xs: 12, sm: 6, md: 2 }}>
               <Paper variant="outlined" sx={{ p: 2 }}>
                 <TextField
@@ -188,6 +214,40 @@ export default function CreateSessionPage({ userAttributes, userGroups }: GMCont
                   }}
                   inputProps={{ min: def.min, max: def.max, step: 1 }}
                   helperText={`Min ${def.min}, Max ${def.max}`}
+                />
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
+
+        {/* Boolean Session Properties */}
+        <Typography variant="h6" sx={{ mb: 1, mt: 2 }}>Boolean Properties</Typography>
+
+        <Grid container spacing={2}>
+          {BOOLEAN_SESSION_PROPERTIES_LIST.map((def) => (
+            <Grid key={def.key} size={{ xs: 12, sm: 6, md: 4 }}>
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={booleanConfigValues[def.key]}
+                      onChange={(e) => {
+                        setBooleanConfigValues(prev => ({ 
+                          ...prev, 
+                          [def.key]: e.target.checked 
+                        }));
+                      }}
+                      color="primary"
+                    />
+                  }
+                  label={def.name}
+                  labelPlacement="start"
+                  sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    margin: 0 
+                  }}
                 />
               </Paper>
             </Grid>
