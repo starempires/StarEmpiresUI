@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Group } from 'react-konva';
 import Coords from './Coords';
+import Intensity from './Intensity';
 import World from './World';
 import Portal from './Portal';
 import Border from './Border';
@@ -49,7 +50,8 @@ export default function Sector(props: SectorProps) {
       unidentifiedShips,
       worldColor,
       prohibition,
-      collapsed
+      collapsed,
+      intensity
     } = useMemo(() => {
       const [xpos, ypos] = Constants.coordsToPosition(turnData.radius, oblique, y);
       const sectorKey = Constants.getCoordinateKey(oblique, y);
@@ -62,9 +64,18 @@ export default function Sector(props: SectorProps) {
       const coordsColor = Constants.COORDS_STATUS_COLOR_MAP.get(sectorData.status) || "white";
 
       let borderType: BorderType = Constants.BORDER_TYPE.Regular;
-      if (sectorData.storms) {
+      let intensity = 0;
+      if (sectorData.storms && sectorData.storms.length > 0) {
           borderType = Constants.BORDER_TYPE.Nebula;
-          if (sectorData.storms.find((storm: any) => storm.intensity > 0)) {
+
+          // Sum all storm intensities in this sector (treat missing/undefined as 0)
+          intensity = sectorData.storms.reduce(
+            (sum: number, storm: any) => sum + (storm?.intensity ?? 0),
+            0
+          );
+
+          // If any storm has a non-zero intensity, make this a Storm border
+          if (intensity > 0) {
               borderType = Constants.BORDER_TYPE.Storm;
           }
       }
@@ -110,7 +121,8 @@ export default function Sector(props: SectorProps) {
       unidentifiedShips,
       worldColor,
       prohibition,
-      collapsed
+      collapsed,
+      intensity
     };
   }, [turnData, oblique, y]);
 
@@ -130,6 +142,7 @@ export default function Sector(props: SectorProps) {
       >
         <Hex color={scanColor} x={xpos} y={ypos} />
         <Coords x={xpos} y={ypos} text={coordsText} color={coordsColor} />
+        {intensity > 0 && <Intensity x={xpos} y={ypos} text={String(intensity)} />}
         {world && (
           <World
             x={xpos}

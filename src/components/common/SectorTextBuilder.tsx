@@ -177,41 +177,60 @@ const buildCoordsText = (sectorData: any): string =>
       return count + " " + noun + (count > 1 ? "s" : "");
   }
 
-const formatShipStats = (ship: any, turnData: any): string => {
-   let text = "";
-   const foundShipClass = turnData.shipClasses.find((shipClass:any) => shipClass.name === ship.shipClass);
-   if (foundShipClass) {
-       text += "  ";
-       if (ship.carrier != null) {
-           text += " +";
-       }
-       const racks = ship.racks || 0;
-       var usedRacks;
-       if (ship.owner === turnData.name || turnData.name === "GM") {
-           usedRacks = racks - (ship.emptyRacks ||0);
-       }
-       else {
-           usedRacks = racks == 0 ? "0" : "?";
-       }
-
-       text += ship.name + " (" + ship.shipClass + "/" + ship.hull +
-                            ", g/e/s " +
-                            (ship.opGuns ? ship.opGuns : 0) + "/" +
-                            (ship.opEngines ? ship.opEngines: 0) + "/" +
-                            (ship.opScan ? ship.opScan : 0) +
-                            ", dp " + ship.dpRemaining + "/" + foundShipClass.dp +
-                            ", OR " + Math.round(ship.opRating * 100) + "%" +
-                            ", r " + usedRacks + "/" + racks +
-                            ", t " + ship.tonnage +
-                            ")";
-   }
-   else {
-       text += "  " + ship.name + " (" + ship.shipClass +
-                            "/" + ship.hull + ", t " + ship.tonnage + ")";
-   }
-   if (ship.conditions) {
-       text += " #" + ship.conditions.join(",");
-   }
+const formatShipStats = (ship: any, scanStatus: Constants.ScanStatusType, name: string, shipClass: any): string => {
+   let text = "  ";
+   const isFullyVisible = [ship.owner, "GM"].includes(name);
+   switch (scanStatus) {
+       case Constants.SCAN_STATUS_TYPE.Visible:
+           var racks = (ship.racks || 0), usedRacks = "0";
+           if (isFullyVisible) {
+               if (racks > 0) {
+                   usedRacks = String(racks - (ship.emptyRacks || 0));
+               }
+               if (ship.carrier != null) {
+                   text += " +";
+               }
+               text += ship.name + " (" + ship.shipClass + "/" + ship.hullType +
+                       ", g/e/s " +
+                       (ship.opGuns ? ship.opGuns : 0) + "/" +
+                       (ship.opEngines ? ship.opEngines: 0) + "/" +
+                       (ship.opScan ? ship.opScan : 0) +
+                       ", dp " + ship.dpRemaining + "/" + shipClass.dp +
+                       ", OR " + Math.round(ship.opRating * 100) + "%" +
+                       ", r " + usedRacks + "/" + racks +
+                       ", t " + ship.tonnage +
+                       ")";
+           }
+           else if (shipClass) {
+               usedRacks = (racks > 0) ? "?" : "0";
+               text += ship.name + " (" + ship.shipClass + "/" + ship.hullType +
+                       ", g/e/s " +
+                       (ship.opGuns ? ship.opGuns : 0) + "/" +
+                       (ship.opEngines ? ship.opEngines: 0) + "/" +
+                       (ship.opScan ? ship.opScan : 0) +
+                       ", dp " + ship.dpRemaining + "/" + shipClass.dp +
+                       ", OR " + Math.round(ship.opRating * 100) + "%" +
+                       ", r " + usedRacks + "/" + racks +
+                       ", t " + ship.tonnage +
+                       ")";
+           } else {
+               text += ship.name + " (" + ship.shipClass + "/" + ship.hullType +
+                                   ", t " + ship.tonnage +
+                                   ")";
+           }
+           if (ship.conditions) {
+               text += " #" + ship.conditions.join(",");
+           }
+           break;
+       case Constants.SCAN_STATUS_TYPE.Scanned:
+           const hullType = shipClass ? ship.hullType : "unknown";
+           text += ship.name + " (" + ship.shipClass + "/" + hullType +
+                       ", t " + ship.tonnage +
+                       ")";
+           break;
+       default:
+           break;
+  }
    text += "\n";
    return text;
 }
@@ -255,6 +274,7 @@ const sortShips = (ships: any[]): any[] => {
 
     return result;
 };
+
 const buildShipsText = (sectorData: any, turnData: any): string => {
       let text = "";
       if (sectorData.ships) {
@@ -266,8 +286,9 @@ const buildShipsText = (sectorData: any, turnData: any): string => {
                let empireShips = sectorData.ships[e].ships;
                let sortedShips = sortShips(empireShips);
                for (const ship of sortedShips) {
-                    text += formatShipStats(ship, turnData);
-               };
+                    const shipClass = turnData.shipClasses.find((shipClass:any) => shipClass.name === ship.shipClass);
+                    text += formatShipStats(ship, sectorData.status, turnData.name, shipClass);
+               }
           });
       }
       if (sectorData.unidentifiedShipCount > 0) {

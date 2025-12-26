@@ -69,12 +69,14 @@ export default function World (props: WorldProps) {
                 <Line points={blockadePoints}
                       stroke={Constants.PROHIBITION_COLOR}
                       shadowEnabled={false}
+                      strokeWidth={4}
                       listening={false}
                 />}
           {props.prohibition === Constants.PROHIBITION_TYPE.Interdicted &&
                 <Line points={interdictionPoints}
                       stroke={Constants.PROHIBITION_COLOR}
                       shadowEnabled={false}
+                      strokeWidth={4}
                       listening={false}
                 />}
          <Text

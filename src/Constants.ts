@@ -6,7 +6,7 @@ export const RADIUS: number = 35;
 export const SHORT_SIDE: number = RADIUS / 2;
 export const LONG_SIDE: number = (SQRT_THREE * RADIUS) / 2;
 export const PROHIBITION_COLOR: string = "orange";
-export const PROHIBITION_LINE_OFFSET: number = 3;
+export const PROHIBITION_LINE_OFFSET: number = 4;
 export const COORDS_FONT_SIZE: number = 10;
 export const COORDS_FONT_FAMILY: string = "Arial Rounded";
 export const COORDS_COLOR_UNKNOWN: string = "white";
@@ -27,6 +27,7 @@ export const INFO_HOVER_FONT_FAMILY: string = "Calibri";
 export const SHIP_DOT_SIZE: number = 5;
 export const DEFAULT_DESIGN_MULTIPLIER = 0.5;
 export const DEFAULT_AUTO_REPAIR_MULTIPLIER = 0.1;
+export const INTENSITY_FONT_SIZE: number = WORLD_RADIUS;
 
 // Enums defined as constant objects with literal types
 export const SCAN_STATUS_TYPE = {
