@@ -17,12 +17,12 @@ export default function Coords({x, y, text, color} : {x: number; y: number; text
     return (
              <Text
                    x={x - textWidth/2}
-                   y={y + Constants.RADIUS - (Constants.COORDS_FONT_SIZE *1.6) }
+                   y={y + Constants.RADIUS - (Constants.COORDS_FONT_SIZE * 1.7) }
                    stroke={color}
                    fill={color}
                    align="center"
                    listening={false}
-                   strokeWidth={0.3}
+                   strokeWidth={0.4}
                    text={text} fontSize={Constants.COORDS_FONT_SIZE} fontFamily={Constants.COORDS_FONT_FAMILY}
              />
     );

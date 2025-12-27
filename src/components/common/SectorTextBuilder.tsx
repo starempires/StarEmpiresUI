@@ -152,7 +152,7 @@ const buildCoordsText = (sectorData: any): string =>
 
           switch (sectorData.status) {
               case Constants.SCAN_STATUS_TYPE.Stale:
-                   text = "\n" + world.name + ", production " +
+                   text = "\n" + world.name +
                          " [" + owner + "]" +
                          ", production " + world.production;
                    break;
@@ -163,7 +163,7 @@ const buildCoordsText = (sectorData: any): string =>
               case Constants.SCAN_STATUS_TYPE.Visible:
                    text = "\n" + world.name + " [" + owner + homeworld + "]" +
                           ", production " + world.production +
-                          (world.stockpile ? ", stockpile " + world.stockpile : "") +
+                          (world.stockpile ? "\n    stockpile " + world.stockpile : "") +
                           (world.prohibition ? ", " + world.prohibition : "");
                    break;
               default:
@@ -308,13 +308,13 @@ const buildShipsHoverText = (sectorData: any): string => {
           empiresPresent.forEach((e) => {
                 text += e + ": ";
                 text += plural(sectorData.ships[e].count, "ship") + ", " +
-                        plural(sectorData.ships[e].tonnage, " tonne") + "\n";
+                        plural(sectorData.ships[e].tonnage, "tonne") + "\n";
           });
       }
       if (sectorData.unidentifiedShipCount > 0) {
           text += "\n";
           text += plural(sectorData.unidentifiedShipCount, "unidentified ship") +
-                  ", " + plural(sectorData.unidentifiedShipTonnage, " tonne") + "\n";
+                  ", " + plural(sectorData.unidentifiedShipTonnage, "tonne") + "\n";
       }
       return text;
   }

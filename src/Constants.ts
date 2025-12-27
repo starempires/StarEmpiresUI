@@ -2,29 +2,31 @@
 
 // Basic numerical and string constants
 export const SQRT_THREE: number = Math.sqrt(3);
-export const RADIUS: number = 35;
+export const RADIUS: number = 50;
 export const SHORT_SIDE: number = RADIUS / 2;
 export const LONG_SIDE: number = (SQRT_THREE * RADIUS) / 2;
 export const PROHIBITION_COLOR: string = "orange";
 export const PROHIBITION_LINE_OFFSET: number = 4;
-export const COORDS_FONT_SIZE: number = 10;
+export const COORDS_FONT_SIZE: number = 12;
 export const COORDS_FONT_FAMILY: string = "Arial Rounded";
 export const COORDS_COLOR_UNKNOWN: string = "white";
 export const COORDS_COLOR_KNOWN: string = "black";
-export const WORLD_RADIUS: number = 15;
+export const WORLD_RADIUS: number = 20;
 export const PRODUCTION_COLOR: string = "#333333";
 export const WORLD_BORDER_COLOR: string = "black";
 export const WORLD_BORDER_DASH_PATTERN: number[] = [10, 5];
 export const UNIDENTIFIED_SHIPS_COLOR: string = "black";
 export const PORTAL_COLOR: string = "orange";
 export const CONNECTION_COLOR: string = "orange";
-export const INFO_HOVER_X_OFFSET: number = 20;
+export const INFO_HOVER_X_OFFSET: number = 10;
 export const INFO_HOVER_Y_OFFSET: number = -10;
 export const INFO_HOVER_BACKGROUND_COLOR: string = "lightgrey";
+export const INFO_HOVER_BORDER_COLOR: string = "darkgrey";
 export const INFO_HOVER_TEXT_COLOR: string = "black";
-export const INFO_HOVER_FONT_SIZE: number = 10;
+export const INFO_HOVER_FONT_SIZE: number = 12;
 export const INFO_HOVER_FONT_FAMILY: string = "Calibri";
-export const SHIP_DOT_SIZE: number = 5;
+export const INFO_HOVER_PADDING: number = 5;
+export const SHIP_DOT_SIZE: number = 6;
 export const DEFAULT_DESIGN_MULTIPLIER = 0.5;
 export const DEFAULT_AUTO_REPAIR_MULTIPLIER = 0.1;
 export const INTENSITY_FONT_SIZE: number = WORLD_RADIUS;
