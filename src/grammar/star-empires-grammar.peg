@@ -1,0 +1,252 @@
+# Star Empires Orders — PEG Grammar
+
+Start
+  <- _ cmd:Command _ !.
+
+Command
+  <- authorize:Authorize
+   / deny:Deny
+   / build:Build
+   / deploy:Deploy
+   / design:Design
+   / destruct:Destruct
+   / fire:Fire
+   / give:Give
+   / load:Load
+   / move:Move
+   / pool:Pool
+   / repair:Repair
+   / toggle:Toggle
+   / transfer:Transfer
+
+# -----------------------------
+# AUTHORIZE / DENY
+# -----------------------------
+
+Authorize
+  <- "AUTHORIZE"i __ targets:AuthTargetList __ "TO"i __ toEmpires:EmpireList
+
+Deny
+  <- "DENY"i __ targets:AuthTargetList __ "TO"i __ toEmpires:EmpireList
+
+AuthTargetList
+  <- all:AllTargets
+   / coordinates:CoordinateTargets
+   / locations:LocationTargets
+   / ships:ShipTargets
+
+AllTargets
+  <- "ALL"i
+
+CoordinateTargets
+  <- items:CoordinateList
+
+LocationTargets
+  <- items:LocationList
+
+ShipTargets
+  <- items:ShipList
+
+EmpireList
+  <- first:EmpireName rest:(__ EmpireName)*
+
+CoordinateList
+  <- first:Coordinate rest:(__ Coordinate)*
+
+LocationList
+  <- first:LocationName rest:(__ LocationName)*
+
+ShipList
+  <- first:ShipName rest:(__ ShipName)*
+
+# -----------------------------
+# BUILD
+# -----------------------------
+
+Build
+  <- "BUILD"i __ world:WorldName __ count:Count __ shipClass:ShipClassName ( __ shipNames:ShipNames )?
+
+Count
+  <- max:Max / n:Number
+
+ShipNames
+  <- auto:NameStar
+   / explicit:NameList
+
+NameStar
+  <- base:Name "*"
+
+NameList
+  <- first:Name rest:(__ Name)+
+
+# -----------------------------
+# DEPLOY / DESTRUCT
+# -----------------------------
+
+Deploy
+  <- "DEPLOY"i __ ships:ShipList
+
+Destruct
+  <- "DESTRUCT"i __ ships:ShipList
+
+# -----------------------------
+# DESIGN (positional)
+# -----------------------------
+
+Design
+  <- "DESIGN"i __ world:WorldName __ shipClass:ShipClassName __ hull:HullType __ params:DesignParams
+
+HullType
+  <- missile:MissileHullType
+   / other:OtherHullType
+
+MissileHullType
+  <- "MISSILE"i
+
+OtherHullType
+  <- !("MISSILE"i) Name
+
+DesignParams
+  <- missileParams:MissileParams
+   / generalParams:GeneralParams
+
+MissileParams
+  <- __ guns:Int __ tonnage:Int
+
+GeneralParams
+  <- __ guns:Int __ dp:Int __ engines:Int __ scan:Int __ racks:Int
+
+# -----------------------------
+# FIRE
+# -----------------------------
+
+Fire
+  <- "FIRE"i ( __ sort:SortOrder )? __ target:FireTarget ( __ except:ExceptShips )? __ "AT"i __ atEmpires:EmpireList
+
+SortOrder
+  <- asc:("asc"i) / desc:("desc"i)
+
+FireTarget
+  <- coordinate:Coordinate
+   / location:LocationName
+   / ships:ShipList
+
+ExceptShips
+  <- "EXCEPT"i __ ships:ShipList
+
+# -----------------------------
+# GIVE
+# -----------------------------
+
+Give
+  <- "GIVE"i __ shipClasses:ShipClassList __ "TO"i __ toEmpires:EmpireList
+
+ShipClassList
+  <- first:ShipClassName rest:(__ ShipClassName)*
+
+# -----------------------------
+# LOAD
+# -----------------------------
+
+Load
+  <- "LOAD"i __ ships:ShipList __ "ONTO"i __ carrier:ShipName
+
+# -----------------------------
+# MOVE
+# -----------------------------
+
+Move
+  <- "MOVE"i __ source:MoveSource ( __ except:ExceptShips )? __ "TO"i __ destination:Destination
+
+MoveSource
+  <- coordinate:Coordinate
+   / location:LocationName
+   / ships:ShipList
+
+Destination
+  <- coordinate:Coordinate
+   / location:LocationName
+
+# -----------------------------
+# POOL
+# -----------------------------
+
+Pool
+  <- "POOL"i __ world:WorldName ( __ exceptWorlds:ExceptWorlds )?
+
+ExceptWorlds
+  <- "EXCEPT"i __ worlds:WorldList
+
+WorldList
+  <- first:WorldName rest:(__ WorldName)*
+
+# -----------------------------
+# REPAIR
+# -----------------------------
+
+Repair
+  <- "REPAIR"i __ ship:ShipName __ amount:RepairAmount __ worlds:WorldList
+
+RepairAmount
+  <- dp:("dp"i) / max:Max
+
+# -----------------------------
+# TOGGLE
+# -----------------------------
+
+Toggle
+  <- "TOGGLE"i __ visibility:Visibility __ targets:ToggleTargets
+
+Visibility
+  <- private:("PRIVATE"i) / public:("PUBLIC"i)
+
+ToggleTargets
+  <- ships:ShipList
+   / shipClasses:ShipClassList
+
+# -----------------------------
+# TRANSFER
+# -----------------------------
+
+Transfer
+  <- "TRANSFER"i __ fromWorld:WorldName __ amount:TransferAmount __ toWorld:WorldName ( __ owner:EmpireName )?
+
+TransferAmount
+  <- max:Max / n:Number
+
+# -----------------------------
+# LEXICAL RULES
+# -----------------------------
+
+WorldName      <- Name
+LocationName   <- "@" Name / Name
+ShipName       <- Name
+ShipClassName  <- Name
+EmpireName     <- Name
+
+# Coordinate: (oblique,y), comma-only delimiter, optional parens
+Coordinate
+  <- "(" _ pair:ObliqueY _ ")" / pair:ObliqueY
+
+ObliqueY
+  <- oblique:Int _ "," _ y:Int
+
+# --- primitives ---
+Number
+  <- Int
+
+Max
+  <- "MAX"i
+
+Int
+  <- "-"? [0-9]+
+
+Name
+  <- Ident
+
+Ident
+  <- [A-Za-z_] [A-Za-z0-9_]*
+
+# --- whitespace ---
+_   <- [ \t\r\n]*
+__  <- [ \t\r\n]+
