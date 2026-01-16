@@ -1,7 +1,10 @@
 node_modules
 .idea
+.vscode
 
 # amplify
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+
+dist/
